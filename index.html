@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>Reintegration Core — District 01 · TTRPG Hybrid</title>
+<title>Reintegration Core — District 01 · Grappling Hook Hybrid v1.16.0</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
   *{margin:0;padding:0;box-sizing:border-box;}
@@ -33,6 +33,15 @@
   #tt-head h3{font-size:7px;color:#8ab4f8;letter-spacing:1px;margin:0;}
   #tt-toggle{font-size:6px;color:rgba(130,180,248,0.7);border:1px solid rgba(91,155,213,0.4);border-radius:3px;padding:2px 6px;}
   #ttobjective{font-size:6px;color:rgba(252,231,110,0.9);padding:5px 8px;line-height:1.45;border-bottom:1px solid rgba(91,155,213,0.15);}
+  #ttactions{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;padding:5px 8px;border-bottom:1px solid rgba(91,155,213,0.15);}
+  .ttact{font-family:'Press Start 2P',monospace;font-size:5px;line-height:1.3;color:#d9ecff;background:rgba(20,24,40,0.86);border:1px solid rgba(91,155,213,0.45);border-radius:4px;padding:6px 4px;min-height:30px;-webkit-tap-highlight-color:transparent;}
+  .ttact:active{background:rgba(91,155,213,0.28);}
+  .ttact.on{border-color:#69f0ae;color:#b8ffe9;box-shadow:0 0 6px rgba(105,240,174,0.35);}
+  #ttprocedure{display:none;padding:5px 8px;border-bottom:1px solid rgba(91,155,213,0.15);background:rgba(6,10,20,0.42);}
+  #ttpanel.expanded #ttprocedure{display:block;}
+  #ttprocedure .pcard-title{font-size:6px;color:#69f0ae;letter-spacing:.6px;margin-bottom:4px;}
+  #ttprocedure .pcard-line{font-size:5.5px;line-height:1.45;color:rgba(220,235,255,0.82);margin-bottom:3px;}
+  #ttprocedure b{color:#fce76e;font-weight:normal;}
   /* Collapsed: show only last 2-3 lines (no scroll). Expanded: full scrollable history. */
   #ttlog{padding:4px 8px;display:flex;flex-direction:column;gap:3px;}
   #ttpanel.collapsed #ttlog{max-height:none;overflow:visible;}
@@ -70,13 +79,19 @@
   <div id="ttpanel" class="collapsed">
     <div id="tt-head"><h3>INTENT LOG</h3><span id="tt-toggle">TAP TO EXPAND ▾</span></div>
     <div id="ttobjective"></div>
+    <div id="ttactions">
+      <button class="ttact" id="ttValidateBtn" type="button">VALIDATE<br>ROOM</button>
+      <button class="ttact" id="ttExportBtn" type="button">EXPORT<br>LOG</button>
+      <button class="ttact" id="ttTableModeBtn" type="button">TABLE<br>MODE OFF</button>
+    </div>
+    <div id="ttprocedure"></div>
     <div id="ttlog"></div>
   </div>
   <div id="title-screen">
     <h1>REINTEGRATION<br>CORE</h1>
-    <h2>DISTRICT 01 — TTRPG HYBRID</h2>
+    <h2>DISTRICT 01 — TTRPG HYBRID + SCROLL 1.18.0</h2>
     <p>PRESS START</p>
-    <div class="sub">DIAGNOSE. REPAIR. VALIDATE.<br>GREEN IS NOT PROOF.</div>
+    <div class="sub">DIAGNOSE. CONNECT. VALIDATE.<br>ANCHORS ARE NOT ASSUMPTIONS.</div>
   </div>
   <div id="toolbar"></div>
   <div id="touch" class="show">
@@ -101,25 +116,161 @@
   </div>
 </div>
 <script>
-// ═══ REINTEGRATION CORE — D01 — v1.14.1 + TTRPG HYBRID LAYER ═══
-// Locked engine preserved verbatim. TTRPG layer added at marked seams only.
-const COLS=32,ROWS=30,HUD_ROWS=3;
+// ═══ REINTEGRATION CORE — D01 — v1.16.1 + FIXED-ANCHOR GRAPPLING HOOK LADDER-CLEARANCE PATCH ═══
+// Locked engine preserved. TTRPG/tabletop layer plus fixed-anchor Grappling Hook added at marked seams only.
+const COLS=32,ROWS=20,HUD_ROWS=3;
+// DISPLAY_ROWS preserves the prior video output height/ratio while ROWS remains the 20-row lowered-ceiling room logic.
+// This fixes the v1.18.1 visibility drift: lower the ceiling in the map, not the player-facing video frame.
+const DISPLAY_ROWS=30;
+const SCROLLING_ROOM_BASE_WIDTH=64;
+const LOWERED_CEILING_ROWS_REMOVED=10;
+let cameraX=0;
 const NES={bg:'#0a0a1a',wall:'#3a3a4a',wallLt:'#4a4a5c',plat:'#5a5a6c',platLt:'#6a6a7e',ladder:'#b53120',ladRng:'#8a2218',door:'#d4a017',doorLt:'#fce76e',termOn:'#00c853',termOff:'#00703c',glyph:'#448aff',glyphLt:'#82b1ff',hidden:'#1a1a2e',fault:'#ff1744',faultDk:'#b71c1c',catalyst:'#aa00ff',catLt:'#d500f9',vent:'#ff6d00',ventLt:'#ff9100',heat:'#ff3d00',heatLt:'#ff6e40',conv:'#536dfe',convLt:'#8c9eff',convArr:'#c5cae9',player:'#fce76e',playerDk:'#d4a017',scout:'#e040fb',scoutSt:'#7c4dff',scoutRc:'#ff6090',hud:'#c5cae9',hudDim:'#5c6170',hudBg:'#0d0d20',white:'#e8eaf6',stab:'#69f0ae',stabLo:'#ff5252',black:'#000000',dialogBg:'#0d0d20',dialogBd:'#5b9bd5'};
 const ROOM_MAPS={
-R02:['################################','#..............................#','#..............................#','#..............................#','#..............................#','#..............................#','#..............................#','#..............................#','#........GL........L...........#','#.......__L________L_..........#','#.........L........L...........#','#.........L........L...........#','#.........L........L...........#','#.........L........L...........#','D.........L........L.....L.....D','#____L____L________L_____L_____#','#....L....L........L.....L.....#','#....L....L........L.....L.....#','#....L....L........LS.X..L.....#','#....L....L......._L_____L___..#','#....LX...L........L...........#','#..__L____L__......L...........#','#....L.............L...........#','#....L.............L...........#','#....L.............L...........#','#....L.............L...........#','D...SL........G....L...........D','#____L_____________L___________#','################################','################################'],
-R03:['################################','#..............................#','#..............................#','#..............................#','#..............................#','#..............................#','#..............................#','#..............................#','#.....S..................S.....#','#_____L__________________L_____#','#.....L..................L.....#','#.....L..................L.....#','#.....L..................L.....#','#.....L..................L.....#','D.....L........L.........L.....D','#_____L________L_________L_____#','#.....L........L.........L.....#','#.....L........L.........L.....#','#.....L........L.........L.....#','#.....L........L.........L.....#','#.....L........G.........L.....#','#_____L________L_________L_____#','#.....L........L.........L.....#','#.....L........L.........L.....#','#.....L........L.........L.....#','#.....L........L.........L.....#','D..G..L........L.........L.....D','#_____L________L_________L_____#','################################','################################'],
-R12:['################################','#..............................#','#..............................#','#..............................#','#..............................#','#..............................#','#..............................#','#..............................#','#.................G............#','#............L________L_____L__#','#............L........L.....L..#','#............L........L.....L..#','#............L........L.....L..#','#............L........L.....L..#','D.....G......L........L.....L..D','#___L________L________L_____L__#','#...L........L........L........#','#...L........L........L........#','#...L........L........L........#','#...L........L........L........#','#...L....S...L........L........#','#___L________L___.....L........#','#...L........L.................#','#...L........L.................#','#...L........L.................#','#...L........L.................#','D...L..S.....L.................D','#___L________L_________________#','################################','################################'],
-R04:['################################','#..............................#','#..............................#','#..............................#','#..............................#','#..............................#','#..............................#','#..............................#','#.....L..................L.....#','#_____L______......______L_____#','#.....L..................L.....#','#.....L..................L.....#','#.....L..................L.....#','#.....L..................L.....#','D.....L........V~........L.....D','#_____L__________________L_____#','#.....L..................L.....#','#.....L..................L.....#','#.....L..................L.....#','#.....L..................L.....#','#.....L........V~........L.....#','#_____L__________________L_____#','#.....L..................L.....#','#.....L..................L.....#','#.....L..................L.....#','#.....L..................L.....#','D.G.S.L..................L..G..D','#_____L__________________L_____#','################################','################################'],
-R05:['################################','#..............................#','#..............................#','#..............................#','#..............................#','#..............................#','#..............................#','#..............................#','#.G..L............L.......L.G..#','#____L____________L_______L____#','#....L............L.......L....#','#....L............L.......L....#','#....L............L.......L....#','#....L............L.......L....#','D....L.......LCCC.L.......L....D','#____L_______L____L_______L____#','#....L.......L............L....#','#....L.......L............L....#','#....L.......L............L....#','#....L.......L............L....#','#....L.......LCC..........L....#','#____L_______L____________L____#','#....L....................L....#','#....L....................L....#','#....L....................L....#','#....L....................L....#','D..S.L.................S..L....D','#____L____________________L____#','################################','################################'],
-R06:['################################','#..............................#','#..............................#','#..............................#','#..............................#','#..............................#','#..............................#','#..............................#','#....L..S..L........L..S..L....#','#____L_____L________L_____L____#','#....L.....L........L.....L....#','#....L.....L........L.....L....#','#....L.....L........L.....L....#','#....L.....L........L.....L....#','D....L.....L...X....L.....L....D','#____L_____L________L_____L____#','#....L.....L........L.....L....#','#....L.....L........L.....L....#','#....L.....L........L.....L....#','#....L.....L........L.....L....#','#....L...X.L........L.X...L....#','#____L_____L________L_____L____#','#....L.....L........L.....L....#','#....L.....L........L.....L....#','#....L.....L........L.....L....#','#....L.....L........L.....L....#','D..S.L.....L...G....L.....L....D','#____L_____L________L_____L____#','################################','################################'],
+R02:[
+'################################################################',
+'#..............................................................#',
+'#..............................................................#',
+'#........G.....................................................#',
+'#_____L_________L_______________L_________________L____________#',
+'#.....L.........L...............L.................L............#',
+'#.....L.........L...............L.................L............#',
+'#.....L.........L...............L.................L............#',
+'#.....L.........L...............L.................L............#',
+'#.....L.........L...............L.................L............#',
+'#_____L_________L_______________L_________________L____________#',
+'#.....L.........L...............L.................L............#',
+'#.....L.........L...............L.................L............#',
+'#.....L.........L...............L.................L............#',
+'#.....L.........L...............L.................L............#',
+'#.....L.........L...............L.................L............#',
+'#.....L.........L.....X.........L.........X.......L............#',
+'D.....L.......S.L...........G...L.................L............D',
+'#_____L_________L_______________L_________________L____________#',
+'################################################################',
+],
+R03:[
+'################################################################',
+'#..............................................................#',
+'#..............................................................#',
+'#.......S..............................................S.......#',
+'#_____L_________L_______________L_________________L____________#',
+'#.....L.........L...............L.................L............#',
+'#.....L.........L...............L.................L............#',
+'#.....L.........L...............L.................L............#',
+'#.....L.........L...............L.................L............#',
+'#.....L.........L...............L.................L............#',
+'#_____L_________L_______________L_________________L____________#',
+'#.....L.........L...............L.................L............#',
+'#.....L.........L...............L.................L............#',
+'#.....L.........L...............L.................L............#',
+'#.....L.........L...............L.................L............#',
+'#.....L.........L...............L.................L............#',
+'#.....L.........L...G...........L.................L............#',
+'D..G..L.........L...............L.................L............D',
+'#_____L_________L_______________L_________________L____________#',
+'################################################################',
+],
+R12:[
+'################################################################',
+'#..............................................................#',
+'#..............................................................#',
+'#.................G............................................#',
+'#_____L_________L_______________L_________________L____________#',
+'#.....L.........L...............L.................L............#',
+'#.....L.........L...............L.................L............#',
+'#.....L.........L...............L.................L............#',
+'#.....L.........L...............L.................L............#',
+'#.....L.........L.........HHH...L.................L............#',
+'#_____L_________L_______________L_________________L____________#',
+'#.....L.........L...............L.................L............#',
+'#.....L.........L...............L.................L............#',
+'#.....L.........L...............L.................L............#',
+'#.....L.........L...............L.................L............#',
+'#.....L.........L...............L.................L............#',
+'#.....L.........L...............L.................L............#',
+'D.....L.S.......L...............L...........S.....L............D',
+'#_____L_________L_______________L_________________L____________#',
+'################################################################',
+],
+R04:[
+'################################################################',
+'#..............................................................#',
+'#..............................................................#',
+'#..............................................................#',
+'#_____L_________L_______________L_________________L____________#',
+'#.....L.........L...............L.................L............#',
+'#.....L.........L...............L.................L............#',
+'#.....L.........L...............L.................L............#',
+'#.....L.........L...............L.................L............#',
+'#.....L.........L...............L.................L............#',
+'#_____L_________L_______________L_________________L____________#',
+'#.....L.........L...............L.................L............#',
+'#.....L.........L...............L.................L............#',
+'#.....L.........L...............L.................L............#',
+'#.....L.........L...............L.................L............#',
+'#.....L.........L.......~.......L........~........L............#',
+'#.....L.........L.......V.......L........V........L............#',
+'D.G...L.........L...............L.................L.......G....D',
+'#_____L_________L_______________L_________________L____________#',
+'################################################################',
+],
+R05:[
+'################################################################',
+'#..............................................................#',
+'#..............................................................#',
+'#.G.......................................................G....#',
+'#_____L_________L_______________L_________________L____________#',
+'#.....L.........L...............L.................L............#',
+'#.....L.........L...............L.................L............#',
+'#.....L.........L...............L.................L............#',
+'#.....L.........L...............L.................L............#',
+'#.....L.........L...............L.................L............#',
+'#_____L_________L_______________L_________________L____________#',
+'#.....L.........L...............L.................L............#',
+'#.....L.........L...............L.................L............#',
+'#.....L.........L...............L.................L............#',
+'#.....L.........L...............L.................L............#',
+'#.....L.........L...............L.................L............#',
+'#.....L.........L.......CCC.....L.....CCC.........L............#',
+'D.....L.........L...............L.................L............D',
+'#_____L_________L_______________L_________________L____________#',
+'################################################################',
+],
+R06:[
+'################################################################',
+'#..............................................................#',
+'#..............................................................#',
+'#.......S..............................................S.......#',
+'#_____L_________L_______________L_________________L____________#',
+'#.....L.........L...............L.................L............#',
+'#.....L.........L...............L.................L............#',
+'#.....L.........L...............L.................L............#',
+'#.....L.........L...............L.................L............#',
+'#.....L.........L...............L.................L............#',
+'#_____L_________L_______________L_________________L____________#',
+'#.....L.........L...............L.................L............#',
+'#.....L.........L...............L.................L............#',
+'#.....L.........L...............L.................L............#',
+'#.....L.........L...............L.................L............#',
+'#.....L.........L...............L.................L............#',
+'#.....L.........L.......X.......L.......X.........L............#',
+'D.....L.........L.............G.L.................L............D',
+'#_____L_________L_______________L_________________L____________#',
+'################################################################',
+],
 };
 const GLYPH_TEXT={
-  'R02_9_8':'CLIMB LADDERS TO\nREACH OFFSET LEDGES.','R02_14_26':'CLEAR EVERY FAULT\nBEFORE THE EXIT.',
-  'R03_15_20':'TWO RELAYS, FAR APART.\nSET BOTH \u2014 THE BOARD LIES.','R03_3_26':'A GREEN BOARD IS NOT\nA PROVEN ROUTE.',
-  'R12_18_8':'SCAN MAPS THE SECTOR.\nUSE IT BEFORE THE EXIT.','R12_6_14':'TERMINALS LOG\nROUTE HANDOFFS.',
-  'R04_2_26':'HEAT VENTS BURST\nON A TIMER. COOL THEM.','R04_28_26':'THERMAL COOLS V AND ~.\nCLEAR THE COLUMN.',
-  'R05_2_8':'CATALYST BLOCKS\nWALL THE ROUTE.','R05_28_8':'DAMP DISSOLVES C BLOCKS.\nCLEAR TO PASS.',
-  'R06_15_26':'FAULTS AND RELAYS.\nPROVE THE WHOLE ROUTE.',
+  'R02_9_3':'CLIMB LADDERS TO\nREACH OFFSET LEDGES.',
+  'R02_28_17':'CLEAR EVERY FAULT\nBEFORE THE EXIT.',
+  'R03_20_16':'TWO RELAYS, FAR APART.\nSET BOTH — THE BOARD LIES.',
+  'R03_3_17':'A GREEN BOARD IS NOT\nA PROVEN ROUTE.',
+  'R12_18_3':'SCAN MAPS THE SECTOR.\nUSE IT BEFORE THE EXIT.',
+  'R04_2_17':'HEAT VENTS BURST\nON A TIMER. COOL THEM.',
+  'R04_58_17':'THERMAL COOLS V AND ~.\nCLEAR THE COLUMN.',
+  'R05_2_3':'CATALYST BLOCKS\nWALL THE ROUTE.',
+  'R05_58_3':'DAMP DISSOLVES C BLOCKS.\nCLEAR TO PASS.',
+  'R06_30_17':'FAULTS AND RELAYS.\nPROVE THE WHOLE ROUTE.',
 };
 const ROOM_DIALOGUE={
   R02:'FAULT DETECTED.\nDIAGNOSE, THEN CLEAR.',
@@ -130,16 +281,17 @@ const ROOM_DIALOGUE={
   R06:'ENGINE APPROACH.\nFAULTS AND RELAYS. PROVE IT ALL.',
 };
 const TRANSITIONS={
-  R02:{'0_14':null,'0_26':null,'31_14':'R03_0_14','31_26':'R03_0_26'},
-  R03:{'0_14':'R02_31_14','0_26':'R02_31_26','31_14':'R12_0_14','31_26':'R12_0_26'},
-  R12:{'0_14':'R03_31_14','0_26':'R03_31_26','31_14':'R04_0_14','31_26':'R04_0_26'},
-  R04:{'0_14':'R12_31_14','0_26':'R12_31_26','31_14':'R05_0_14','31_26':'R05_0_26'},
-  R05:{'0_14':'R04_31_14','0_26':'R04_31_26','31_14':'R06_0_14','31_26':'R06_0_26'},
-  R06:{'0_14':'R05_31_14','0_26':'R05_31_26','31_14':'COMPLETE','31_26':'COMPLETE'},
+  R02:{'31_17':'R03_0_17'},
+  R03:{'0_17':'R02_31_17','31_17':'R12_0_17'},
+  R12:{'0_17':'R03_31_17','31_17':'R04_0_17'},
+  R04:{'0_17':'R12_31_17','31_17':'R05_0_17'},
+  R05:{'0_17':'R04_31_17','31_17':'R06_0_17'},
+  R06:{'0_17':'R05_31_17','31_17':'COMPLETE'},
 };
 const ALL_TOOLS=[
   {id:'PULSE',name:'PULSE',abbr:'PLS',desc:'Clear faults / stun scouts'},
   {id:'SCANNER',name:'SCAN',abbr:'SCN',desc:'Reveal hidden routes'},
+  {id:'GRAPPLE',name:'HOOK',abbr:'HOK',desc:'Fixed-anchor access'},
   {id:'SYNC',name:'SYNC',abbr:'SYN',desc:'Link relay terminals'},
   {id:'THERMAL',name:'THERM',abbr:'THR',desc:'Cool vents & plumes'},
   {id:'CATALYST',name:'DAMP',abbr:'DMP',desc:'Clear catalyst blocks'},
@@ -153,7 +305,7 @@ const Audio={ctx:null,master:null,hum:null,humGain:null,humOn:true,ready:false,
   tone(freq,dur,type='square',vol=0.25,when=0){if(!this.ready)return;const t=this.ctx.currentTime+when;const o=this.ctx.createOscillator();const g=this.ctx.createGain();o.type=type;o.frequency.setValueAtTime(freq,t);g.gain.setValueAtTime(0.0001,t);g.gain.exponentialRampToValueAtTime(vol,t+0.005);g.gain.exponentialRampToValueAtTime(0.0001,t+dur);o.connect(g);g.connect(this.master);o.start(t);o.stop(t+dur+0.02);},
   slide(f0,f1,dur,type='square',vol=0.3){if(!this.ready)return;const t=this.ctx.currentTime;const o=this.ctx.createOscillator();const g=this.ctx.createGain();o.type=type;o.frequency.setValueAtTime(f0,t);o.frequency.exponentialRampToValueAtTime(Math.max(20,f1),t+dur);g.gain.setValueAtTime(vol,t);g.gain.exponentialRampToValueAtTime(0.0001,t+dur);o.connect(g);g.connect(this.master);o.start(t);o.stop(t+dur+0.02);},
   noise(dur,vol=0.3,filterFreq=800){if(!this.ready)return;const t=this.ctx.currentTime;const n=Math.floor(this.ctx.sampleRate*dur);const buf=this.ctx.createBuffer(1,n,this.ctx.sampleRate);const d=buf.getChannelData(0);for(let i=0;i<n;i++)d[i]=(Math.random()*2-1);const src=this.ctx.createBufferSource();src.buffer=buf;const f=this.ctx.createBiquadFilter();f.type='lowpass';f.frequency.value=filterFreq;const g=this.ctx.createGain();g.gain.setValueAtTime(vol,t);g.gain.exponentialRampToValueAtTime(0.0001,t+dur);src.connect(f);f.connect(g);g.connect(this.master);src.start(t);src.stop(t+dur+0.02);},
-  tool(id){this.resume();switch(id){case'PULSE':this.tone(660,0.08,'square',0.22);this.tone(990,0.07,'square',0.18,0.05);break;case'SCANNER':this.tone(880,0.06,'triangle',0.2);this.tone(1320,0.06,'triangle',0.18,0.04);break;case'SYNC':this.tone(523,0.07,'sine',0.22);this.tone(784,0.09,'sine',0.2,0.06);break;case'THERMAL':this.slide(500,180,0.18,'sawtooth',0.18);break;case'CATALYST':this.tone(440,0.05,'square',0.2);this.tone(370,0.08,'square',0.2,0.05);break;case'CHKPT':this.tone(659,0.07,'sine',0.22);this.tone(988,0.1,'sine',0.2,0.07);break;case'READER':this.tone(440,0.04,'sine',0.16);this.tone(330,0.10,'sine',0.18,0.05);this.tone(220,0.14,'sine',0.16,0.12);break;default:this.tone(600,0.07,'square',0.2);}},
+  tool(id){this.resume();switch(id){case'PULSE':this.tone(660,0.08,'square',0.22);this.tone(990,0.07,'square',0.18,0.05);break;case'SCANNER':this.tone(880,0.06,'triangle',0.2);this.tone(1320,0.06,'triangle',0.18,0.04);break;case'GRAPPLE':this.tone(520,0.05,'triangle',0.18);this.slide(760,420,0.16,'square',0.16);this.tone(980,0.05,'sine',0.14,0.12);break;case'SYNC':this.tone(523,0.07,'sine',0.22);this.tone(784,0.09,'sine',0.2,0.06);break;case'THERMAL':this.slide(500,180,0.18,'sawtooth',0.18);break;case'CATALYST':this.tone(440,0.05,'square',0.2);this.tone(370,0.08,'square',0.2,0.05);break;case'CHKPT':this.tone(659,0.07,'sine',0.22);this.tone(988,0.1,'sine',0.2,0.07);break;case'READER':this.tone(440,0.04,'sine',0.16);this.tone(330,0.10,'sine',0.18,0.05);this.tone(220,0.14,'sine',0.16,0.12);break;default:this.tone(600,0.07,'square',0.2);}},
   thud(){this.resume();this.slide(180,50,0.22,'square',0.32);this.noise(0.12,0.2,400);},
   doorChime(){this.resume();this.tone(523,0.08,'sine',0.22);this.tone(659,0.08,'sine',0.22,0.07);this.tone(784,0.12,'sine',0.22,0.14);},
   ladderTick(){this.resume();this.tone(1200,0.025,'square',0.08);},
@@ -173,18 +325,27 @@ const Audio={ctx:null,master:null,hum:null,humGain:null,humOn:true,ready:false,
 const TT={
   log:[],            // {text,kind}
   roomState:{},      // per-room flags the validator reads
+  tableMode:false,   // optional: reduces reflex pressure for tabletop walkthroughs
   objectives:{
     R02:'DIAGNOSE the fault. Clear every X with PULSE, then reach the exit — the door proves the route is clean.',
     R03:'Board reads SYNCED. Do not trust it. Activate BOTH relays; the exit door tests the real link.',
-    R12:'Map the route. SCAN the sector to confirm the path, then reach the exit.',
+    R12:'Map the route. SCAN the sector, use fixed anchors where useful, then reach the exit.',
     R04:'Heat leak. Cool every vent and plume with THERMAL, then reach the exit.',
     R05:'Catalyst buildup. Clear every block with DAMP, then reach the exit.',
-    R06:'Capstone: clear all faults AND activate both relays, then climb to the exit.',
+    R06:'Capstone: clear all faults, activate both relays, use anchors where useful, then prove the exit route.',
+  },
+  procedures:{
+    R02:{title:'R02 · Fault Diagnosis',reported:'Fault detected. The path may look open, but unresolved X markers make the route unsafe.',decision:'Pick what is a real fault versus map noise. Use PULSE to clear or isolate every live fault.',tool:'PULSE = corrective action. READER/Glyphs = context only.',gate:'Validate passes only when no X faults remain.',fail:'Any remaining fault means the door holds. The route is not proven.',access:'HOOK may connect only to fixed anchors. It can help reposition for fault clearance, but it does not validate the repair.'},
+    R03:{title:'R03 · Relay Verification',reported:'The board may claim SYNCED before the handoff is actually complete.',decision:'Verify both endpoints instead of trusting reported green status.',tool:'SYNC + terminal interaction confirms relays A and B.',gate:'Validate passes only when both relays are truly set.',fail:'One relay creates false confidence. The door exposes the lie.',access:'HOOK can help reach relay approaches only where an authored anchor exists. It cannot fake relay verification.'},
+    R12:{title:'R12 · Route Mapping',reported:'The route is locked because continuity is not mapped.',decision:'Scan before committing. Decide what route evidence is sufficient.',tool:'SCAN reveals/records route continuity.',gate:'Validate passes only after the sector is scanned/mapped.',fail:'Unmapped continuity cannot be treated as reliable.',access:'HOOK supports mapped route access; SCAN still governs whether the route is trusted.'},
+    R04:{title:'R04 · Heat Containment',reported:'Heat sources create route pressure. Moving through them is not the same as solving them.',decision:'Contain the pressure before declaring passage safe.',tool:'THERMAL cools vents and plumes.',gate:'Validate passes only when heat sources are cleared.',fail:'Residual heat means the route remains dangerous.',access:'HOOK may cross to fixed anchors, but heat must still be contained before validation.'},
+    R05:{title:'R05 · Catalyst Clearance',reported:'Catalyst blocks obstruct the route physically/systemically.',decision:'Clear the obstruction before treating a planned path as available.',tool:'DAMP clears catalyst blocks.',gate:'Validate passes only when catalyst obstruction is gone.',fail:'The route may be imagined, but access is still blocked.',access:'HOOK cannot attach to catalyst blocks. Clear obstruction or use authored anchors only.'},
+    R06:{title:'R06 · Capstone Route Validation',reported:'The engine approach combines faults, relays, and route proof.',decision:'Do not solve one subsystem and call the whole route fixed.',tool:'PULSE clears faults; SYNC/terminals verify relays.',gate:'Validate passes only when all faults are clear and both relays are set.',fail:'Any unresolved fault or relay gap blocks final validation.',access:'HOOK is access support only. Final proof still requires faults clear and relays verified.'},
   },
   // What each room needs to actually be "repaired" — validation checks reality, not belief.
   push(text,kind){ this.log.push({text,kind:kind||'info'}); if(this.log.length>40)this.log.shift(); renderTTLog(); },
   reset(){ this.log=[]; this.roomState={}; },
-  enterRoom(id){ this.push('— ENTER '+id+' —','info'); setObjective(this.objectives[id]||''); },
+  enterRoom(id){ this.push('— ENTER '+id+' —','info'); setObjective(this.objectives[id]||''); renderProcedureCard(id); },
   // record a tool action + its observed effect
   record(toolId, effectText, kind){ this.push(toolId+': '+effectText, kind||'info'); },
 };
@@ -200,14 +361,140 @@ function renderTTLog(){
   if(expanded) box.scrollTop=box.scrollHeight;
 }
 
-// ── VALIDATION: the False Green principle, made digital ──
+function renderProcedureCard(id){
+  const el=document.getElementById('ttprocedure'); if(!el)return;
+  const p=TT.procedures[id];
+  if(!p){el.innerHTML='';return;}
+  el.innerHTML='<div class="pcard-title">'+p.title+'</div>'+
+    '<div class="pcard-line"><b>Reported:</b> '+p.reported+'</div>'+
+    '<div class="pcard-line"><b>Decision:</b> '+p.decision+'</div>'+
+    '<div class="pcard-line"><b>Tool posture:</b> '+p.tool+'</div>'+
+    '<div class="pcard-line"><b>Anchor access:</b> '+(p.access||'Fixed anchors only; no arbitrary surface attachment.')+'</div>'+
+    '<div class="pcard-line"><b>Validate:</b> '+p.gate+'</div>'+
+    '<div class="pcard-line"><b>If not:</b> '+p.fail+'</div>';
+}
+function setTableMode(on){
+  TT.tableMode=!!on;
+  const btn=document.getElementById('ttTableModeBtn');
+  if(btn){btn.classList.toggle('on',TT.tableMode);btn.innerHTML=TT.tableMode?'TABLE<br>MODE ON':'TABLE<br>MODE OFF';}
+  TT.push(TT.tableMode?'TABLE MODE ON: reflex scout pressure reduced for tabletop walkthrough.':'TABLE MODE OFF: standard hybrid play restored.','judge');
+}
+function exportTTLog(){
+  const validated=TT.roomState[currentRoom+'_validated']?'YES':'NO';
+  const lines=[];
+  lines.push('Reintegration Core — District 01 · 64x20 Scrolling Corridor + Grapple 1.16.1 Tabletop Run Log');
+  lines.push(new Date().toLocaleString());
+  lines.push('Room: '+currentRoom);
+  lines.push('Validated: '+validated);
+  lines.push('Stability: '+player.stability+'/3');
+  lines.push('Table Mode: '+(TT.tableMode?'ON':'OFF'));
+  lines.push('');
+  TT.log.slice(-40).forEach(e=>lines.push((e.kind||'info').toUpperCase()+': '+e.text));
+  const blob=new Blob([lines.join('\n')],{type:'text/plain'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);a.download='district_01_ttrpg_intent_log.txt';
+  document.body.appendChild(a);a.click();a.remove();
+  setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+}
+function bindTTPanelButtons(){
+  const v=document.getElementById('ttValidateBtn'); if(v)v.addEventListener('click',e=>{e.preventDefault();validateRoom();});
+  const x=document.getElementById('ttExportBtn'); if(x)x.addEventListener('click',e=>{e.preventDefault();exportTTLog();});
+  const m=document.getElementById('ttTableModeBtn'); if(m)m.addEventListener('click',e=>{e.preventDefault();setTableMode(!TT.tableMode);});
+}
+
+
+// ── FIXED-ANCHOR GRAPPLING HOOK v1.16.1 ──
+// Grapple is an access/route-planning tool. It attaches only to authored anchors, never arbitrary walls/platforms.
+// Ladder-clearance rule: anchors must not sit on/over ladder systems by default. Keep authored anchors roughly 3 grid spaces from functional ladders unless a future room explicitly introduces broken ladders.
+const GRAPPLE_RANGE=6.4;
+const GRAPPLE_MIN_DIST=0.85;
+const GRAPPLE_DURATION=18;
+const GRAPPLE_ANCHOR_LADDER_CLEARANCE=3.0;
+const GRAPPLE_ANCHORS={
+  R02:[{id:'R02-A1',x:2.4,y:16.2,landX:2.4,landY:16.6,label:'entry-side anchor'},{id:'R02-A2',x:24.0,y:9.2,landX:24.0,landY:9.6,label:'mid access off-ladder'},{id:'R02-A3',x:42.0,y:16.2,landX:42.0,landY:16.6,label:'expanded fault access'},{id:'R02-A4',x:58.0,y:9.2,landX:58.0,landY:9.6,label:'far floor anchor'}],
+  R03:[{id:'R03-A1',x:2.8,y:16.2,landX:2.8,landY:16.6,label:'entry-side anchor'},{id:'R03-A2',x:24.0,y:9.2,landX:24.0,landY:9.6,label:'center handoff off-ladder'},{id:'R03-A3',x:42.0,y:16.2,landX:42.0,landY:16.6,label:'scroll relay approach'},{id:'R03-A4',x:58.0,y:3.2,landX:58.0,landY:3.6,label:'far relay approach'}],
+  R12:[{id:'R12-A1',x:10.0,y:16.2,landX:10.0,landY:16.6,label:'entry route off-ladder'},{id:'R12-A2',x:24.0,y:9.2,landX:24.0,landY:9.6,label:'scan approach off-ladder'},{id:'R12-A3',x:42.0,y:16.2,landX:42.0,landY:16.6,label:'scroll scan approach'},{id:'R12-A4',x:58.0,y:3.2,landX:58.0,landY:3.6,label:'far map node'}],
+  R04:[{id:'R04-A1',x:2.6,y:16.2,landX:2.6,landY:16.6,label:'entry safe point off-ladder'},{id:'R04-A2',x:24.0,y:9.2,landX:24.0,landY:9.6,label:'heat bypass anchor'},{id:'R04-A3',x:42.0,y:16.2,landX:42.0,landY:16.6,label:'scroll heat bypass'},{id:'R04-A4',x:58.0,y:16.2,landX:58.0,landY:16.6,label:'exit approach off-ladder'}],
+  R05:[{id:'R05-A1',x:2.0,y:16.2,landX:2.0,landY:16.6,label:'entry-side anchor'},{id:'R05-A2',x:24.0,y:9.2,landX:24.0,landY:9.6,label:'catalyst approach off-ladder'},{id:'R05-A3',x:42.0,y:16.2,landX:42.0,landY:16.6,label:'scroll catalyst route'},{id:'R05-A4',x:58.0,y:16.2,landX:58.0,landY:16.6,label:'exit anchor off-ladder'}],
+  R06:[{id:'R06-A1',x:10.0,y:16.2,landX:10.0,landY:16.6,label:'relay A route between ladders'},{id:'R06-A2',x:24.0,y:9.2,landX:24.0,landY:9.6,label:'fault column off-ladder'},{id:'R06-A3',x:42.0,y:16.2,landX:42.0,landY:16.6,label:'scroll capstone anchor'},{id:'R06-A4',x:58.0,y:16.2,landX:58.0,landY:16.6,label:'relay B route between ladders'}]
+};
+let grappleState=null;
+let grappleFailFlash=0;
+function roomAnchors(){return GRAPPLE_ANCHORS[currentRoom]||[];}
+function playerCenter(){return {x:player.x,y:player.y+PH/2};}
+function anchorDist(a){const p=playerCenter();return Math.hypot(a.x-p.x,a.y-p.y);}
+function findNearestAnchor(){
+  let best=null,bd=Infinity;
+  for(const a of roomAnchors()){
+    const d=anchorDist(a);
+    if(d<bd){best=a;bd=d;}
+  }
+  if(!best)return {anchor:null,dist:Infinity,reason:'No fixed anchors authored in this room.'};
+  if(bd<GRAPPLE_MIN_DIST)return {anchor:best,dist:bd,reason:'Anchor too close. Near-zero-distance safety guard blocked the hook.'};
+  if(bd>GRAPPLE_RANGE)return {anchor:best,dist:bd,reason:'Nearest fixed anchor is outside readable range.'};
+  return {anchor:best,dist:bd,reason:''};
+}
+function startGrapple(){
+  if(gameState!=='PLAY')return;
+  if(grappleState&&grappleState.active){TT.record('HOOK','already connected to a fixed anchor','info');return;}
+  const found=findNearestAnchor();
+  if(!found.anchor){grappleFailFlash=18;TT.record('HOOK',found.reason,'bad');showDialogue('HOOK FAILED.\nNO FIXED ANCHOR.');Audio.fail();return;}
+  if(found.reason){grappleFailFlash=18;TT.record('HOOK',found.reason+' '+found.anchor.id,'bad');showDialogue('HOOK FAILED.\n'+found.reason.toUpperCase());Audio.fail();return;}
+  const a=found.anchor;
+  player.vx=0;player.vy=0;player.onLadder=false;player.onGround=false;
+  grappleState={active:true,anchor:a,sx:player.x,sy:player.y,tx:a.landX,ty:a.landY,t:0,dur:GRAPPLE_DURATION};
+  TT.record('HOOK','fixed anchor connected: '+a.id+' ('+a.label+'). Controlled pull engaged.','good');
+  showDialogue('HOOK CONNECTED.\nFIXED ANCHOR ONLY.');
+}
+function updateGrappleMotion(){
+  if(!grappleState||!grappleState.active)return false;
+  const g=grappleState;
+  g.t++;
+  const p=Math.min(1,g.t/g.dur);
+  const eased=1-Math.pow(1-p,3);
+  player.x=g.sx+(g.tx-g.sx)*eased;
+  player.y=g.sy+(g.ty-g.sy)*eased;
+  player.vx=0;player.vy=0;player.onGround=false;player.onLadder=false;
+  if(g.t>=g.dur){
+    player.x=g.tx;player.y=g.ty;player.vx=0;player.vy=0;grappleState=null;snapToFloor();TT.push('HOOK route complete. Access established through authored anchor.','good');
+  }
+  return true;
+}
+function renderGrappleAnchors(oy){
+  const equipped=player.pocket[1]&&player.pocket[1].id==='GRAPPLE';
+  if(equipped){
+    const p=playerCenter();
+    ctx.strokeStyle='rgba(102,227,255,0.18)';ctx.lineWidth=1;ctx.beginPath();ctx.arc(p.x*T,oy+p.y*T,GRAPPLE_RANGE*T,0,Math.PI*2);ctx.stroke();
+  }
+  roomAnchors().forEach(a=>{
+    const x=a.x*T,y=oy+a.y*T;
+    const d=anchorDist(a);
+    const inRange=d>=GRAPPLE_MIN_DIST&&d<=GRAPPLE_RANGE;
+    const active=grappleState&&grappleState.anchor&&grappleState.anchor.id===a.id;
+    ctx.save();ctx.translate(x,y);ctx.rotate(Math.PI/4);
+    ctx.fillStyle=active?'rgba(252,231,110,0.95)':(inRange&&equipped?'rgba(102,227,255,0.92)':'rgba(91,155,213,0.48)');
+    ctx.strokeStyle=active?NES.doorLt:(inRange&&equipped?NES.glyphLt:'rgba(130,177,255,0.55)');
+    ctx.lineWidth=1.5;ctx.fillRect(-T*0.23,-T*0.23,T*0.46,T*0.46);ctx.strokeRect(-T*0.23,-T*0.23,T*0.46,T*0.46);ctx.restore();
+    if(inRange&&equipped){ctx.strokeStyle='rgba(102,227,255,0.35)';ctx.beginPath();ctx.arc(x,y,T*0.45+Math.sin(frame*0.15)*T*0.08,0,Math.PI*2);ctx.stroke();}
+  });
+  if(grappleState&&grappleState.active){
+    const p=playerCenter(),a=grappleState.anchor;
+    ctx.strokeStyle='rgba(252,231,110,0.85)';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(p.x*T,oy+p.y*T);ctx.lineTo(a.x*T,oy+a.y*T);ctx.stroke();
+  }
+  if(grappleFailFlash>0){
+    grappleFailFlash--;
+    const p=playerCenter();ctx.strokeStyle='rgba(255,91,120,'+(grappleFailFlash/18)+')';ctx.lineWidth=2;ctx.beginPath();ctx.arc(p.x*T,oy+p.y*T,GRAPPLE_RANGE*T,0,Math.PI*2);ctx.stroke();
+  }
+}
+
+// ── VALIDATION: proof before progress, made digital ──
 // A room is proven only when its real state passes. "Green board" never counts as proof.
 function validateRoom(){
   if(gameState!=='PLAY')return;
   const id=currentRoom;
   let pass=false, detail='';
   if(id==='R02'){
-    let faults=0; for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++)if(getTile(c,r)==='X')faults++;
+    let faults=0; for(let r=0;r<ROWS;r++)for(let c=0;c<roomWidth();c++)if(getTile(c,r)==='X')faults++;
     pass = faults===0;
     detail = pass ? 'No faults remain. Route verified clean.' : (faults+' fault(s) still live. Not proven.');
   } else if(id==='R03'){
@@ -220,15 +507,15 @@ function validateRoom(){
     pass = !!TT.roomState.R12_scanned;
     detail = pass ? 'Route mapped and confirmed open.' : 'Route unmapped. SCAN the sector first.';
   } else if(id==='R04'){
-    let heat=0; for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++){const t=getTile(c,r);if(t==='V'||t==='~')heat++;}
+    let heat=0; for(let r=0;r<ROWS;r++)for(let c=0;c<roomWidth();c++){const t=getTile(c,r);if(t==='V'||t==='~')heat++;}
     pass = heat===0;
     detail = pass ? 'All vents cooled. Passage safe.' : (heat+' heat source(s) still active.');
   } else if(id==='R05'){
-    let cat=0; for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++)if(getTile(c,r)==='C')cat++;
+    let cat=0; for(let r=0;r<ROWS;r++)for(let c=0;c<roomWidth();c++)if(getTile(c,r)==='C')cat++;
     pass = cat===0;
     detail = pass ? 'All catalyst blocks cleared.' : (cat+' catalyst block(s) remain.');
   } else if(id==='R06'){
-    let faults=0; for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++)if(getTile(c,r)==='X')faults++;
+    let faults=0; for(let r=0;r<ROWS;r++)for(let c=0;c<roomWidth();c++)if(getTile(c,r)==='X')faults++;
     const a=!!TT.roomState.R06_relayA, b=!!TT.roomState.R06_relayB;
     pass = faults===0 && a && b;
     if(pass) detail='Faults clear, both relays set. Engine route proven.';
@@ -242,7 +529,7 @@ function validateRoom(){
   return pass;
 }
 
-// ── QUICK TOOL BAR: one-tap access to all 7 tools (replaces SELECT detour) ──
+// ── QUICK TOOL BAR: one-tap access to the six swappable B-tools; PULSE stays fixed on A ──
 function buildToolbar(){
   const bar=document.getElementById('toolbar'); if(!bar)return;
   bar.innerHTML='';
@@ -298,10 +585,22 @@ function drawTileArt(g,t,fr,ox,oy){const P=(px,py,w,h,c)=>{g.fillStyle=c;g.fillR
   case'<':{P(0,0,16,7,NES.plat);P(0,0,16,2,NES.platLt);P(0,6,16,3,NES.convLt);const aoff=fr*4;for(let axx=-4;axx<16;axx+=8){const a=((16-(axx+aoff))%16+16)%16;P(a,6,3,3,NES.convArr);P(a-1,7,2,1,NES.convLt);}break;}
   case'H':{P(0,0,16,16,'rgba(90,90,140,0.10)');break;}
 }}
+function roomWidth(){return roomTiles&&roomTiles[0]?roomTiles[0].length:COLS;}
+function clampCamera(v){return Math.max(0,Math.min(Math.max(0,roomWidth()-COLS),v));}
+function updateCamera(){
+  if(!roomTiles||gameState==='TITLE'||gameState==='COMPLETE'){cameraX=0;return;}
+  const desired=player.x-COLS*0.48;
+  cameraX += (clampCamera(desired)-cameraX)*0.22;
+}
+function transitionKeyForDoor(c,r){
+  if(c===0)return '0_'+r;
+  if(c>=roomWidth()-1)return '31_'+r; // legacy transition side-key: right edge, regardless of room width
+  return c+'_'+r;
+}
 function resize(){const vw=innerWidth,vh=innerHeight,isMobile=vw<700;const touchEl=document.getElementById('touch'),metaEl=document.getElementById('metabtns'),barEl=document.getElementById('toolbar'),ttEl=document.getElementById('ttpanel');
   if(isMobile){touchEl.classList.add('show');metaEl.classList.add('show');}else{touchEl.classList.remove('show');metaEl.classList.remove('show');}
   // Canvas budget leaves room below for the inline intent log + (mobile) the fixed control stack.
-  const playH=isMobile?vh*0.46:vh*0.74,playW=vw*(isMobile?0.98:0.74),totalRows=ROWS+HUD_ROWS;
+  const playH=isMobile?vh*0.46:vh*0.74,playW=vw*(isMobile?0.98:0.74),totalRows=DISPLAY_ROWS+HUD_ROWS;
   T=Math.floor(Math.min(playW/COLS,playH/totalRows));if(T<6)T=6;GW=COLS*T;GH=totalRows*T;
   canvas.width=GW;canvas.height=GH;canvas.style.width=GW+'px';canvas.style.height=GH+'px';ctx.imageSmoothingEnabled=false;
 }
@@ -313,7 +612,7 @@ function isDown(a){switch(a){case'left':return keys['arrowleft']||keys['a'];case
 function wasPressed(a){switch(a){case'left':return justPressed['arrowleft']||justPressed['a'];case'right':return justPressed['arrowright']||justPressed['d'];case'up':return justPressed['arrowup']||justPressed['w'];case'down':return justPressed['arrowdown']||justPressed['s'];case'A':return justPressed['z']||justPressed['j'];case'B':return justPressed['x']||justPressed['k'];case'start':return justPressed['enter']||justPressed[' '];case'select':return justPressed['tab']||justPressed['shift'];case'validate':return justPressed['v'];}return false;}
 const PW=0.32,PH=1.4;
 const PULSE_TOOL=ALL_TOOLS.find(t=>t.id==='PULSE');
-const B_TOOLS=ALL_TOOLS.filter(t=>t.id!=='PULSE'); // the 6 swappable tools for pocket B
+const B_TOOLS=ALL_TOOLS.filter(t=>t.id!=='PULSE'); // swappable B-tools; PULSE remains fixed on A
 let player={x:2,y:27,vx:0,vy:0,facing:1,onLadder:false,onGround:false,coyote:0,stability:3,pocket:[PULSE_TOOL, B_TOOLS[0]],iFrames:0,checkpoint:null,animFrame:0,animTimer:0};
 let currentRoom='R02',roomTiles=[],clearedTiles={},revealedH={};
 let scouts=[],dialogue=null,syncState={active:false,termA:false,termB:false,timer:0};
@@ -327,7 +626,7 @@ function updateFade(){if(!fade.active)return;fade.timer--;if(fade.phase==='out'&
 const SPEED=0.085,CLIMB=0.075,GRAVITY=0.045,MAX_FALL=0.4;
 const CONV_FORCE=0.035,IFRAMES=60,SCOUT_SPEED=0.028,VENT_CYCLE=180,SYNC_TIMER=300;
 const TOOL_RANGE=3,TOOL_COOLDOWN=20,COYOTE=6;
-function getTile(c,r){if(c<0||c>=COLS||r<0||r>=ROWS)return '#';return roomTiles[r][c];}
+function getTile(c,r){if(c<0||c>=roomWidth()||r<0||r>=ROWS)return '#';return roomTiles[r]&&roomTiles[r][c]!==undefined?roomTiles[r][c]:'#';}
 function isWall(c,r){return getTile(c,r)==='#';}
 function isBlockSolid(c,r){const t=getTile(c,r);return t==='#'||t==='C';}
 function isSolidTop(c,r){const t=getTile(c,r);return t==='_'||t==='='||t==='<';}
@@ -338,28 +637,31 @@ function isHazardTile(c,r){const t=getTile(c,r);if(t==='X')return true;if(t==='~
 function loadRoom(roomId,entryCol,entryRow){
   currentRoom=roomId;const src=ROOM_MAPS[roomId];if(!src)return;
   roomTiles=src.map(row=>row.split(''));
-  for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++){const k=roomId+'_'+c+'_'+r;if(clearedTiles[k]){const ch=roomTiles[r][c];if(ch==='X'||ch==='C')roomTiles[r][c]='.';if(ch==='V')roomTiles[r][c]='_';}if(revealedH[k]&&roomTiles[r][c]==='H')roomTiles[r][c]='_';}
-  if(entryCol!==undefined){player.x=entryCol;player.y=entryRow;if(entryCol===0)player.x=1.6;if(entryCol===31)player.x=29.4;}else{player.x=2;player.y=27;}
+  for(let r=0;r<ROWS;r++)for(let c=0;c<roomWidth();c++){const k=roomId+'_'+c+'_'+r;if(clearedTiles[k]){const ch=roomTiles[r][c];if(ch==='X'||ch==='C')roomTiles[r][c]='.';if(ch==='V')roomTiles[r][c]='_';}if(revealedH[k]&&roomTiles[r][c]==='H')roomTiles[r][c]='_';}
+  if(entryCol!==undefined){player.x=entryCol;player.y=entryRow;if(entryCol===0)player.x=1.6;if(entryCol===31)player.x=roomWidth()-2.6;}else{player.x=2;player.y=18;}
+  cameraX=clampCamera(player.x-COLS*0.48);
   player.vy=0;player.vx=0;player.onLadder=false;player.coyote=0;snapToFloor();
   scouts=[];
-  if(roomId==='R03'){scouts.push(createDrone(10,21,20));}
-  if(roomId==='R12'){scouts.push(createDrone(14,26,20));}
-  if(roomId==='R06'){const bot=createScout(15,26);bot.leftBound=7;bot.rightBound=24;bot.x=15;scouts.push(bot);}
-  syncState={active:false,termA:false,termB:false,timer:0};particles=[];coolTiles=[];syncBeam=null;toolEffect=null;
+  if(roomId==='R03'){scouts.push(createDrone(18,45,15));}
+  if(roomId==='R12'){scouts.push(createDrone(18,45,15));}
+  if(roomId==='R06'){const bot=createScout(30,17);bot.leftBound=12;bot.rightBound=48;bot.x=30;scouts.push(bot);}
+  syncState={active:false,termA:false,termB:false,timer:0};particles=[];coolTiles=[];syncBeam=null;toolEffect=null;grappleState=null;grappleFailFlash=0;
   showDialogue(ROOM_DIALOGUE[roomId]||'');
   TT.enterRoom(roomId); // ── TTRPG hook: log entry + set objective ──
 }
 function snapToFloor(){let pc=Math.round(player.x);for(let r=Math.floor(player.y);r<ROWS;r++){if(isWall(pc,r)||isSolidTop(pc,r)){player.y=r-PH;player.onGround=true;return;}}}
-function createScout(spawnCol,spawnRow){const src=ROOM_MAPS[currentRoom];let floorRow=spawnRow;for(let r=spawnRow;r<ROWS;r++){const t=src[r][spawnCol];if(t==='_'||t==='#'){floorRow=r-1;break;}}const standable=(c)=>{const below=src[floorRow+1]?src[floorRow+1][c]:'#';const here=src[floorRow][c];return here!=='#'&&here!=='L'&&(below==='_'||below==='#'||below==='=');};let lb=spawnCol,rb=spawnCol;for(let c=spawnCol-1;c>=0;c--){if(!standable(c))break;lb=c;}for(let c=spawnCol+1;c<COLS;c++){if(!standable(c))break;rb=c;}return{x:spawnCol,y:floorRow-(PH-1),dir:1,kind:'patrol',state:'PATROL',stunTimer:0,recoveryTimer:0,leftBound:lb,rightBound:rb,animFrame:0,hitLatch:false};}
+function createScout(spawnCol,spawnRow){const src=ROOM_MAPS[currentRoom];let floorRow=spawnRow;for(let r=spawnRow;r<ROWS;r++){const t=src[r][spawnCol];if(t==='_'||t==='#'){floorRow=r-1;break;}}const standable=(c)=>{const below=src[floorRow+1]?src[floorRow+1][c]:'#';const here=src[floorRow][c];return here!=='#'&&here!=='L'&&(below==='_'||below==='#'||below==='=');};let lb=spawnCol,rb=spawnCol;for(let c=spawnCol-1;c>=0;c--){if(!standable(c))break;lb=c;}for(let c=spawnCol+1;c<roomWidth();c++){if(!standable(c))break;rb=c;}return{x:spawnCol,y:floorRow-(PH-1),dir:1,kind:'patrol',state:'PATROL',stunTimer:0,recoveryTimer:0,leftBound:lb,rightBound:rb,animFrame:0,hitLatch:false};}
 function createDrone(leftCol,rightCol,row){const baseY=row-(PH-1)-1.0;return{x:leftCol,y:baseY,baseY:baseY,dir:1,kind:'drone',state:'PATROL',stunTimer:0,recoveryTimer:0,leftBound:leftCol,rightBound:rightCol,animFrame:0,bob:0,hitLatch:false};}
-function updateScouts(){for(const s of scouts){switch(s.state){case'PATROL':if(s.kind==='drone'){s.x+=SCOUT_SPEED*0.85*s.dir;if(s.x<=s.leftBound){s.x=s.leftBound;s.dir=1;}if(s.x>=s.rightBound){s.x=s.rightBound;s.dir=-1;}s.bob=(s.bob||0)+0.06;s.y=s.baseY+Math.sin(s.bob)*0.18;}else{s.x+=SCOUT_SPEED*s.dir;if(s.x<=s.leftBound){s.x=s.leftBound;s.dir=1;}if(s.x>=s.rightBound){s.x=s.rightBound;s.dir=-1;}}break;case'STUNNED':s.stunTimer--;if(s.stunTimer<=0){s.state='RECOVERY';s.recoveryTimer=40;}break;case'RECOVERY':s.recoveryTimer--;if(s.recoveryTimer<=0)s.state='PATROL';break;}s.animFrame=(s.animFrame+0.05)%2;}}
-function scoutContactCheck(){if(player.iFrames>0)return;for(const s of scouts){if(s.state==='STUNNED')continue;if(Math.abs(s.x-player.x)<0.7&&Math.abs(s.y-player.y)<0.9){hitPlayer();return;}}}
+function updateScouts(){if(TT.tableMode)return;for(const s of scouts){switch(s.state){case'PATROL':if(s.kind==='drone'){s.x+=SCOUT_SPEED*0.85*s.dir;if(s.x<=s.leftBound){s.x=s.leftBound;s.dir=1;}if(s.x>=s.rightBound){s.x=s.rightBound;s.dir=-1;}s.bob=(s.bob||0)+0.06;s.y=s.baseY+Math.sin(s.bob)*0.18;}else{s.x+=SCOUT_SPEED*s.dir;if(s.x<=s.leftBound){s.x=s.leftBound;s.dir=1;}if(s.x>=s.rightBound){s.x=s.rightBound;s.dir=-1;}}break;case'STUNNED':s.stunTimer--;if(s.stunTimer<=0){s.state='RECOVERY';s.recoveryTimer=40;}break;case'RECOVERY':s.recoveryTimer--;if(s.recoveryTimer<=0)s.state='PATROL';break;}s.animFrame=(s.animFrame+0.05)%2;}}
+function scoutContactCheck(){if(TT.tableMode)return;if(player.iFrames>0)return;for(const s of scouts){if(s.state==='STUNNED')continue;if(Math.abs(s.x-player.x)<0.7&&Math.abs(s.y-player.y)<0.9){hitPlayer();return;}}}
 function updatePlayer(){
   if(gameState!=='PLAY')return;
   player.animTimer++;if(player.animTimer>10){player.animTimer=0;player.animFrame=(player.animFrame+1)%4;}
   if(player.iFrames>0)player.iFrames--;if(toolCooldown>0)toolCooldown--;
   if(toolEffect){toolEffect.timer--;if(toolEffect.timer<=0)toolEffect=null;}
   updateParticles();if(syncBeam){syncBeam.timer--;if(syncBeam.timer<=0)syncBeam=null;}
+  // Grapple motion is controlled/scripted to prevent corrupt velocity. Movement input pauses during pull.
+  if(updateGrappleMotion())return;
   const footRow=Math.floor(player.y+PH-0.05);const midRow=Math.floor(player.y+PH/2);const pc=Math.round(player.x);
   const ladCol=Math.round(player.x);
   const onLadderTile=isLadder(ladCol,midRow)||isLadder(ladCol,footRow)||isLadder(ladCol,Math.floor(player.y))||isLadder(ladCol,Math.floor(player.y+PH))||isLadder(ladCol,Math.floor(player.y+PH/2)+1);
@@ -370,7 +672,7 @@ function updatePlayer(){
   let nx=player.x+dx;const topR=Math.floor(player.y+0.1),botR=Math.floor(player.y+PH-0.1);
   if(dx<0){const lc=Math.floor(nx-PW);if(isBlockSolid(lc,topR)||isBlockSolid(lc,botR)||isBlockSolid(lc,midRow))nx=lc+1+PW;}
   else if(dx>0){const rc=Math.floor(nx+PW);if(isBlockSolid(rc,topR)||isBlockSolid(rc,botR)||isBlockSolid(rc,midRow))nx=rc-PW;}
-  player.x=Math.max(PW,Math.min(COLS-PW,nx));
+  player.x=Math.max(PW,Math.min(roomWidth()-PW,nx));
   if(player.onLadder){
     player.vy=0;if(isDown('up'))player.vy=-CLIMB;if(isDown('down'))player.vy=CLIMB;
     if(player.vy!==0){ladderTickTimer++;if(ladderTickTimer>=12){Audio.ladderTick();ladderTickTimer=0;}}else{ladderTickTimer=10;}
@@ -389,6 +691,7 @@ function updatePlayer(){
   }
   if(player.iFrames<=0){const hcols=[Math.floor(player.x-PW+0.02),Math.round(player.x),Math.floor(player.x+PW-0.02)];const hrows=[Math.floor(player.y+0.1),midRow,Math.floor(player.y+PH-0.1)];outer:for(const hc of hcols)for(const hr of hrows){if(isHazardTile(hc,hr)){hitPlayer();break outer;}}}
   scoutContactCheck();
+  if(wasPressed('validate'))validateRoom();
   if(wasPressed('up'))handleInteraction();
   if(wasPressed('A')&&toolCooldown<=0)useTool(0);
   if(wasPressed('B')&&toolCooldown<=0)useTool(1);
@@ -396,10 +699,10 @@ function updatePlayer(){
   ventCycle=(ventCycle+1)%VENT_CYCLE;
 }
 function hitPlayer(){player.stability--;player.iFrames=IFRAMES;Audio.thud();TT.push('STABILITY HIT ('+player.stability+' left)','bad');if(player.stability<=0)resetRoom();}
-function resetRoom(){player.stability=3;if(player.checkpoint&&player.checkpoint.room===currentRoom){player.x=player.checkpoint.x;player.y=player.checkpoint.y;}else{player.x=2;player.y=27;}player.vy=0;player.vx=0;player.onLadder=false;player.iFrames=IFRAMES;player.coyote=0;snapToFloor();TT.push('SETBACK: returned to entry. Stability reset.','bad');if(currentRoom==='R03'){scouts=[];scouts.push(createDrone(10,21,20));}if(currentRoom==='R12'){scouts=[];scouts.push(createDrone(14,26,20));}if(currentRoom==='R06'){scouts=[];const bot=createScout(15,26);bot.leftBound=7;bot.rightBound=24;bot.x=15;scouts.push(bot);}}
+function resetRoom(){player.stability=3;if(player.checkpoint&&player.checkpoint.room===currentRoom){player.x=player.checkpoint.x;player.y=player.checkpoint.y;}else{player.x=2;player.y=18;}player.vy=0;player.vx=0;player.onLadder=false;player.iFrames=IFRAMES;player.coyote=0;snapToFloor();TT.push('SETBACK: returned to entry. Stability reset.','bad');if(currentRoom==='R03'){scouts=[];scouts.push(createDrone(18,45,15));}if(currentRoom==='R12'){scouts=[];scouts.push(createDrone(18,45,15));}if(currentRoom==='R06'){scouts=[];const bot=createScout(30,17);bot.leftBound=12;bot.rightBound=48;bot.x=30;scouts.push(bot);}}
 function handleInteraction(){const pc=Math.round(player.x),pr=Math.floor(player.y+PH/2);const checks=[[pc,pr],[pc,pr+1],[pc,pr-1],[pc-1,pr],[pc+1,pr],[Math.floor(player.x),Math.floor(player.y+PH-0.1)]];const seen=new Set();
   for(const [c,r] of checks){const key=c+','+r;if(seen.has(key))continue;seen.add(key);const t=getTile(c,r);
-    if(t==='D'){const trans=TRANSITIONS[currentRoom];const dk=c+'_'+r;if(trans&&trans[dk]!==undefined){const dest=trans[dk];
+    if(t==='D'){const trans=TRANSITIONS[currentRoom];const dk=transitionKeyForDoor(c,r);if(trans&&trans[dk]!==undefined){const dest=trans[dk];
       if(dest===null){showDialogue('SECTOR SEALED.\nNO ROUTE THIS WAY.');return;}
       // TTRPG: reaching the forward door auto-checks the repair. No button — the door is the test.
       if(dest==='COMPLETE'||dest.startsWith('R')){
@@ -410,12 +713,12 @@ function handleInteraction(){const pc=Math.round(player.x),pr=Math.floor(player.
       Audio.doorChime();TT.push('Route door → '+dest.split('_')[0],'good');startTransition(dest);return;}}
     if(t==='S'){
       if(currentRoom==='R03'){
-        if(c===6&&r===8){syncState.termA=true;TT.roomState.R03_relayA=true;if(!syncState.active){syncState.active=true;syncState.timer=SYNC_TIMER;}Audio.interact();TT.record('RELAY A','activated','good');showDialogue('RELAY A ACTIVATED.\nREACH RELAY B.');return;}
-        if(c===25&&r===8){syncState.termB=true;TT.roomState.R03_relayB=true;if(!syncState.active){syncState.active=true;syncState.timer=SYNC_TIMER;}Audio.interact();TT.record('RELAY B','activated','good');showDialogue('RELAY B ACTIVATED.');return;}
+        if(c===8&&r===3){syncState.termA=true;TT.roomState.R03_relayA=true;if(!syncState.active){syncState.active=true;syncState.timer=SYNC_TIMER;}Audio.interact();TT.record('RELAY A','activated','good');showDialogue('RELAY A ACTIVATED.\nREACH RELAY B.');return;}
+        if(c===55&&r===3){syncState.termB=true;TT.roomState.R03_relayB=true;if(!syncState.active){syncState.active=true;syncState.timer=SYNC_TIMER;}Audio.interact();TT.record('RELAY B','activated','good');showDialogue('RELAY B ACTIVATED.');return;}
       }
       if(currentRoom==='R06'){
         if(c===8&&r===8){TT.roomState.R06_relayA=true;Audio.interact();TT.record('RELAY A','activated','good');showDialogue('RELAY A ACTIVATED.\nFIND RELAY B.');return;}
-        if(c===23&&r===8){TT.roomState.R06_relayB=true;Audio.interact();TT.record('RELAY B','activated','good');showDialogue('RELAY B ACTIVATED.');return;}
+        if(c===55&&r===3){TT.roomState.R06_relayB=true;Audio.interact();TT.record('RELAY B','activated','good');showDialogue('RELAY B ACTIVATED.');return;}
       }
       player.checkpoint={room:currentRoom,x:player.x,y:player.y};Audio.interact();TT.push('Checkpoint saved.','info');showDialogue('CHECKPOINT SAVED.\nSTABILITY PRESERVED.');return;}
     if(t==='G'){const txt=GLYPH_TEXT[currentRoom+'_'+c+'_'+r];if(txt){Audio.interact();TT.push('Read node: '+txt.replace(/\n/g,' '),'info');showDialogue(txt);}return;}
@@ -428,6 +731,9 @@ function useTool(idx){
   const inRange=(fn)=>{for(let dr=-TOOL_RANGE;dr<=TOOL_RANGE;dr++)for(let dc=-TOOL_RANGE;dc<=TOOL_RANGE;dc++)fn(pc+dc,pr+dr);};
   const oy=HUD_ROWS*T;let hitCount=0;
   switch(tool.id){
+    case'GRAPPLE':
+      startGrapple();
+      break;
     case'PULSE':
       inRange((c,r)=>{if(getTile(c,r)==='X'){roomTiles[r][c]='.';clearedTiles[currentRoom+'_'+c+'_'+r]=true;hitCount++;const cx=c*T+T/2,cy=oy+r*T+T/2;spawnParticle({x:cx,y:cy,vx:0,vy:0,life:6,maxLife:6,color:'255,255,255',size:T*0.9,kind:'flash'});for(let k=0;k<8;k++){const a=Math.random()*Math.PI*2,sp=1+Math.random()*2;spawnParticle({x:cx,y:cy,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp,life:18+Math.random()*10,maxLife:28,color:'255,90,90',size:T*0.18,kind:'spark',drag:0.92});}}});
       let stunned=0;for(const s of scouts){if(Math.abs(s.x-player.x)<TOOL_RANGE&&Math.abs(s.y-player.y)<TOOL_RANGE){if(s.state==='PATROL'||s.state==='RECOVERY'){s.state='STUNNED';s.stunTimer=120;Audio.stun();stunned++;}}}
@@ -439,7 +745,7 @@ function useTool(idx){
       TT.record('SCAN',hitCount?('revealed '+hitCount+' hidden route tile(s)'):'no hidden route in range',hitCount?'good':'info');
       break;
     case'SYNC':
-      {let best=null,bd=1e9;for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++){if(getTile(c,r)==='S'){const d=Math.hypot(c-player.x,r-(player.y+PH/2));if(d<bd){bd=d;best={c,r};}}}if(best){syncBeam={x0:player.x*T,y0:oy+(player.y+PH/2)*T,x1:best.c*T+T/2,y1:oy+best.r*T+T/2,timer:90};}}
+      {let best=null,bd=1e9;for(let r=0;r<ROWS;r++)for(let c=0;c<roomWidth();c++){if(getTile(c,r)==='S'){const d=Math.hypot(c-player.x,r-(player.y+PH/2));if(d<bd){bd=d;best={c,r};}}}if(best){syncBeam={x0:player.x*T,y0:oy+(player.y+PH/2)*T,x1:best.c*T+T/2,y1:oy+best.r*T+T/2,timer:90};}}
       TT.record('SYNC','aimed at nearest relay — interact to confirm','info');showDialogue('USE AT A RELAY\nTERMINAL (PRESS UP).');break;
     case'THERMAL':
       inRange((c,r)=>{const t=getTile(c,r);if(t==='V'||t==='~'){roomTiles[r][c]=t==='V'?'_':'.';clearedTiles[currentRoom+'_'+c+'_'+r]=true;hitCount++;coolTiles.push({room:currentRoom,c,r,timer:24,wasVent:t==='V'});const cx=c*T+T/2,cy=oy+r*T+T/2;for(let k=0;k<5;k++){const a=Math.random()*Math.PI*2,sp=0.6+Math.random()*1.4;spawnParticle({x:cx,y:cy,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp-0.4,life:20+Math.random()*10,maxLife:30,color:'120,160,255',size:T*0.22,kind:'steam',drag:0.95});}}});
@@ -454,7 +760,16 @@ function useTool(idx){
 }
 function showDialogue(text){dialogue={text,timer:200,reveal:0,len:text.replace(/\n/g,'').length};}
 function updateDialogue(){if(dialogue){dialogue.timer--;if(dialogue.reveal<dialogue.len)dialogue.reveal+=0.6;if(dialogue.timer<=0)dialogue=null;}}
-function render(){ctx.fillStyle=NES.bg;ctx.fillRect(0,0,GW,GH);if(gameState==='TITLE'){renderTitle();return;}if(gameState==='COMPLETE'){renderComplete();return;}const oy=HUD_ROWS*T;for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++)renderTile(c,r,c*T,oy+r*T);for(const s of scouts)renderScout(s,oy);renderCoolTiles(oy);renderPlayer(oy);if(toolEffect)renderToolEffect(oy);renderSyncBeam();renderParticles();renderHUD();if(dialogue)renderDialogue(oy);
+function render(){ctx.fillStyle=NES.bg;ctx.fillRect(0,0,GW,GH);if(gameState==='TITLE'){renderTitle();return;}if(gameState==='COMPLETE'){renderComplete();return;}const oy=HUD_ROWS*T;updateCamera();ctx.save();ctx.translate(-cameraX*T,0);const startCol=Math.max(0,Math.floor(cameraX)-2),endCol=Math.min(roomWidth(),Math.ceil(cameraX+COLS)+2);for(let r=0;r<ROWS;r++)for(let c=startCol;c<endCol;c++)renderTile(c,r,c*T,oy+r*T);renderGrappleAnchors(oy);for(const s of scouts)renderScout(s,oy);renderCoolTiles(oy);renderPlayer(oy);if(toolEffect)renderToolEffect(oy);renderSyncBeam();renderParticles();ctx.restore();
+  // v1.18.1: Preserve the old video frame height. The 20-row corridor occupies the top of the game area; the remaining restored output area stays as dark console/background, not missing content.
+  if(typeof DISPLAY_ROWS!=='undefined' && DISPLAY_ROWS>ROWS){
+    ctx.fillStyle='rgba(6,10,22,0.92)';
+    ctx.fillRect(0, oy+ROWS*T, GW, (DISPLAY_ROWS-ROWS)*T);
+    ctx.strokeStyle='rgba(91,155,213,0.18)';
+    ctx.lineWidth=1;
+    ctx.beginPath();ctx.moveTo(0, oy+ROWS*T+0.5);ctx.lineTo(GW, oy+ROWS*T+0.5);ctx.stroke();
+  }
+  renderHUD();if(dialogue)renderDialogue(oy);
   if(syncState.active){const barW=(syncState.timer/SYNC_TIMER)*(GW-T*4);ctx.fillStyle=syncState.timer<60?NES.fault:NES.termOn;ctx.fillRect(T*2,oy-T*0.4,barW,T*0.3);ctx.strokeStyle=NES.hudDim;ctx.lineWidth=1;ctx.strokeRect(T*2,oy-T*0.4,GW-T*4,T*0.3);}
   if(gameState==='PAUSED'){
     ctx.fillStyle='rgba(8,8,20,0.92)'; ctx.fillRect(0,0,GW,GH);
@@ -477,7 +792,7 @@ function render(){ctx.fillStyle=NES.bg;ctx.fillRect(0,0,GW,GH);if(gameState==='T
     // Footer: controls reminder + resume
     const fy=startY+ALL_TOOLS.length*rowH+GH*0.02;
     ctx.textAlign='center'; ctx.font=Math.floor(fs*0.62)+'px "Press Start 2P",monospace'; ctx.fillStyle=NES.hudDim;
-    ctx.fillText('A = PULSE (FIXED)   B = SELECTED TOOL   TAP A TOOL TO LOAD B',GW/2,fy);
+    ctx.fillText('A = PULSE (FIXED)   B = SELECTED TOOL   HOOK = FIXED ANCHORS ONLY',GW/2,fy);
     ctx.fillStyle=NES.stab; if(frame%40<25)ctx.fillText('PRESS START TO RESUME',GW/2,fy+fs*1.6);
   }
   if(fade.active){let a;if(fade.phase==='out')a=1-(fade.timer/FADE_FRAMES);else a=(fade.timer/FADE_FRAMES);ctx.fillStyle='rgba(10,10,26,'+Math.max(0,Math.min(1,a))+')';ctx.fillRect(0,0,GW,GH);}}
@@ -506,8 +821,8 @@ function renderToolEffect(oy){if(!toolEffect)return;const ex=toolEffect.x*T,ey=o
 function renderParticles(){for(const p of particles){const a=Math.max(0,p.life/p.maxLife);switch(p.kind){case'flash':ctx.fillStyle='rgba('+p.color+','+a+')';ctx.fillRect(p.x-p.size/2,p.y-p.size/2,p.size,p.size);break;case'spark':case'rise':case'steam':ctx.fillStyle='rgba('+p.color+','+a+')';ctx.fillRect(p.x-p.size/2,p.y-p.size/2,p.size,p.size);break;case'reveal':ctx.strokeStyle='rgba('+p.color+','+a+')';ctx.lineWidth=1.5;ctx.strokeRect(p.x-p.size/2,p.y-p.size/2,p.size,p.size);ctx.fillStyle='rgba('+p.color+','+(a*0.3)+')';ctx.fillRect(p.x-p.size/2,p.y-p.size/2,p.size,p.size);break;case'shard':{if(p.rot!==undefined)p.rot+=p.vr||0;ctx.save();ctx.translate(p.x,p.y);ctx.rotate(p.rot||0);ctx.fillStyle='rgba('+p.color+','+a+')';ctx.beginPath();ctx.moveTo(0,-p.size);ctx.lineTo(p.size*0.7,0);ctx.lineTo(0,p.size);ctx.lineTo(-p.size*0.7,0);ctx.closePath();ctx.fill();ctx.restore();break;}default:ctx.fillStyle='rgba('+p.color+','+a+')';ctx.fillRect(p.x-1,p.y-1,2,2);}}}
 function renderCoolTiles(oy){for(const ct of coolTiles){if(ct.room!==currentRoom)continue;const x=ct.c*T,y=oy+ct.r*T,a=ct.timer/24;ctx.fillStyle='rgba(80,140,255,'+(0.5*a)+')';ctx.fillRect(x,y,T,T);ctx.fillStyle='rgba(200,230,255,'+(0.3*a)+')';ctx.fillRect(x,y,T,2);}}
 function renderSyncBeam(){if(!syncBeam)return;const a=Math.min(1,syncBeam.timer/30)*0.7;const pulse=0.5+0.5*Math.sin(frame*0.4);const oy=HUD_ROWS*T;const x0=player.x*T,y0=oy+(player.y+PH/2)*T;ctx.strokeStyle='rgba(0,200,83,'+(a*(0.5+0.5*pulse))+')';ctx.lineWidth=2+pulse*1.5;ctx.beginPath();ctx.moveTo(x0,y0);ctx.lineTo(syncBeam.x1,syncBeam.y1);ctx.stroke();ctx.strokeStyle='rgba(130,255,180,'+a+')';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(x0,y0);ctx.lineTo(syncBeam.x1,syncBeam.y1);ctx.stroke();ctx.fillStyle='rgba(130,255,180,'+a+')';ctx.beginPath();ctx.arc(syncBeam.x1,syncBeam.y1,3+pulse*2,0,Math.PI*2);ctx.fill();}
-function drawToolIcon(id,cx,cy,sz){const h=sz/2;ctx.save();ctx.translate(cx,cy);ctx.lineWidth=1.5;ctx.lineCap='round';switch(id){case'PULSE':ctx.strokeStyle=NES.fault;ctx.beginPath();ctx.arc(0,0,h*0.5,0,Math.PI*2);ctx.stroke();ctx.beginPath();ctx.arc(0,0,h*0.85,0,Math.PI*2);ctx.stroke();break;case'SCANNER':ctx.strokeStyle=NES.glyphLt;ctx.beginPath();ctx.arc(-h*0.2,-h*0.2,h*0.5,0,Math.PI*2);ctx.stroke();ctx.beginPath();ctx.moveTo(h*0.15,h*0.15);ctx.lineTo(h*0.7,h*0.7);ctx.stroke();break;case'SYNC':ctx.strokeStyle=NES.termOn;ctx.beginPath();ctx.arc(-h*0.45,0,h*0.3,0,Math.PI*2);ctx.stroke();ctx.beginPath();ctx.arc(h*0.45,0,h*0.3,0,Math.PI*2);ctx.stroke();ctx.beginPath();ctx.moveTo(-h*0.15,0);ctx.lineTo(h*0.15,0);ctx.stroke();break;case'THERMAL':ctx.strokeStyle=NES.convLt;for(let a=0;a<6;a++){ctx.beginPath();ctx.moveTo(0,0);ctx.lineTo(Math.cos(a*Math.PI/3)*h*0.8,Math.sin(a*Math.PI/3)*h*0.8);ctx.stroke();}break;case'CATALYST':ctx.strokeStyle=NES.catLt;ctx.beginPath();ctx.moveTo(0,-h*0.8);ctx.lineTo(h*0.6,0);ctx.lineTo(0,h*0.8);ctx.lineTo(-h*0.6,0);ctx.closePath();ctx.stroke();break;case'CHKPT':ctx.strokeStyle=NES.stab;ctx.beginPath();ctx.moveTo(-h*0.4,-h*0.8);ctx.lineTo(-h*0.4,h*0.8);ctx.stroke();ctx.fillStyle=NES.stab;ctx.beginPath();ctx.moveTo(-h*0.4,-h*0.8);ctx.lineTo(h*0.5,-h*0.45);ctx.lineTo(-h*0.4,-h*0.1);ctx.closePath();ctx.fill();break;case'READER':ctx.strokeStyle='#00dcb4';ctx.beginPath();ctx.arc(0,0,h*0.3,0,Math.PI*2);ctx.stroke();ctx.beginPath();ctx.arc(0,0,h*0.6,0,Math.PI*2);ctx.stroke();break;default:ctx.strokeStyle=NES.hudDim;ctx.strokeRect(-h*0.5,-h*0.5,h,h);}ctx.restore();}
-function renderHUD(){const hudH=HUD_ROWS*T;ctx.fillStyle=NES.hudBg;ctx.fillRect(0,0,GW,hudH);ctx.strokeStyle=NES.dialogBd;ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(0,hudH-0.5);ctx.lineTo(GW,hudH-0.5);ctx.stroke();const fs=Math.max(7,Math.floor(T*0.55));ctx.font=fs+'px "Press Start 2P",monospace';ctx.textAlign='left';ctx.fillStyle=NES.hudDim;ctx.fillText('D01-'+currentRoom,T*0.5,T*0.95);
+function drawToolIcon(id,cx,cy,sz){const h=sz/2;ctx.save();ctx.translate(cx,cy);ctx.lineWidth=1.5;ctx.lineCap='round';switch(id){case'PULSE':ctx.strokeStyle=NES.fault;ctx.beginPath();ctx.arc(0,0,h*0.5,0,Math.PI*2);ctx.stroke();ctx.beginPath();ctx.arc(0,0,h*0.85,0,Math.PI*2);ctx.stroke();break;case'SCANNER':ctx.strokeStyle=NES.glyphLt;ctx.beginPath();ctx.arc(-h*0.2,-h*0.2,h*0.5,0,Math.PI*2);ctx.stroke();ctx.beginPath();ctx.moveTo(h*0.15,h*0.15);ctx.lineTo(h*0.7,h*0.7);ctx.stroke();break;case'GRAPPLE':ctx.strokeStyle=NES.doorLt;ctx.beginPath();ctx.arc(-h*0.45,-h*0.05,h*0.22,0,Math.PI*2);ctx.stroke();ctx.beginPath();ctx.moveTo(-h*0.25,0);ctx.lineTo(h*0.55,-h*0.48);ctx.lineTo(h*0.38,-h*0.18);ctx.moveTo(h*0.55,-h*0.48);ctx.lineTo(h*0.15,-h*0.48);ctx.stroke();break;case'SYNC':ctx.strokeStyle=NES.termOn;ctx.beginPath();ctx.arc(-h*0.45,0,h*0.3,0,Math.PI*2);ctx.stroke();ctx.beginPath();ctx.arc(h*0.45,0,h*0.3,0,Math.PI*2);ctx.stroke();ctx.beginPath();ctx.moveTo(-h*0.15,0);ctx.lineTo(h*0.15,0);ctx.stroke();break;case'THERMAL':ctx.strokeStyle=NES.convLt;for(let a=0;a<6;a++){ctx.beginPath();ctx.moveTo(0,0);ctx.lineTo(Math.cos(a*Math.PI/3)*h*0.8,Math.sin(a*Math.PI/3)*h*0.8);ctx.stroke();}break;case'CATALYST':ctx.strokeStyle=NES.catLt;ctx.beginPath();ctx.moveTo(0,-h*0.8);ctx.lineTo(h*0.6,0);ctx.lineTo(0,h*0.8);ctx.lineTo(-h*0.6,0);ctx.closePath();ctx.stroke();break;case'CHKPT':ctx.strokeStyle=NES.stab;ctx.beginPath();ctx.moveTo(-h*0.4,-h*0.8);ctx.lineTo(-h*0.4,h*0.8);ctx.stroke();ctx.fillStyle=NES.stab;ctx.beginPath();ctx.moveTo(-h*0.4,-h*0.8);ctx.lineTo(h*0.5,-h*0.45);ctx.lineTo(-h*0.4,-h*0.1);ctx.closePath();ctx.fill();break;case'READER':ctx.strokeStyle='#00dcb4';ctx.beginPath();ctx.arc(0,0,h*0.3,0,Math.PI*2);ctx.stroke();ctx.beginPath();ctx.arc(0,0,h*0.6,0,Math.PI*2);ctx.stroke();break;default:ctx.strokeStyle=NES.hudDim;ctx.strokeRect(-h*0.5,-h*0.5,h,h);}ctx.restore();}
+function renderHUD(){const hudH=HUD_ROWS*T;ctx.fillStyle=NES.hudBg;ctx.fillRect(0,0,GW,hudH);ctx.strokeStyle=NES.dialogBd;ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(0,hudH-0.5);ctx.lineTo(GW,hudH-0.5);ctx.stroke();const fs=Math.max(7,Math.floor(T*0.55));ctx.font=fs+'px "Press Start 2P",monospace';ctx.textAlign='left';ctx.fillStyle=NES.hudDim;ctx.fillText('D01-'+currentRoom+'  '+(Math.floor(cameraX)+1)+'/'+roomWidth(),T*0.5,T*0.95);
   // TTRPG: validated stamp
   if(TT.roomState[currentRoom+'_validated']){ctx.fillStyle=NES.stab;ctx.font=Math.floor(fs*0.85)+'px "Press Start 2P",monospace';ctx.fillText('✓ VALIDATED',T*0.5+fs*5,T*0.95);}
   else{ctx.fillStyle=NES.stabLo;ctx.font=Math.floor(fs*0.85)+'px "Press Start 2P",monospace';ctx.fillText('UNVERIFIED',T*0.5+fs*5,T*0.95);}
@@ -534,7 +849,7 @@ function gameLoop(){frame++;
     case'PAUSED':if(wasPressed('start'))gameState='PLAY';break;
     case'COMPLETE':if(completionTimer>120&&(wasPressed('start')||wasPressed('A'))){gameState='PLAY';player.stability=3;player.checkpoint=null;clearedTiles={};revealedH={};TT.reset();loadRoom('R02');}break;
   }
-  // TTRPG: validate hotkey also works outside updatePlayer guard via 'v' handled in updatePlayer
+  // TTRPG: validation is enforced at route doors; manual validation button remains a future patch option.
   render();
   Object.keys(justPressed).forEach(k=>delete justPressed[k]);
   requestAnimationFrame(gameLoop);
@@ -544,7 +859,7 @@ document.getElementById('title-screen').addEventListener('click',startGame);
 document.getElementById('title-screen').addEventListener('touchend',e=>{e.preventDefault();startGame();});
 addEventListener('resize',resize);
 (function(){const h=document.getElementById('tt-head');if(h){h.addEventListener('click',toggleTTLog);h.addEventListener('touchend',e=>{e.preventDefault();toggleTTLog();});}})();
-buildTileset();resize();setupTouch();buildToolbar();requestAnimationFrame(gameLoop);
+buildTileset();resize();setupTouch();buildToolbar();bindTTPanelButtons();requestAnimationFrame(gameLoop);
 </script>
 </body>
 </html>
