@@ -3,16 +3,16 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>Reintegration Core — District 01 · Wide View v1.18.2</title>
+<title>Reintegration Core — District 01 · Grappling Hook Hybrid v1.16.0</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
   *{margin:0;padding:0;box-sizing:border-box;}
-  html,body{width:100%;height:100%;overflow:hidden;background:#0a0a1a;font-family:'Press Start 2P',monospace;touch-action:none;user-select:none;-webkit-user-select:none;}
-  #wrap{display:flex;flex-direction:column;align-items:center;justify-content:flex-start;width:100%;height:100%;position:relative;padding-top:env(safe-area-inset-top,0px);padding-bottom:215px;overflow-y:auto;overflow-x:hidden;}
-  canvas{display:block;image-rendering:pixelated;image-rendering:crisp-edges;margin-top:0;}
+  html,body{width:100%;min-height:100%;overflow-x:hidden;overflow-y:auto;background:#0a0a1a;font-family:'Press Start 2P',monospace;touch-action:pan-y;user-select:none;-webkit-user-select:none;}
+  #wrap{display:flex;flex-direction:column;align-items:center;justify-content:flex-start;width:100%;min-height:100svh;height:auto;position:relative;padding-top:env(safe-area-inset-top,0px);padding-bottom:calc(28px + env(safe-area-inset-bottom,0px));overflow:visible;}
+  canvas{display:block;image-rendering:pixelated;image-rendering:crisp-edges;margin-top:0;touch-action:none;}
 
   /* ── Quick Tool Bar (NEW: replaces SELECT-menu detour for access) ── */
-  #toolbar{display:none;width:100%;max-width:640px;margin:8px auto 0;justify-content:center;gap:5px;z-index:14;padding:0 6px;flex-wrap:wrap;flex:0 0 auto;}
+  #toolbar{display:none;width:calc(100% - 12px);max-width:760px;margin:10px auto 0;justify-content:center;gap:6px;z-index:14;padding:0 6px;flex-wrap:wrap;flex:0 0 auto;order:30;}
   #toolbar.show{display:flex;}
   .qtool{pointer-events:auto;min-width:62px;background:rgba(20,24,40,0.86);border:1.5px solid rgba(120,130,170,0.4);border-radius:6px;padding:5px 6px 4px;display:flex;flex-direction:column;align-items:center;gap:2px;-webkit-tap-highlight-color:transparent;}
   .qtool .qn{font-size:7px;color:#c5cae9;letter-spacing:.5px;}
@@ -27,7 +27,7 @@
 
   /* ── Tabletop side panel: intent log + validate (NEW) ── */
   /* Inline panel: flows directly under the canvas, never overlaps play or controls. */
-  #ttpanel{display:none;width:100%;max-width:640px;margin:4px auto 0;background:rgba(13,15,30,0.92);border:1.5px solid rgba(91,155,213,0.4);border-radius:6px;flex-direction:column;overflow:hidden;flex:0 0 auto;}
+  #ttpanel{display:none;width:calc(100% - 12px);max-width:760px;margin:8px auto 0;background:rgba(13,15,30,0.92);border:1.5px solid rgba(91,155,213,0.4);border-radius:8px;flex-direction:column;overflow:hidden;flex:0 0 auto;order:20;}
   #ttpanel.show{display:flex;}
   #tt-head{display:flex;justify-content:space-between;align-items:center;padding:5px 8px;border-bottom:1px solid rgba(91,155,213,0.25);cursor:pointer;-webkit-tap-highlight-color:transparent;}
   #tt-head h3{font-size:7px;color:#8ab4f8;letter-spacing:1px;margin:0;}
@@ -53,24 +53,42 @@
   #ttlog::-webkit-scrollbar{width:4px;}
   #ttlog::-webkit-scrollbar-thumb{background:#243140;border-radius:2px;}
 
-  #touch{display:none;position:fixed;bottom:0;left:0;width:100%;padding:4px 10px 12px;gap:4px;justify-content:space-between;align-items:flex-end;z-index:10;pointer-events:none;}
+  #touch{display:none;position:relative;bottom:auto;left:auto;width:calc(100% - 16px);max-width:760px;margin:12px auto 0;padding:8px 10px calc(14px + env(safe-area-inset-bottom,0px));gap:8px;justify-content:space-between;align-items:flex-end;z-index:10;pointer-events:none;order:40;}
   #touch.show{display:flex;}
-  .tpad{display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(3,1fr);width:168px;height:168px;gap:3px;pointer-events:auto;}
+  .tpad{display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(3,1fr);width:min(36vw,156px);height:min(36vw,156px);gap:4px;pointer-events:auto;}
   .tbtn{background:rgba(200,200,220,0.12);border:1.5px solid rgba(200,200,220,0.25);border-radius:8px;display:flex;align-items:center;justify-content:center;color:rgba(200,200,220,0.6);font-family:'Press Start 2P',monospace;font-size:9px;pointer-events:auto;-webkit-tap-highlight-color:transparent;}
   .tbtn:active,.tbtn.pressed{background:rgba(200,200,220,0.3);border-color:rgba(200,200,220,0.5);color:#fff;}
   .tbtn.blank{background:transparent;border-color:transparent;pointer-events:none;}
-  .abtn{width:72px;height:72px;border-radius:50%;background:rgba(200,200,220,0.12);border:1.5px solid rgba(200,200,220,0.25);display:flex;align-items:center;justify-content:center;color:rgba(200,200,220,0.6);font-family:'Press Start 2P',monospace;font-size:12px;pointer-events:auto;-webkit-tap-highlight-color:transparent;}
+  .abtn{width:min(18vw,76px);height:min(18vw,76px);border-radius:50%;background:rgba(200,200,220,0.12);border:1.5px solid rgba(200,200,220,0.25);display:flex;align-items:center;justify-content:center;color:rgba(200,200,220,0.6);font-family:'Press Start 2P',monospace;font-size:12px;pointer-events:auto;-webkit-tap-highlight-color:transparent;}
   .abtn:active,.abtn.pressed{background:rgba(200,200,220,0.3);border-color:rgba(200,200,220,0.5);color:#fff;}
   #actbtns{display:flex;flex-direction:column;gap:6px;align-items:center;pointer-events:auto;}
-  #metabtns{display:flex;gap:6px;align-items:center;pointer-events:auto;position:fixed;bottom:172px;left:50%;transform:translateX(-50%);z-index:11;}
+  #metabtns{display:flex;gap:6px;align-items:center;justify-content:center;pointer-events:auto;position:relative;bottom:auto;left:auto;transform:none;z-index:11;margin:8px auto 0;order:35;}
   .mbtn{padding:6px 14px;background:rgba(200,200,220,0.08);border:1px solid rgba(200,200,220,0.2);border-radius:4px;color:rgba(200,200,220,0.5);font-family:'Press Start 2P',monospace;font-size:6px;pointer-events:auto;-webkit-tap-highlight-color:transparent;}
   .mbtn:active{background:rgba(200,200,220,0.25);color:#fff;}
-  #title-screen{position:absolute;top:0;left:0;width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:100;background:#0a0a1a;cursor:pointer;}
+  #title-screen{position:fixed;top:0;left:0;width:100%;height:100svh;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:100;background:#0a0a1a;cursor:pointer;}
   #title-screen h1{color:#5b9bd5;font-size:clamp(28px,4.5vw,62px);letter-spacing:4px;margin-bottom:16px;text-align:center;line-height:1.35;text-shadow:0 0 22px rgba(91,155,213,.42);}
   #title-screen h2{color:#8ab4f8;font-size:clamp(12px,1.35vw,20px);letter-spacing:2px;margin-bottom:34px;text-align:center;}
   #title-screen p{color:rgba(200,200,220,0.72);font-size:clamp(10px,1.1vw,16px);animation:blink 1.2s infinite;}
   #title-screen .sub{color:rgba(200,200,220,0.42);font-size:clamp(9px,.95vw,14px);margin-top:24px;line-height:2;letter-spacing:1px;text-align:center;}
   @keyframes blink{0%,100%{opacity:1;}50%{opacity:0.2;}}
+
+  @media (max-width: 768px){
+    html,body{height:auto;min-height:100svh;overflow-y:auto;overflow-x:hidden;}
+    #wrap{height:auto;min-height:100svh;overflow:visible;padding-bottom:calc(28px + env(safe-area-inset-bottom,0px));}
+    canvas{margin-top:6px;max-width:calc(100vw - 10px);height:auto;}
+    #ttpanel{margin-top:8px;}
+    #toolbar{margin-top:10px;}
+    #touch.show{display:flex;}
+    #metabtns.show{display:flex;}
+    .qtool{min-width:30%;padding:8px 7px 7px;border-radius:9px;}
+    .qtool .qn{font-size:9px;}
+    .qtool .qd{font-size:6px;}
+    #tt-head h3{font-size:10px;}
+    #ttobjective{font-size:8px;line-height:1.55;padding:10px 12px;}
+    .ttact{font-size:7px;min-height:48px;border-radius:8px;}
+    .ttline{font-size:8px;}
+    .mbtn{font-size:8px;padding:9px 20px;border-radius:8px;}
+  }
 </style>
 </head>
 <body>
@@ -89,7 +107,7 @@
   </div>
   <div id="title-screen">
     <h1>REINTEGRATION<br>CORE</h1>
-    <h2>DISTRICT 01 — TTRPG HYBRID · WIDE VIEW 1.18.2</h2>
+    <h2>DISTRICT 01 — TTRPG HYBRID · MOBILE SCALE 1.18.3</h2>
     <p>PRESS START</p>
     <div class="sub">DIAGNOSE. CONNECT. VALIDATE.<br>ANCHORS ARE NOT ASSUMPTIONS.</div>
   </div>
@@ -116,14 +134,15 @@
   </div>
 </div>
 <script>
-// ═══ REINTEGRATION CORE — D01 — v1.16.1 + FIXED-ANCHOR GRAPPLING HOOK LADDER-CLEARANCE PATCH ═══
+// ═══ REINTEGRATION CORE — D01 — v1.18.3 + MOBILE SCALE AND ACCESS RHYTHM PATCH ═══
 // Locked engine preserved. TTRPG/tabletop layer plus fixed-anchor Grappling Hook added at marked seams only.
-const COLS=48,ROWS=20,HUD_ROWS=3;
-// DISPLAY_ROWS now matches the lowered 20-row corridor. Output is widened instead of padded with dead vertical space.
+const COLS=36,ROWS=20,HUD_ROWS=3;
+// DISPLAY_ROWS preserves the prior video output height/ratio while ROWS remains the 20-row lowered-ceiling room logic.
+// This fixes the v1.18.1 visibility drift: lower the ceiling in the map, not the player-facing video frame.
 const DISPLAY_ROWS=20;
 const SCROLLING_ROOM_BASE_WIDTH=64;
 const LOWERED_CEILING_ROWS_REMOVED=10;
-const VIEWPORT_DOCTRINE='48x20 visible corridor / 64x20 logical room';
+const VIEWPORT_DOCTRINE='36x20 visible mobile corridor / 64x20 logical room';
 let cameraX=0;
 const NES={bg:'#0a0a1a',wall:'#3a3a4a',wallLt:'#4a4a5c',plat:'#5a5a6c',platLt:'#6a6a7e',ladder:'#b53120',ladRng:'#8a2218',door:'#d4a017',doorLt:'#fce76e',termOn:'#00c853',termOff:'#00703c',glyph:'#448aff',glyphLt:'#82b1ff',hidden:'#1a1a2e',fault:'#ff1744',faultDk:'#b71c1c',catalyst:'#aa00ff',catLt:'#d500f9',vent:'#ff6d00',ventLt:'#ff9100',heat:'#ff3d00',heatLt:'#ff6e40',conv:'#536dfe',convLt:'#8c9eff',convArr:'#c5cae9',player:'#fce76e',playerDk:'#d4a017',scout:'#e040fb',scoutSt:'#7c4dff',scoutRc:'#ff6090',hud:'#c5cae9',hudDim:'#5c6170',hudBg:'#0d0d20',white:'#e8eaf6',stab:'#69f0ae',stabLo:'#ff5252',black:'#000000',dialogBg:'#0d0d20',dialogBd:'#5b9bd5'};
 const ROOM_MAPS={
@@ -131,66 +150,66 @@ R02:[
 '################################################################',
 '#..............................................................#',
 '#..............................................................#',
-'#........G.....................................................#',
-'#_____L_________L_______________L_________________L____________#',
-'#.....L.........L...............L.................L............#',
-'#.....L.........L...............L.................L............#',
-'#.....L.........L...............L.................L............#',
-'#.....L.........L...............L.................L............#',
-'#.....L.........L...............L.................L............#',
-'#_____L_________L_______________L_________________L____________#',
-'#.....L.........L...............L.................L............#',
-'#.....L.........L...............L.................L............#',
-'#.....L.........L...............L.................L............#',
-'#.....L.........L...............L.................L............#',
-'#.....L.........L...............L.................L............#',
-'#.....L.........L.....X.........L.........X.......L............#',
-'D.....L.......S.L...........G...L.................L............D',
-'#_____L_________L_______________L_________________L____________#',
+'#..............................................................#',
+'#.........G....................................................#',
+'#______________________________________________________________#',
+'#.................L...........................L................#',
+'#.................L...........................L................#',
+'#.................L...........................L................#',
+'#.................L...........................L................#',
+'#.................L.....................G.....L................#',
+'#_________________L___________________________L________________#',
+'#.......L.........................L.....................L......#',
+'#.......L.........................L.....................L......#',
+'#.......L.........................L.....................L......#',
+'#.......L.........................L.....................L......#',
+'#.......L.........................L.....................L......#',
+'D.......L...........S.........X...L.................X...L......D',
+'#_______L_________________________L_____________________L______#',
 '################################################################',
 ],
 R03:[
 '################################################################',
 '#..............................................................#',
 '#..............................................................#',
-'#.......S..............................................S.......#',
-'#_____L_________L_______________L_________________L____________#',
-'#.....L.........L...............L.................L............#',
-'#.....L.........L...............L.................L............#',
-'#.....L.........L...............L.................L............#',
-'#.....L.........L...............L.................L............#',
-'#.....L.........L...............L.................L............#',
-'#_____L_________L_______________L_________________L____________#',
-'#.....L.........L...............L.................L............#',
-'#.....L.........L...............L.................L............#',
-'#.....L.........L...............L.................L............#',
-'#.....L.........L...............L.................L............#',
-'#.....L.........L...............L.................L............#',
-'#.....L.........L...G...........L.................L............#',
-'D..G..L.........L...............L.................L............D',
-'#_____L_________L_______________L_________________L____________#',
+'#..............................................................#',
+'#.................S...................................S........#',
+'#______________________________________________________________#',
+'#.................L...........................L................#',
+'#.................L...........................L................#',
+'#.................L...........................L................#',
+'#.................L...........................L................#',
+'#.................L.......G...................L................#',
+'#_________________L___________________________L________________#',
+'#.......L.........................L.....................L......#',
+'#.......L.........................L.....................L......#',
+'#.......L.........................L.....................L......#',
+'#.......L.........................L.....................L......#',
+'#.......L.........................L.....................L......#',
+'D..G....L.........................L.....................L......D',
+'#_______L_________________________L_____________________L______#',
 '################################################################',
 ],
 R12:[
 '################################################################',
 '#..............................................................#',
 '#..............................................................#',
+'#..............................................................#',
 '#.................G............................................#',
-'#_____L_________L_______________L_________________L____________#',
-'#.....L.........L...............L.................L............#',
-'#.....L.........L...............L.................L............#',
-'#.....L.........L...............L.................L............#',
-'#.....L.........L...............L.................L............#',
-'#.....L.........L.........HHH...L.................L............#',
-'#_____L_________L_______________L_________________L____________#',
-'#.....L.........L...............L.................L............#',
-'#.....L.........L...............L.................L............#',
-'#.....L.........L...............L.................L............#',
-'#.....L.........L...............L.................L............#',
-'#.....L.........L...............L.................L............#',
-'#.....L.........L...............L.................L............#',
-'D.....L.S.......L...............L...........S.....L............D',
-'#_____L_________L_______________L_________________L____________#',
+'#______________________________________________________________#',
+'#.................L...........................L................#',
+'#.................L...........................L................#',
+'#.................L...........................L................#',
+'#.................L...........................L................#',
+'#.................L.......HHH.................L................#',
+'#_________________L___________________________L________________#',
+'#.......L.........................L.....................L......#',
+'#.......L.........................L.....................L......#',
+'#.......L.........................L.....................L......#',
+'#.......L.........................L.....................L......#',
+'#.......L.........................L.....................L......#',
+'D.......S.........................L.............S.......L......D',
+'#_______L_________________________L_____________________L______#',
 '################################################################',
 ],
 R04:[
@@ -198,79 +217,80 @@ R04:[
 '#..............................................................#',
 '#..............................................................#',
 '#..............................................................#',
-'#_____L_________L_______________L_________________L____________#',
-'#.....L.........L...............L.................L............#',
-'#.....L.........L...............L.................L............#',
-'#.....L.........L...............L.................L............#',
-'#.....L.........L...............L.................L............#',
-'#.....L.........L...............L.................L............#',
-'#_____L_________L_______________L_________________L____________#',
-'#.....L.........L...............L.................L............#',
-'#.....L.........L...............L.................L............#',
-'#.....L.........L...............L.................L............#',
-'#.....L.........L...............L.................L............#',
-'#.....L.........L.......~.......L........~........L............#',
-'#.....L.........L.......V.......L........V........L............#',
-'D.G...L.........L...............L.................L.......G....D',
-'#_____L_________L_______________L_________________L____________#',
+'#..............................................................#',
+'#______________________________________________________________#',
+'#.................L...........................L................#',
+'#.................L...........................L................#',
+'#.................L...........................L................#',
+'#.................L...........................L................#',
+'#.................L...........................L................#',
+'#_________________L___________________________L________________#',
+'#.......L.........................L.....................L......#',
+'#.......L.........................L.....................L......#',
+'#.......L.........................L.....................L......#',
+'#.......L.........................L.....................L......#',
+'#.......L...................~.....L.........~...........L......#',
+'D..G....L...................V.....L.........V...........L.G....D',
+'#_______L_________________________L_____________________L______#',
 '################################################################',
 ],
 R05:[
 '################################################################',
 '#..............................................................#',
 '#..............................................................#',
-'#.G.......................................................G....#',
-'#_____L_________L_______________L_________________L____________#',
-'#.....L.........L...............L.................L............#',
-'#.....L.........L...............L.................L............#',
-'#.....L.........L...............L.................L............#',
-'#.....L.........L...............L.................L............#',
-'#.....L.........L...............L.................L............#',
-'#_____L_________L_______________L_________________L____________#',
-'#.....L.........L...............L.................L............#',
-'#.....L.........L...............L.................L............#',
-'#.....L.........L...............L.................L............#',
-'#.....L.........L...............L.................L............#',
-'#.....L.........L...............L.................L............#',
-'#.....L.........L.......CCC.....L.....CCC.........L............#',
-'D.....L.........L...............L.................L............D',
-'#_____L_________L_______________L_________________L____________#',
+'#..............................................................#',
+'#..G......................................................G....#',
+'#______________________________________________________________#',
+'#.................L...........................L................#',
+'#.................L...........................L................#',
+'#.................L...........................L................#',
+'#.................L...........................L................#',
+'#.................L...........................L................#',
+'#_________________L___________________________L________________#',
+'#.......L.........................L.....................L......#',
+'#.......L.........................L.....................L......#',
+'#.......L.........................L.....................L......#',
+'#.......L.........................L.....................L......#',
+'#.......L.........................L.....................L......#',
+'D.......L...................CCC...L.........CCC.........L......D',
+'#_______L_________________________L_____________________L______#',
 '################################################################',
 ],
 R06:[
 '################################################################',
 '#..............................................................#',
 '#..............................................................#',
-'#.......S..............................................S.......#',
-'#_____L_________L_______________L_________________L____________#',
-'#.....L.........L...............L.................L............#',
-'#.....L.........L...............L.................L............#',
-'#.....L.........L...............L.................L............#',
-'#.....L.........L...............L.................L............#',
-'#.....L.........L...............L.................L............#',
-'#_____L_________L_______________L_________________L____________#',
-'#.....L.........L...............L.................L............#',
-'#.....L.........L...............L.................L............#',
-'#.....L.........L...............L.................L............#',
-'#.....L.........L...............L.................L............#',
-'#.....L.........L...............L.................L............#',
-'#.....L.........L.......X.......L.......X.........L............#',
-'D.....L.........L.............G.L.................L............D',
-'#_____L_________L_______________L_________________L____________#',
+'#..............................................................#',
+'#.................S...................................S........#',
+'#______________________________________________________________#',
+'#.................L...........................L................#',
+'#.................L...........................L................#',
+'#.................L...........................L................#',
+'#.................L...........................L................#',
+'#.................L...........................L................#',
+'#_________________L___________________________L________________#',
+'#.......L.........................L.....................L......#',
+'#.......L.........................L.....................L......#',
+'#.......L.........................L.....................L......#',
+'#.......L.........................L.....................L......#',
+'#.......L.........................L.....................L......#',
+'D.......L.....................X...G.........X...........L......D',
+'#_______L_________________________L_____________________L______#',
 '################################################################',
 ],
 };
+
 const GLYPH_TEXT={
-  "R02_9_3":"CLIMB LADDERS TO\nREACH OFFSET LEDGES.",
-  "R02_28_17":"CLEAR EVERY FAULT\nBEFORE THE EXIT.",
-  "R03_20_16":"TWO RELAYS, FAR APART.\nSET BOTH — THE BOARD LIES.",
+  "R02_10_4":"SHORT LADDERS.\nANCHORS CREATE ACCESS.",
+  "R02_40_10":"CLEAR EVERY FAULT\nBEFORE THE EXIT.",
+  "R03_26_10":"TWO RELAYS, FAR APART.\nSET BOTH \u2014 THE BOARD LIES.",
   "R03_3_17":"A GREEN BOARD IS NOT\nA PROVEN ROUTE.",
-  "R12_18_3":"SCAN MAPS THE SECTOR.\nUSE IT BEFORE THE EXIT.",
-  "R04_2_17":"HEAT VENTS BURST\nON A TIMER. COOL THEM.",
+  "R12_18_4":"SCAN MAPS THE SECTOR.\nUSE IT BEFORE THE EXIT.",
+  "R04_3_17":"HEAT VENTS BURST\nON A TIMER. COOL THEM.",
   "R04_58_17":"THERMAL COOLS V AND ~.\nCLEAR THE COLUMN.",
-  "R05_2_3":"CATALYST BLOCKS\nWALL THE ROUTE.",
-  "R05_58_3":"DAMP DISSOLVES C BLOCKS.\nCLEAR TO PASS.",
-  "R06_30_17":"FAULTS AND RELAYS.\nPROVE THE WHOLE ROUTE.",
+  "R05_3_4":"CATALYST BLOCKS\nWALL THE ROUTE.",
+  "R05_58_4":"DAMP DISSOLVES C BLOCKS.\nCLEAR TO PASS.",
+  "R06_34_17":"FAULTS AND RELAYS.\nPROVE THE WHOLE ROUTE.",
 };
 const ROOM_DIALOGUE={
   R02:'FAULT DETECTED.\nDIAGNOSE, THEN CLEAR.',
@@ -411,12 +431,12 @@ const GRAPPLE_MIN_DIST=0.85;
 const GRAPPLE_DURATION=18;
 const GRAPPLE_ANCHOR_LADDER_CLEARANCE=3.0;
 const GRAPPLE_ANCHORS={
-  R02:[{id:'R02-A1',x:2.4,y:16.2,landX:2.4,landY:16.6,label:'entry-side anchor'},{id:'R02-A2',x:24.0,y:9.2,landX:24.0,landY:9.6,label:'mid access off-ladder'},{id:'R02-A3',x:42.0,y:16.2,landX:42.0,landY:16.6,label:'expanded fault access'},{id:'R02-A4',x:58.0,y:9.2,landX:58.0,landY:9.6,label:'far floor anchor'}],
-  R03:[{id:'R03-A1',x:2.8,y:16.2,landX:2.8,landY:16.6,label:'entry-side anchor'},{id:'R03-A2',x:24.0,y:9.2,landX:24.0,landY:9.6,label:'center handoff off-ladder'},{id:'R03-A3',x:42.0,y:16.2,landX:42.0,landY:16.6,label:'scroll relay approach'},{id:'R03-A4',x:58.0,y:3.2,landX:58.0,landY:3.6,label:'far relay approach'}],
-  R12:[{id:'R12-A1',x:10.0,y:16.2,landX:10.0,landY:16.6,label:'entry route off-ladder'},{id:'R12-A2',x:24.0,y:9.2,landX:24.0,landY:9.6,label:'scan approach off-ladder'},{id:'R12-A3',x:42.0,y:16.2,landX:42.0,landY:16.6,label:'scroll scan approach'},{id:'R12-A4',x:58.0,y:3.2,landX:58.0,landY:3.6,label:'far map node'}],
-  R04:[{id:'R04-A1',x:2.6,y:16.2,landX:2.6,landY:16.6,label:'entry safe point off-ladder'},{id:'R04-A2',x:24.0,y:9.2,landX:24.0,landY:9.6,label:'heat bypass anchor'},{id:'R04-A3',x:42.0,y:16.2,landX:42.0,landY:16.6,label:'scroll heat bypass'},{id:'R04-A4',x:58.0,y:16.2,landX:58.0,landY:16.6,label:'exit approach off-ladder'}],
-  R05:[{id:'R05-A1',x:2.0,y:16.2,landX:2.0,landY:16.6,label:'entry-side anchor'},{id:'R05-A2',x:24.0,y:9.2,landX:24.0,landY:9.6,label:'catalyst approach off-ladder'},{id:'R05-A3',x:42.0,y:16.2,landX:42.0,landY:16.6,label:'scroll catalyst route'},{id:'R05-A4',x:58.0,y:16.2,landX:58.0,landY:16.6,label:'exit anchor off-ladder'}],
-  R06:[{id:'R06-A1',x:10.0,y:16.2,landX:10.0,landY:16.6,label:'relay A route between ladders'},{id:'R06-A2',x:24.0,y:9.2,landX:24.0,landY:9.6,label:'fault column off-ladder'},{id:'R06-A3',x:42.0,y:16.2,landX:42.0,landY:16.6,label:'scroll capstone anchor'},{id:'R06-A4',x:58.0,y:16.2,landX:58.0,landY:16.6,label:'relay B route between ladders'}]
+  R02:[{id:'R02-A1',x:3.0,y:16.2,landX:3.0,landY:16.6,label:'entry floor anchor'},{id:'R02-A2',x:14.0,y:9.2,landX:14.0,landY:9.6,label:'mid-deck access'},{id:'R02-A3',x:28.0,y:3.2,landX:28.0,landY:3.6,label:'upper short access'},{id:'R02-A4',x:42.0,y:16.2,landX:42.0,landY:16.6,label:'fault access'},{id:'R02-A5',x:60.0,y:9.2,landX:60.0,landY:9.6,label:'far deck anchor'}],
+  R03:[{id:'R03-A1',x:3.0,y:16.2,landX:3.0,landY:16.6,label:'entry floor anchor'},{id:'R03-A2',x:14.0,y:9.2,landX:14.0,landY:9.6,label:'relay approach'},{id:'R03-A3',x:28.0,y:3.2,landX:28.0,landY:3.6,label:'upper relay access'},{id:'R03-A4',x:42.0,y:16.2,landX:42.0,landY:16.6,label:'scroll handoff'},{id:'R03-A5',x:60.0,y:3.2,landX:60.0,landY:3.6,label:'far relay anchor'}],
+  R12:[{id:'R12-A1',x:3.0,y:16.2,landX:3.0,landY:16.6,label:'entry floor anchor'},{id:'R12-A2',x:14.0,y:9.2,landX:14.0,landY:9.6,label:'mid-deck route'},{id:'R12-A3',x:28.0,y:3.2,landX:28.0,landY:3.6,label:'scan approach'},{id:'R12-A4',x:42.0,y:16.2,landX:42.0,landY:16.6,label:'scroll scan support'},{id:'R12-A5',x:60.0,y:9.2,landX:60.0,landY:9.6,label:'far deck anchor'}],
+  R04:[{id:'R04-A1',x:3.0,y:16.2,landX:3.0,landY:16.6,label:'entry safe point'},{id:'R04-A2',x:14.0,y:9.2,landX:14.0,landY:9.6,label:'heat bypass access'},{id:'R04-A3',x:28.0,y:3.2,landX:28.0,landY:3.6,label:'upper cooling access'},{id:'R04-A4',x:42.0,y:16.2,landX:42.0,landY:16.6,label:'vent approach'},{id:'R04-A5',x:60.0,y:9.2,landX:60.0,landY:9.6,label:'far safety anchor'}],
+  R05:[{id:'R05-A1',x:3.0,y:16.2,landX:3.0,landY:16.6,label:'entry floor anchor'},{id:'R05-A2',x:14.0,y:9.2,landX:14.0,landY:9.6,label:'catalyst bypass'},{id:'R05-A3',x:28.0,y:3.2,landX:28.0,landY:3.6,label:'upper clearance access'},{id:'R05-A4',x:42.0,y:16.2,landX:42.0,landY:16.6,label:'block approach'},{id:'R05-A5',x:60.0,y:9.2,landX:60.0,landY:9.6,label:'far deck anchor'}],
+  R06:[{id:'R06-A1',x:3.0,y:16.2,landX:3.0,landY:16.6,label:'entry floor anchor'},{id:'R06-A2',x:14.0,y:9.2,landX:14.0,landY:9.6,label:'relay handoff'},{id:'R06-A3',x:28.0,y:3.2,landX:28.0,landY:3.6,label:'upper capstone access'},{id:'R06-A4',x:42.0,y:16.2,landX:42.0,landY:16.6,label:'fault approach'},{id:'R06-A5',x:60.0,y:3.2,landX:60.0,landY:3.6,label:'far relay anchor'}],
 };
 let grappleState=null;
 let grappleFailFlash=0;
@@ -599,8 +619,8 @@ function transitionKeyForDoor(c,r){
 }
 function resize(){const vw=innerWidth,vh=innerHeight,isMobile=vw<700;const touchEl=document.getElementById('touch'),metaEl=document.getElementById('metabtns'),barEl=document.getElementById('toolbar'),ttEl=document.getElementById('ttpanel');
   if(isMobile){touchEl.classList.add('show');metaEl.classList.add('show');}else{touchEl.classList.remove('show');metaEl.classList.remove('show');}
-  // Canvas budget leaves room below for the inline intent log + (mobile) the fixed control stack.
-  const playH=isMobile?vh*0.48:vh*0.62,playW=vw*(isMobile?0.98:0.92),totalRows=DISPLAY_ROWS+HUD_ROWS;
+  // Mobile scale pass: prioritize board readability. Lower UI scrolls below instead of crushing the viewport.
+  const playH=isMobile?vh*0.66:vh*0.74,playW=vw*(isMobile?0.98:0.92),totalRows=DISPLAY_ROWS+HUD_ROWS;
   T=Math.floor(Math.min(playW/COLS,playH/totalRows));if(T<6)T=6;GW=COLS*T;GH=totalRows*T;
   canvas.width=GW;canvas.height=GH;canvas.style.width=GW+'px';canvas.style.height=GH+'px';ctx.imageSmoothingEnabled=false;
 }
@@ -611,9 +631,10 @@ function setupTouch(){document.querySelectorAll('.tbtn[data-key],.abtn[data-key]
 function isDown(a){switch(a){case'left':return keys['arrowleft']||keys['a'];case'right':return keys['arrowright']||keys['d'];case'up':return keys['arrowup']||keys['w'];case'down':return keys['arrowdown']||keys['s'];case'A':return keys['z']||keys['j'];case'B':return keys['x']||keys['k'];case'start':return keys['enter']||keys[' '];case'select':return keys['tab']||keys['shift'];}return false;}
 function wasPressed(a){switch(a){case'left':return justPressed['arrowleft']||justPressed['a'];case'right':return justPressed['arrowright']||justPressed['d'];case'up':return justPressed['arrowup']||justPressed['w'];case'down':return justPressed['arrowdown']||justPressed['s'];case'A':return justPressed['z']||justPressed['j'];case'B':return justPressed['x']||justPressed['k'];case'start':return justPressed['enter']||justPressed[' '];case'select':return justPressed['tab']||justPressed['shift'];case'validate':return justPressed['v'];}return false;}
 const PW=0.32,PH=1.4;
+const ELI_VISUAL_SCALE=1.22; // visual-only enlargement; collision box stays stable
 const PULSE_TOOL=ALL_TOOLS.find(t=>t.id==='PULSE');
 const B_TOOLS=ALL_TOOLS.filter(t=>t.id!=='PULSE'); // swappable B-tools; PULSE remains fixed on A
-let player={x:2,y:27,vx:0,vy:0,facing:1,onLadder:false,onGround:false,coyote:0,stability:3,pocket:[PULSE_TOOL, B_TOOLS[0]],iFrames:0,checkpoint:null,animFrame:0,animTimer:0};
+let player={x:2,y:18,vx:0,vy:0,facing:1,onLadder:false,onGround:false,coyote:0,stability:3,pocket:[PULSE_TOOL, B_TOOLS[0]],iFrames:0,checkpoint:null,animFrame:0,animTimer:0};
 let currentRoom='R02',roomTiles=[],clearedTiles={},revealedH={};
 let scouts=[],dialogue=null,syncState={active:false,termA:false,termB:false,timer:0};
 let ventCycle=0,toolEffect=null,toolCooldown=0,completionTimer=0;
@@ -638,13 +659,13 @@ function loadRoom(roomId,entryCol,entryRow){
   currentRoom=roomId;const src=ROOM_MAPS[roomId];if(!src)return;
   roomTiles=src.map(row=>row.split(''));
   for(let r=0;r<ROWS;r++)for(let c=0;c<roomWidth();c++){const k=roomId+'_'+c+'_'+r;if(clearedTiles[k]){const ch=roomTiles[r][c];if(ch==='X'||ch==='C')roomTiles[r][c]='.';if(ch==='V')roomTiles[r][c]='_';}if(revealedH[k]&&roomTiles[r][c]==='H')roomTiles[r][c]='_';}
-  if(entryCol!==undefined){player.x=entryCol;player.y=entryRow;if(entryCol===0)player.x=1.6;if(entryCol===31)player.x=roomWidth()-2.6;}else{player.x=2;player.y=18;}
+  if(entryCol!==undefined){player.x=entryCol;player.y=entryRow;if(entryCol===0)player.x=1.6;if(entryCol===31||entryCol>=roomWidth()-1)player.x=roomWidth()-2.6;}else{player.x=2;player.y=18;}
   cameraX=clampCamera(player.x-COLS*0.48);
   player.vy=0;player.vx=0;player.onLadder=false;player.coyote=0;snapToFloor();
   scouts=[];
-  if(roomId==='R03'){scouts.push(createDrone(18,45,15));}
-  if(roomId==='R12'){scouts.push(createDrone(18,45,15));}
-  if(roomId==='R06'){const bot=createScout(30,17);bot.leftBound=12;bot.rightBound=48;bot.x=30;scouts.push(bot);}
+  if(roomId==='R03'){scouts.push(createDrone(22,44,14));}
+  if(roomId==='R12'){scouts.push(createDrone(22,44,14));}
+  if(roomId==='R06'){const bot=createScout(30,17);bot.leftBound=12;bot.rightBound=50;bot.x=30;scouts.push(bot);}
   syncState={active:false,termA:false,termB:false,timer:0};particles=[];coolTiles=[];syncBeam=null;toolEffect=null;grappleState=null;grappleFailFlash=0;
   showDialogue(ROOM_DIALOGUE[roomId]||'');
   TT.enterRoom(roomId); // ── TTRPG hook: log entry + set objective ──
@@ -699,7 +720,7 @@ function updatePlayer(){
   ventCycle=(ventCycle+1)%VENT_CYCLE;
 }
 function hitPlayer(){player.stability--;player.iFrames=IFRAMES;Audio.thud();TT.push('STABILITY HIT ('+player.stability+' left)','bad');if(player.stability<=0)resetRoom();}
-function resetRoom(){player.stability=3;if(player.checkpoint&&player.checkpoint.room===currentRoom){player.x=player.checkpoint.x;player.y=player.checkpoint.y;}else{player.x=2;player.y=18;}player.vy=0;player.vx=0;player.onLadder=false;player.iFrames=IFRAMES;player.coyote=0;snapToFloor();TT.push('SETBACK: returned to entry. Stability reset.','bad');if(currentRoom==='R03'){scouts=[];scouts.push(createDrone(18,45,15));}if(currentRoom==='R12'){scouts=[];scouts.push(createDrone(18,45,15));}if(currentRoom==='R06'){scouts=[];const bot=createScout(30,17);bot.leftBound=12;bot.rightBound=48;bot.x=30;scouts.push(bot);}}
+function resetRoom(){player.stability=3;if(player.checkpoint&&player.checkpoint.room===currentRoom){player.x=player.checkpoint.x;player.y=player.checkpoint.y;}else{player.x=2;player.y=18;}player.vy=0;player.vx=0;player.onLadder=false;player.iFrames=IFRAMES;player.coyote=0;snapToFloor();TT.push('SETBACK: returned to entry. Stability reset.','bad');if(currentRoom==='R03'){scouts=[];scouts.push(createDrone(22,44,14));}if(currentRoom==='R12'){scouts=[];scouts.push(createDrone(22,44,14));}if(currentRoom==='R06'){scouts=[];const bot=createScout(30,17);bot.leftBound=12;bot.rightBound=50;bot.x=30;scouts.push(bot);}}
 function handleInteraction(){const pc=Math.round(player.x),pr=Math.floor(player.y+PH/2);const checks=[[pc,pr],[pc,pr+1],[pc,pr-1],[pc-1,pr],[pc+1,pr],[Math.floor(player.x),Math.floor(player.y+PH-0.1)]];const seen=new Set();
   for(const [c,r] of checks){const key=c+','+r;if(seen.has(key))continue;seen.add(key);const t=getTile(c,r);
     if(t==='D'){const trans=TRANSITIONS[currentRoom];const dk=transitionKeyForDoor(c,r);if(trans&&trans[dk]!==undefined){const dest=trans[dk];
@@ -713,12 +734,12 @@ function handleInteraction(){const pc=Math.round(player.x),pr=Math.floor(player.
       Audio.doorChime();TT.push('Route door → '+dest.split('_')[0],'good');startTransition(dest);return;}}
     if(t==='S'){
       if(currentRoom==='R03'){
-        if(c===8&&r===3){syncState.termA=true;TT.roomState.R03_relayA=true;if(!syncState.active){syncState.active=true;syncState.timer=SYNC_TIMER;}Audio.interact();TT.record('RELAY A','activated','good');showDialogue('RELAY A ACTIVATED.\nREACH RELAY B.');return;}
-        if(c===55&&r===3){syncState.termB=true;TT.roomState.R03_relayB=true;if(!syncState.active){syncState.active=true;syncState.timer=SYNC_TIMER;}Audio.interact();TT.record('RELAY B','activated','good');showDialogue('RELAY B ACTIVATED.');return;}
+        if(c===18&&r===4){syncState.termA=true;TT.roomState.R03_relayA=true;if(!syncState.active){syncState.active=true;syncState.timer=SYNC_TIMER;}Audio.interact();TT.record('RELAY A','activated','good');showDialogue('RELAY A ACTIVATED.\nREACH RELAY B.');return;}
+        if(c===54&&r===4){syncState.termB=true;TT.roomState.R03_relayB=true;if(!syncState.active){syncState.active=true;syncState.timer=SYNC_TIMER;}Audio.interact();TT.record('RELAY B','activated','good');showDialogue('RELAY B ACTIVATED.');return;}
       }
       if(currentRoom==='R06'){
-        if(c===8&&r===8){TT.roomState.R06_relayA=true;Audio.interact();TT.record('RELAY A','activated','good');showDialogue('RELAY A ACTIVATED.\nFIND RELAY B.');return;}
-        if(c===55&&r===3){TT.roomState.R06_relayB=true;Audio.interact();TT.record('RELAY B','activated','good');showDialogue('RELAY B ACTIVATED.');return;}
+        if(c===18&&r===4){TT.roomState.R06_relayA=true;Audio.interact();TT.record('RELAY A','activated','good');showDialogue('RELAY A ACTIVATED.\nFIND RELAY B.');return;}
+        if(c===54&&r===4){TT.roomState.R06_relayB=true;Audio.interact();TT.record('RELAY B','activated','good');showDialogue('RELAY B ACTIVATED.');return;}
       }
       player.checkpoint={room:currentRoom,x:player.x,y:player.y};Audio.interact();TT.push('Checkpoint saved.','info');showDialogue('CHECKPOINT SAVED.\nSTABILITY PRESERVED.');return;}
     if(t==='G'){const txt=GLYPH_TEXT[currentRoom+'_'+c+'_'+r];if(txt){Audio.interact();TT.push('Read node: '+txt.replace(/\n/g,' '),'info');showDialogue(txt);}return;}
@@ -761,7 +782,7 @@ function useTool(idx){
 function showDialogue(text){dialogue={text,timer:200,reveal:0,len:text.replace(/\n/g,'').length};}
 function updateDialogue(){if(dialogue){dialogue.timer--;if(dialogue.reveal<dialogue.len)dialogue.reveal+=0.6;if(dialogue.timer<=0)dialogue=null;}}
 function render(){ctx.fillStyle=NES.bg;ctx.fillRect(0,0,GW,GH);if(gameState==='TITLE'){renderTitle();return;}if(gameState==='COMPLETE'){renderComplete();return;}const oy=HUD_ROWS*T;updateCamera();ctx.save();ctx.translate(-cameraX*T,0);const startCol=Math.max(0,Math.floor(cameraX)-2),endCol=Math.min(roomWidth(),Math.ceil(cameraX+COLS)+2);for(let r=0;r<ROWS;r++)for(let c=startCol;c<endCol;c++)renderTile(c,r,c*T,oy+r*T);renderGrappleAnchors(oy);for(const s of scouts)renderScout(s,oy);renderCoolTiles(oy);renderPlayer(oy);if(toolEffect)renderToolEffect(oy);renderSyncBeam();renderParticles();ctx.restore();
-  // v1.18.2: no restored dead-air band. The visual output is widened to show the scrolling corridor.
+  // v1.18.1: Preserve the old video frame height. The 20-row corridor occupies the top of the game area; the remaining restored output area stays as dark console/background, not missing content.
   if(typeof DISPLAY_ROWS!=='undefined' && DISPLAY_ROWS>ROWS){
     ctx.fillStyle='rgba(6,10,22,0.92)';
     ctx.fillRect(0, oy+ROWS*T, GW, (DISPLAY_ROWS-ROWS)*T);
@@ -807,7 +828,7 @@ function renderTile(c,r,x,y){const t=roomTiles[r]?roomTiles[r][c]:'#';const s=T,
 const ELI={H:'#fce76e',Hd:'#d4a017',S:'#e0a878',Sd:'#b07b50',W:'#3b6ea5',Wd:'#274d77',B:'#5a4632',Bd:'#3a2c1f',T:'#c5cae9',K:'#1a1a2e',E:'#0a0a1a'};
 const ELI_SPR={idle:['....HHHH....','...HHHHHH...','...HHHHHH...','...KSSSSK...','...SEsSEs...','...SSSSSS...','....SSSS....','..WWWWWWWW..','..WWWWWWWW..','.WWWWWWWWWW.','.BBBBBBBBBB.','.BdBBBBBBdB.','.WWWW..WWWW.','.WWWW..WWWW.','.KKK....KKK.','.KK......KK.'],walk1:['....HHHH....','...HHHHHH...','...HHHHHH...','...KSSSSK...','...SEsSEs...','...SSSSSS...','....SSSS....','..WWWWWWWW..','..WWWWWWWW..','.WWWWWWWWWW.','.BBBBBBBBBB.','.BdBBBBBBdB.','..WWWWWWW...','..WWW.WWWW..','..KK...KKK..','.KK......KK.'],walk2:['....HHHH....','...HHHHHH...','...HHHHHH...','...KSSSSK...','...SEsSEs...','...SSSSSS...','....SSSS....','..WWWWWWWW..','..WWWWWWWW..','.WWWWWWWWWW.','.BBBBBBBBBB.','.BdBBBBBBdB.','...WWWWWWW..','..WWWW.WWW..','..KKK...KK..','.KK......KK.'],climb:['....HHHH....','...HHHHHH...','...HHHHHH...','...SSSSSS...','...SSSSSS...','..WTWWWWTW..','..WWWWWWWW..','.WWWWWWWWWW.','.WWWWWWWWWW.','.BBBBBBBBBB.','..WWWWWWWW..','..WW.WW.WW..','..WW.WW.WW..','..KK.WW.KK..','..KK....KK..','...K....K...']};
 function drawSprite(mtx,px,py,cell,flip){for(let r=0;r<mtx.length;r++){const row=mtx[r];for(let c=0;c<row.length;c++){const ch=row[c];if(ch==='.')continue;let col;switch(ch){case'H':col=ELI.H;break;case'h':case'Hd':col=ELI.Hd;break;case'S':col=ELI.S;break;case's':col=ELI.Sd;break;case'W':col=ELI.W;break;case'w':col=ELI.Wd;break;case'B':col=ELI.B;break;case'd':col=ELI.Bd;break;case'T':col=ELI.T;break;case'K':col=ELI.K;break;case'E':col=ELI.E;break;default:col=ELI.W;}const cx=flip?(row.length-1-c):c;ctx.fillStyle=col;ctx.fillRect(px+cx*cell,py+r*cell,cell+0.5,cell+0.5);}}}
-function renderPlayer(oy){const flashing=player.iFrames>0;if(flashing&&Math.floor(player.iFrames/4)%2===0)return;const cols=12,rows=16;const cell=T/cols*0.95;const sprW=cols*cell;const px=player.x*T-sprW/2;const py=oy+player.y*T+(PH*T-rows*cell);const flip=player.facing===-1;let mtx;if(player.onLadder){mtx=ELI_SPR.climb;}else if(isDown('left')||isDown('right')){const phase=Math.floor(frame/6)%4;mtx=(phase===1)?ELI_SPR.walk1:(phase===3)?ELI_SPR.walk2:ELI_SPR.idle;}else{mtx=ELI_SPR.idle;}drawSprite(mtx,px,py,cell,flip);if(flashing){ctx.fillStyle='rgba(255,23,68,0.35)';ctx.fillRect(px,py,sprW,rows*cell);}}
+function renderPlayer(oy){const flashing=player.iFrames>0;if(flashing&&Math.floor(player.iFrames/4)%2===0)return;const cols=12,rows=16;const cell=(T/cols)*ELI_VISUAL_SCALE;const sprW=cols*cell;const sprH=rows*cell;const px=player.x*T-sprW/2;const py=oy+player.y*T+(PH*T-sprH)+T*0.08;const flip=player.facing===-1;let mtx;if(player.onLadder){mtx=ELI_SPR.climb;}else if(isDown('left')||isDown('right')){const phase=Math.floor(frame/6)%4;mtx=(phase===1)?ELI_SPR.walk1:(phase===3)?ELI_SPR.walk2:ELI_SPR.idle;}else{mtx=ELI_SPR.idle;}drawSprite(mtx,px,py,cell,flip);if(flashing){ctx.fillStyle='rgba(255,23,68,0.35)';ctx.fillRect(px,py,sprW,sprH);}}
 function renderScout(s,oy){const sx=s.x*T,sy=oy+s.y*T,sz=T;let color;switch(s.state){case'PATROL':color=NES.scout;break;case'STUNNED':color=NES.scoutSt;break;case'RECOVERY':color=NES.scoutRc;break;default:color=NES.scout;}
   if(s.kind==='drone'){const cx=sx,cy=sy+sz*0.7;if(s.state!=='STUNNED'){ctx.fillStyle='rgba(130,177,255,0.35)';ctx.fillRect(sx-sz*0.2,cy+sz*0.3,sz*0.4,sz*0.18);}ctx.fillStyle=color;ctx.fillRect(sx-sz*0.4,cy-sz*0.25,sz*0.8,sz*0.5);ctx.fillStyle='rgba(0,0,0,0.25)';ctx.fillRect(sx-sz*0.4,cy+sz*0.15,sz*0.8,sz*0.1);const eyeOff=s.dir*sz*0.12;ctx.fillStyle=s.state==='STUNNED'?NES.hudDim:'#82b1ff';ctx.fillRect(sx-sz*0.12+eyeOff,cy-sz*0.1,sz*0.24,sz*0.16);ctx.fillStyle=s.state==='STUNNED'?NES.hudDim:NES.white;ctx.fillRect(sx-sz*0.04+eyeOff,cy-sz*0.06,sz*0.08,sz*0.08);if(s.state==='PATROL'){ctx.fillStyle='rgba(130,177,255,'+(0.15+0.1*Math.sin(frame*0.2))+')';ctx.fillRect(sx-sz*0.06,cy+sz*0.25,sz*0.12,sz*0.5);}if(s.state==='STUNNED'){ctx.fillStyle=NES.doorLt;const so=Math.sin(frame*0.15)*sz*0.2;ctx.font=Math.floor(sz*0.3)+'px monospace';ctx.textAlign='center';ctx.fillText('★',sx+so,cy-sz*0.3);}return;}
   ctx.fillStyle=color;ctx.fillRect(sx-sz*0.35,sy+sz*0.5,sz*0.7,sz*0.6);ctx.fillStyle=s.state==='STUNNED'?NES.hudDim:NES.white;ctx.fillRect(sx-sz*0.15,sy+sz*0.6,sz*0.12,sz*0.12);ctx.fillRect(sx+sz*0.05,sy+sz*0.6,sz*0.12,sz*0.12);if(s.state==='PATROL'){ctx.fillStyle=color;ctx.fillRect(sx+s.dir*sz*0.3,sy+sz*0.75,sz*0.15*s.dir,sz*0.1);}if(s.state==='STUNNED'){ctx.fillStyle=NES.doorLt;const so=Math.sin(frame*0.15)*sz*0.2;ctx.font=Math.floor(sz*0.3)+'px monospace';ctx.textAlign='center';ctx.fillText('★',sx+so,sy+sz*0.4);ctx.fillText('★',sx-so,sy+sz*0.5);}ctx.fillStyle=s.state==='STUNNED'?NES.hudDim:NES.white;const wa=s.state==='PATROL'?Math.sin(frame*0.2)*sz*0.05:0;ctx.fillRect(sx-sz*0.25,sy+sz*1.1+wa,sz*0.15,sz*0.15);ctx.fillRect(sx+sz*0.1,sy+sz*1.1-wa,sz*0.15,sz*0.15);}
