@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>Reintegration Core — District 01 · Wide Board Output v1.18.4</title>
+<title>Reintegration Core — District 01 · Playability Recovery v1.18.5</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
   *{margin:0;padding:0;box-sizing:border-box;}
@@ -12,7 +12,7 @@
   canvas{display:block;image-rendering:pixelated;image-rendering:crisp-edges;margin-top:0;touch-action:none;}
 
   /* ── Quick Tool Bar (NEW: replaces SELECT-menu detour for access) ── */
-  #toolbar{display:none;width:calc(100% - 12px);max-width:860px;margin:12px auto 0;justify-content:center;gap:6px;z-index:14;padding:0 6px;flex-wrap:wrap;flex:0 0 auto;order:30;}
+  #toolbar{display:none;width:calc(100% - 12px);max-width:760px;margin:10px auto 0;justify-content:center;gap:6px;z-index:14;padding:0 6px;flex-wrap:wrap;flex:0 0 auto;order:30;}
   #toolbar.show{display:flex;}
   .qtool{pointer-events:auto;min-width:62px;background:rgba(20,24,40,0.86);border:1.5px solid rgba(120,130,170,0.4);border-radius:6px;padding:5px 6px 4px;display:flex;flex-direction:column;align-items:center;gap:2px;-webkit-tap-highlight-color:transparent;}
   .qtool .qn{font-size:7px;color:#c5cae9;letter-spacing:.5px;}
@@ -25,8 +25,9 @@
   .qtool .slot.A{background:#5b9bd5;color:#06121f;}
   .qtool .slot.B{background:#ff5a5a;color:#1f0606;}
 
-  /* ── Side panel retired in v1.18.4: validation remains internal/door-driven. */
-  #ttpanel{display:none!important;}
+  /* ── Tabletop side panel: intent log + validate (NEW) ── */
+  /* Inline panel: flows directly under the canvas, never overlaps play or controls. */
+  #ttpanel{display:none!important;width:calc(100% - 12px);max-width:760px;margin:8px auto 0;background:rgba(13,15,30,0.92);border:1.5px solid rgba(91,155,213,0.4);border-radius:8px;flex-direction:column;overflow:hidden;flex:0 0 auto;order:20;}
   #ttpanel.show{display:none!important;}
   #tt-head{display:flex;justify-content:space-between;align-items:center;padding:5px 8px;border-bottom:1px solid rgba(91,155,213,0.25);cursor:pointer;-webkit-tap-highlight-color:transparent;}
   #tt-head h3{font-size:7px;color:#8ab4f8;letter-spacing:1px;margin:0;}
@@ -52,7 +53,7 @@
   #ttlog::-webkit-scrollbar{width:4px;}
   #ttlog::-webkit-scrollbar-thumb{background:#243140;border-radius:2px;}
 
-  #touch{display:none;position:relative;bottom:auto;left:auto;width:calc(100% - 16px);max-width:860px;margin:12px auto 0;padding:8px 10px calc(14px + env(safe-area-inset-bottom,0px));gap:8px;justify-content:space-between;align-items:flex-end;z-index:10;pointer-events:none;order:40;}
+  #touch{display:none;position:relative;bottom:auto;left:auto;width:calc(100% - 16px);max-width:760px;margin:12px auto 0;padding:8px 10px calc(14px + env(safe-area-inset-bottom,0px));gap:8px;justify-content:space-between;align-items:flex-end;z-index:10;pointer-events:none;order:40;}
   #touch.show{display:flex;}
   .tpad{display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(3,1fr);width:min(36vw,156px);height:min(36vw,156px);gap:4px;pointer-events:auto;}
   .tbtn{background:rgba(200,200,220,0.12);border:1.5px solid rgba(200,200,220,0.25);border-radius:8px;display:flex;align-items:center;justify-content:center;color:rgba(200,200,220,0.6);font-family:'Press Start 2P',monospace;font-size:9px;pointer-events:auto;-webkit-tap-highlight-color:transparent;}
@@ -74,9 +75,11 @@
   @media (max-width: 768px){
     html,body{height:auto;min-height:100svh;overflow-y:auto;overflow-x:hidden;}
     #wrap{height:auto;min-height:100svh;overflow:visible;padding-bottom:calc(28px + env(safe-area-inset-bottom,0px));}
-    canvas{margin-top:6px;max-width:calc(100vw - 10px);height:auto;}
-    #ttpanel{margin-top:8px;}
+    canvas{margin-top:6px;max-width:calc(100vw - 8px);height:auto;}
+    #ttpanel{display:none!important;margin-top:0;}
     #toolbar{margin-top:10px;}
+    #touch{margin-top:10px;}
+    #metabtns{margin-top:8px;}
     #touch.show{display:flex;}
     #metabtns.show{display:flex;}
     .qtool{min-width:30%;padding:8px 7px 7px;border-radius:9px;}
@@ -93,9 +96,20 @@
 <body>
 <div id="wrap">
   <canvas id="game"></canvas>
+  <div id="ttpanel" class="collapsed">
+    <div id="tt-head"><h3>INTENT LOG</h3><span id="tt-toggle">TAP TO EXPAND ▾</span></div>
+    <div id="ttobjective"></div>
+    <div id="ttactions">
+      <button class="ttact" id="ttValidateBtn" type="button">VALIDATE<br>ROOM</button>
+      <button class="ttact" id="ttExportBtn" type="button">EXPORT<br>LOG</button>
+      <button class="ttact" id="ttTableModeBtn" type="button">TABLE<br>MODE OFF</button>
+    </div>
+    <div id="ttprocedure"></div>
+    <div id="ttlog"></div>
+  </div>
   <div id="title-screen">
     <h1>REINTEGRATION<br>CORE</h1>
-    <h2>DISTRICT 01 — TTRPG HYBRID · WIDE BOARD 1.18.4</h2>
+    <h2>DISTRICT 01 — PLAYABILITY RECOVERY 1.18.5</h2>
     <p>PRESS START</p>
     <div class="sub">DIAGNOSE. CONNECT. VALIDATE.<br>ANCHORS ARE NOT ASSUMPTIONS.</div>
   </div>
@@ -122,15 +136,15 @@
   </div>
 </div>
 <script>
-// ═══ REINTEGRATION CORE — D01 — v1.18.4 + WIDE BOARD OUTPUT PATCH ═══
+// ═══ REINTEGRATION CORE — D01 — v1.18.5 PLAYABILITY RECOVERY ═══
 // Locked engine preserved. TTRPG/tabletop layer plus fixed-anchor Grappling Hook added at marked seams only.
-const COLS=30,ROWS=20,HUD_ROWS=3;
-// DISPLAY_ROWS keeps the logical 20-row corridor visible while the removed side-panel budget lets the board scale larger.
-// Phone doctrine: board/output first; lower UI scrolls below; no forced one-screen fit.
+const COLS=32,ROWS=20,HUD_ROWS=3;
+// DISPLAY_ROWS preserves the prior video output height/ratio while ROWS remains the 20-row lowered-ceiling room logic.
+// This fixes the v1.18.1 visibility drift: lower the ceiling in the map, not the player-facing video frame.
 const DISPLAY_ROWS=20;
 const SCROLLING_ROOM_BASE_WIDTH=64;
 const LOWERED_CEILING_ROWS_REMOVED=10;
-const VIEWPORT_DOCTRINE='30x20 visible mobile corridor / 64x20 logical room; side panel retired from playable layout';
+const VIEWPORT_DOCTRINE='32x20 visible corridor / 64x20 logical room';
 let cameraX=0;
 const NES={bg:'#0a0a1a',wall:'#3a3a4a',wallLt:'#4a4a5c',plat:'#5a5a6c',platLt:'#6a6a7e',ladder:'#b53120',ladRng:'#8a2218',door:'#d4a017',doorLt:'#fce76e',termOn:'#00c853',termOff:'#00703c',glyph:'#448aff',glyphLt:'#82b1ff',hidden:'#1a1a2e',fault:'#ff1744',faultDk:'#b71c1c',catalyst:'#aa00ff',catLt:'#d500f9',vent:'#ff6d00',ventLt:'#ff9100',heat:'#ff3d00',heatLt:'#ff6e40',conv:'#536dfe',convLt:'#8c9eff',convArr:'#c5cae9',player:'#fce76e',playerDk:'#d4a017',scout:'#e040fb',scoutSt:'#7c4dff',scoutRc:'#ff6090',hud:'#c5cae9',hudDim:'#5c6170',hudBg:'#0d0d20',white:'#e8eaf6',stab:'#69f0ae',stabLo:'#ff5252',black:'#000000',dialogBg:'#0d0d20',dialogBd:'#5b9bd5'};
 const ROOM_MAPS={
@@ -183,7 +197,7 @@ R12:[
 '#..............................................................#',
 '#..............................................................#',
 '#..............................................................#',
-'#.................G............................................#',
+'#................G.............................................#',
 '#______________________________________________________________#',
 '#.................L...........................L................#',
 '#.................L...........................L................#',
@@ -262,10 +276,172 @@ R06:[
 '#.......L.........................L.....................L......#',
 '#.......L.........................L.....................L......#',
 '#.......L.........................L.....................L......#',
-'D.......L.....................X...G.........X...........L......D',
+'D.......L.....................X.....G.......X...........L......D',
 '#_______L_________________________L_____________________L______#',
 '################################################################',
 ],
+R07:[
+'################################################################',
+'#..............................................................#',
+'#..............................................................#',
+'#..............................................................#',
+'#.......................................................G......D',
+'#.........................................__L__________________#',
+'#...............................#...........L..................#',
+'#...............................#...........L..................#',
+'#...............................#...........L..................#',
+'#....................___L______________........................#',
+'#.......................L......................................#',
+'#.......................L......................................#',
+'#............U..........L.......#..............................#',
+'#....___L____________...........#..............................#',
+'#.......L.......................#..............................#',
+'#.......L.......................#..............................#',
+'#...G...L.......................#..............................#',
+'D.......L.......................#..............................#',
+'#_______L______________________________________________________#',
+'################################################################',
+],
+};
+
+// ── v1.18.6 SHAFT + HEALTH SHOWER RECOVERY ──
+// Surgical restore only: these blocks were dependencies of the v1.18.3 playable base.
+// They keep the live UI/tabletop DOM safe without reintroducing the visible Intent Log panel.
+const ALL_TOOLS=[
+  {id:'PULSE',name:'PULSE',desc:'Clear faults / stun scouts'},
+  {id:'SCANNER',name:'SCAN',desc:'Reveal hidden route'},
+  {id:'GRAPPLE',name:'HOOK',desc:'Fixed anchors only'},
+  {id:'SYNC',name:'SYNC',desc:'Aim at relay'},
+  {id:'THERMAL',name:'THERM',desc:'Cool heat / vents'},
+  {id:'CATALYST',name:'DAMP',desc:'Clear catalyst blocks'},
+  {id:'CHKPT',name:'SAVE',desc:'Set checkpoint'},
+  {id:'READER',name:'READ',desc:'Read archive nodes'}
+];
+
+const TRANSITIONS={
+  R02:{'0_17':null,'31_17':'R03_0_17'},
+  R03:{'0_17':'R02_63_17','31_17':'R12_0_17'},
+  R12:{'0_17':'R03_63_17','31_17':'R04_0_17'},
+  R04:{'0_17':'R12_63_17','31_17':'R05_0_17'},
+  R05:{'0_17':'R04_63_17','31_17':'R06_0_17'},
+  R06:{'0_17':'R05_63_17','31_17':'R07_0_17'},
+  R07:{'0_17':'R06_63_17','31_4':'COMPLETE'}
+};
+
+const ROOM_DIALOGUE={
+  R02:'DISTRICT 01 ENTRY.\nCLEAR LIVE FAULTS. VALIDATE AT THE DOOR.',
+  R03:'RELAY ROOM.\nCONFIRM BOTH RELAYS BEFORE ROUTING FORWARD.',
+  R12:'SCAN LAYER.\nMAP THE HIDDEN ROUTE BEFORE TRUSTING THE PASSAGE.',
+  R04:'THERMAL BREACH.\nCOOL ACTIVE HEAT SOURCES BEFORE EXIT.',
+  R05:'CATALYST BLOCKAGE.\nDAMPEN BLOCKS TO RESTORE THE ROUTE.',
+  R06:'CAPSTONE ROUTE.\nCLEAR FAULTS, CONFIRM RELAYS, THEN VALIDATE.',
+  R07:'VERTICAL SHAFT.\nBROKEN LADDERS REQUIRE FIXED ANCHOR RECOVERY.'
+};
+
+const GLYPH_TEXT={
+  'R02_10_4':'ANCHORS ARE NOT ASSUMPTIONS.\nUSE FIXED HOOK POINTS ONLY.',
+  'R02_40_10':'A GREEN BOARD IS NOT PROOF.\nTHE DOOR TESTS THE ACTUAL ROUTE.',
+  'R03_3_17':'ENTRY ANCHOR.\nRECOVER POSITION BEFORE RELAY WORK.',
+  'R03_26_10':'RELAY STATE MUST BE CONFIRMED.\nSYNC IS NOT DECORATION.',
+  'R12_17_4':'SCAN BEFORE TRUST.\nUNMAPPED ROUTES REMAIN UNPROVEN.',
+  'R04_3_17':'HEAT BYPASS REQUIRES CONTROLLED ACCESS.',
+  'R04_58_17':'EXIT ANCHOR.\nVALIDATE COOLING BEFORE HANDOFF.',
+  'R05_3_4':'CATALYST BLOCKS ARE REAL OBSTRUCTIONS.',
+  'R05_58_4':'CLEAR THE ROUTE.\nTHEN LET THE DOOR JUDGE.',
+  'R06_36_17':'FINAL CHECKPOINT.\nFAULTS AND RELAYS BOTH MATTER.',
+  'R07_4_16':'BROKEN LADDER DOES NOT MEAN BROKEN ROUTE.\nUSE AUTHORED ANCHORS TO RECOVER UPWARD.',
+  'R07_56_4':'UPWARD ACCESS PROVEN.\nTHE EXIT IS HIGH BECAUSE THE SYSTEM FAILED LOW.'
+};
+
+const TT={
+  log:[],
+  roomState:{},
+  tableMode:false,
+  objectives:{
+    R02:'Clear live faults and prove the route at the door.',
+    R03:'Activate both relays; do not trust false green status.',
+    R12:'Scan and reveal the hidden route before validation.',
+    R04:'Cool all active heat/vent sources before exit.',
+    R05:'Remove catalyst blocks before claiming the path is clear.',
+    R06:'Clear faults and activate both relays for capstone validation.',
+    R07:'Climb the broken shaft, use fixed anchors, and reach the upper exit.'
+  },
+  procedures:{
+    R02:{title:'R02 — Fault Containment',reported:'Faults visible in the route.',decision:'Clear actual fault tiles before exiting.',tool:'A/PULSE clears faults; B-tool remains selectable.',access:'Fixed grapple anchors support route recovery only.',gate:'Forward door calls validateRoom().',fail:'Any X tile remains live.'},
+    R03:{title:'R03 — Relay Confirmation',reported:'System may report synced early.',decision:'Confirm Relay A and Relay B manually.',tool:'SYNC points toward relay; UP confirms terminal.',access:'Fixed anchors create access rhythm between decks.',gate:'Both relay state flags must be true.',fail:'False green if only one or neither relay is set.'},
+    R12:{title:'R12 — Route Mapping',reported:'Path state is unknown.',decision:'Scan before trusting corridor state.',tool:'SCANNER reveals hidden route tiles.',access:'Anchors assist vertical/horizontal repositioning.',gate:'R12_scanned must be true.',fail:'Door holds until sector scan is completed.'},
+    R04:{title:'R04 — Thermal Control',reported:'Heat sources compromise traversal.',decision:'Cool vents/heat before exit.',tool:'THERM removes V/~ heat sources in range.',access:'Anchors support bypass and recovery around heat.',gate:'No V or ~ heat sources remain.',fail:'Any active heat source remains in room state.'},
+    R05:{title:'R05 — Catalyst Dampening',reported:'Catalyst blocks physically obstruct route.',decision:'Remove C blocks before validating.',tool:'DAMP removes catalyst blocks.',access:'Anchors support access but do not delete blocks.',gate:'No C blocks remain.',fail:'Any catalyst block remains.'},
+    R06:{title:'R06 — Capstone Proof',reported:'Multiple system faults remain.',decision:'Clear faults and confirm both relays.',tool:'PULSE clears X; relay interaction confirms state.',access:'Fixed anchors support final route recovery.',gate:'No faults and both relay flags true.',fail:'Any fault or relay gap remains.'},
+    R07:{title:'R07 — Vertical Shaft Recovery',reported:'The shaft route failed low; ladders are broken in segments.',decision:'Use ladders where intact and fixed grapple anchors where broken.',tool:'GRAPPLE creates upward access only through authored anchors; Health Shower restores stability.',access:'Broken ladders are explicit; anchors support recovery without arbitrary wall attachment.',gate:'Reach the upper exit platform.',fail:'Door held if Eli has not actually reached the upper shaft exit.'}
+  },
+  reset(){
+    this.log=[];
+    this.roomState={};
+    this.tableMode=false;
+    renderTTLog();
+    const btn=document.getElementById('ttTableModeBtn');
+    if(btn){btn.classList.remove('on');btn.innerHTML='TABLE<br>MODE OFF';}
+  },
+  push(text,kind='info'){
+    this.log.push({text,kind,t:frame||0});
+    if(this.log.length>80)this.log=this.log.slice(-80);
+    renderTTLog();
+  },
+  record(label,text,kind='info'){
+    this.push(label+': '+text,kind);
+  },
+  enterRoom(id){
+    setObjective(this.objectives[id]||'Validate the route before forward progress.');
+    renderProcedureCard(id);
+    this.push('ENTER '+id+': '+(this.objectives[id]||'Validate route.'),'judge');
+  }
+};
+
+const Audio={
+  ctx:null, hum:null, humGain:null, muted:false,
+  init(){
+    if(this.ctx)return;
+    const AC=window.AudioContext||window.webkitAudioContext;
+    if(!AC)return;
+    try{this.ctx=new AC();}catch(e){this.ctx=null;}
+  },
+  resume(){if(this.ctx&&this.ctx.state==='suspended')this.ctx.resume().catch(()=>{});},
+  beep(freq=440,dur=0.045,type='square',gain=0.035){
+    if(this.muted)return;
+    this.init(); if(!this.ctx)return;
+    const now=this.ctx.currentTime;
+    const osc=this.ctx.createOscillator();
+    const g=this.ctx.createGain();
+    osc.type=type; osc.frequency.setValueAtTime(freq,now);
+    g.gain.setValueAtTime(0.0001,now);
+    g.gain.exponentialRampToValueAtTime(gain,now+0.008);
+    g.gain.exponentialRampToValueAtTime(0.0001,now+dur);
+    osc.connect(g); g.connect(this.ctx.destination);
+    osc.start(now); osc.stop(now+dur+0.02);
+  },
+  startHum(){
+    if(this.muted)return;
+    this.init(); if(!this.ctx||this.hum)return;
+    const now=this.ctx.currentTime;
+    this.hum=this.ctx.createOscillator();
+    this.humGain=this.ctx.createGain();
+    this.hum.type='sine'; this.hum.frequency.setValueAtTime(55,now);
+    this.humGain.gain.setValueAtTime(0.004,now);
+    this.hum.connect(this.humGain); this.humGain.connect(this.ctx.destination);
+    this.hum.start(now);
+  },
+  stopHum(){if(this.hum){try{this.hum.stop();}catch(e){} this.hum=null; this.humGain=null;}},
+  toggleHum(){this.muted=!this.muted;if(this.muted)this.stopHum();else this.startHum();},
+  tool(id){const map={PULSE:180,SCANNER:520,GRAPPLE:660,SYNC:420,THERMAL:260,CATALYST:300,CHKPT:740,READER:560};this.beep(map[id]||440,0.05,'square',0.03);},
+  fail(){this.beep(120,0.12,'sawtooth',0.04);},
+  pass(){this.beep(720,0.08,'square',0.035);setTimeout(()=>this.beep(920,0.06,'square',0.03),70);},
+  interact(){this.beep(540,0.045,'square',0.025);},
+  doorChime(){this.beep(620,0.07,'square',0.03);setTimeout(()=>this.beep(830,0.07,'square',0.025),80);},
+  complete(){this.pass();setTimeout(()=>this.beep(1040,0.12,'square',0.035),150);},
+  thud(){this.beep(95,0.09,'triangle',0.05);},
+  stun(){this.beep(350,0.04,'square',0.03);},
+  ladderTick(){this.beep(210,0.018,'square',0.012);}
 };
 
 function setObjective(t){ const el=document.getElementById('ttobjective'); if(el)el.textContent=t?('OBJECTIVE: '+t):''; }
@@ -335,6 +511,7 @@ const GRAPPLE_ANCHORS={
   R04:[{id:'R04-A1',x:3.0,y:16.2,landX:3.0,landY:16.6,label:'entry safe point'},{id:'R04-A2',x:14.0,y:9.2,landX:14.0,landY:9.6,label:'heat bypass access'},{id:'R04-A3',x:28.0,y:3.2,landX:28.0,landY:3.6,label:'upper cooling access'},{id:'R04-A4',x:42.0,y:16.2,landX:42.0,landY:16.6,label:'vent approach'},{id:'R04-A5',x:60.0,y:9.2,landX:60.0,landY:9.6,label:'far safety anchor'}],
   R05:[{id:'R05-A1',x:3.0,y:16.2,landX:3.0,landY:16.6,label:'entry floor anchor'},{id:'R05-A2',x:14.0,y:9.2,landX:14.0,landY:9.6,label:'catalyst bypass'},{id:'R05-A3',x:28.0,y:3.2,landX:28.0,landY:3.6,label:'upper clearance access'},{id:'R05-A4',x:42.0,y:16.2,landX:42.0,landY:16.6,label:'block approach'},{id:'R05-A5',x:60.0,y:9.2,landX:60.0,landY:9.6,label:'far deck anchor'}],
   R06:[{id:'R06-A1',x:3.0,y:16.2,landX:3.0,landY:16.6,label:'entry floor anchor'},{id:'R06-A2',x:14.0,y:9.2,landX:14.0,landY:9.6,label:'relay handoff'},{id:'R06-A3',x:28.0,y:3.2,landX:28.0,landY:3.6,label:'upper capstone access'},{id:'R06-A4',x:42.0,y:16.2,landX:42.0,landY:16.6,label:'fault approach'},{id:'R06-A5',x:60.0,y:3.2,landX:60.0,landY:3.6,label:'far relay anchor'}],
+  R07:[{id:'R07-A1',x:6.0,y:16.2,landX:6.0,landY:16.6,label:'shaft entry recovery'},{id:'R07-A2',x:20.0,y:10.2,landX:25.0,landY:7.6,label:'broken ladder bypass to mid platform'},{id:'R07-A3',x:40.0,y:6.2,landX:45.0,landY:3.6,label:'upper shaft access'},{id:'R07-A4',x:56.0,y:3.2,landX:56.0,landY:3.6,label:'upper exit recovery'}],
 };
 let grappleState=null;
 let grappleFailFlash=0;
@@ -438,6 +615,9 @@ function validateRoom(){
     pass = faults===0 && a && b;
     if(pass) detail='Faults clear, both relays set. Engine route proven.';
     else detail=(faults?faults+' fault(s) live. ':'')+((!a||!b)?'Relays incomplete.':'');
+  } else if(id==='R07'){
+    pass = player.y <= 4.2;
+    detail = pass ? 'Upper shaft exit reached. Vertical route proven.' : 'Upper shaft exit not reached. Climb and anchor recovery still incomplete.';
   } else {
     detail='No validation procedure for this sector.';
   }
@@ -484,8 +664,8 @@ function selectB(id){
 const canvas=document.getElementById('game');const ctx=canvas.getContext('2d');ctx.imageSmoothingEnabled=false;
 let T=16,GW,GH,frame=0;let gameState='TITLE';
 const TILE_PX=16;
-const TILE_FRAMES={'#':1,'_':1,'L':1,'D':2,'S':4,'G':3,'X':2,'C':4,'V':2,'~':3,'=':4,'<':4,'H':1};
-const TILE_ORDER=['#','_','L','D','S','G','X','C','V','~','=','<','H'];
+const TILE_FRAMES={'#':1,'_':1,'L':1,'D':2,'S':4,'G':3,'X':2,'C':4,'V':2,'~':3,'=':4,'<':4,'H':1,'U':4};
+const TILE_ORDER=['#','_','L','D','S','G','X','C','V','~','=','<','H','U'];
 let tileset=null,tileIndex={};
 function buildTileset(){const maxFrames=Math.max(...Object.values(TILE_FRAMES));const cols=maxFrames,rows=TILE_ORDER.length;const oc=document.createElement('canvas');oc.width=cols*TILE_PX;oc.height=rows*TILE_PX;const g=oc.getContext('2d');TILE_ORDER.forEach((t,row)=>{tileIndex[t]={row,frames:TILE_FRAMES[t]};for(let fr=0;fr<TILE_FRAMES[t];fr++){const ox=fr*TILE_PX,oy=row*TILE_PX;drawTileArt(g,t,fr,ox,oy);}});tileset=oc;}
 function drawTileArt(g,t,fr,ox,oy){const P=(px,py,w,h,c)=>{g.fillStyle=c;g.fillRect(ox+px,oy+py,w,h);};switch(t){
@@ -501,6 +681,7 @@ function drawTileArt(g,t,fr,ox,oy){const P=(px,py,w,h,c)=>{g.fillStyle=c;g.fillR
   case'~':{const a=[0.5,0.35,0.45][fr];P(0,0,16,16,'rgba(255,61,0,'+a+')');P(2,2,12,12,'rgba(255,'+(110+fr*20)+',64,'+(a*0.8)+')');break;}
   case'=':{P(0,0,16,7,NES.plat);P(0,0,16,2,NES.platLt);P(0,6,16,3,NES.conv);const aoff=fr*4;for(let axx=-4;axx<16;axx+=8){const a=((axx+aoff)%16+16)%16;P(a,6,3,3,NES.convArr);P(a+1,7,2,1,NES.conv);}break;}
   case'<':{P(0,0,16,7,NES.plat);P(0,0,16,2,NES.platLt);P(0,6,16,3,NES.convLt);const aoff=fr*4;for(let axx=-4;axx<16;axx+=8){const a=((16-(axx+aoff))%16+16)%16;P(a,6,3,3,NES.convArr);P(a-1,7,2,1,NES.convLt);}break;}
+  case'U':{P(0,0,16,16,'rgba(20,30,50,0.18)');P(1,1,14,14,'rgba(30,42,66,0.62)');P(1,1,14,1,'rgba(130,177,255,0.32)');P(3,2,10,2,'rgba(130,177,255,0.34)');P(4,4,3,2,'rgba(197,202,233,0.75)');P(7,5,5,1,'rgba(197,202,233,0.75)');P(11,5,2,2,'rgba(130,177,255,0.95)');P(5,7,1,5,'rgba(130,177,255,'+([0.25,0.45,0.65,0.45][fr])+')');P(8,8,1,4,'rgba(130,177,255,'+([0.2,0.35,0.55,0.35][fr])+')');P(11,8,1,5,'rgba(130,177,255,'+([0.25,0.4,0.6,0.4][fr])+')');P(2,13,12,2,'rgba(8,12,25,0.55)');break;}
   case'H':{P(0,0,16,16,'rgba(90,90,140,0.10)');break;}
 }}
 function roomWidth(){return roomTiles&&roomTiles[0]?roomTiles[0].length:COLS;}
@@ -515,17 +696,22 @@ function transitionKeyForDoor(c,r){
   if(c>=roomWidth()-1)return '31_'+r; // legacy transition side-key: right edge, regardless of room width
   return c+'_'+r;
 }
-function resize(){const vw=innerWidth,vh=innerHeight,isMobile=vw<700;const touchEl=document.getElementById('touch'),metaEl=document.getElementById('metabtns'),barEl=document.getElementById('toolbar');
+function resize(){const vw=innerWidth,vh=innerHeight,isMobile=vw<700;const touchEl=document.getElementById('touch'),metaEl=document.getElementById('metabtns'),barEl=document.getElementById('toolbar'),ttEl=document.getElementById('ttpanel');
   if(isMobile){touchEl.classList.add('show');metaEl.classList.add('show');}else{touchEl.classList.remove('show');metaEl.classList.remove('show');}
-  // v1.18.4 display pass: side panel is gone, so the board gets the vertical budget. Lower UI scrolls below.
-  const playH=isMobile?vh*0.78:vh*0.80,playW=vw*(isMobile?0.98:0.94),totalRows=DISPLAY_ROWS+HUD_ROWS;
+  // v1.18.5 playability recovery: board readability first, but inputs must remain usable below it.
+  const playH=isMobile?vh*0.70:vh*0.76,playW=vw*(isMobile?0.98:0.92),totalRows=DISPLAY_ROWS+HUD_ROWS;
   T=Math.floor(Math.min(playW/COLS,playH/totalRows));if(T<6)T=6;GW=COLS*T;GH=totalRows*T;
   canvas.width=GW;canvas.height=GH;canvas.style.width=GW+'px';canvas.style.height=GH+'px';ctx.imageSmoothingEnabled=false;
 }
 const keys={},justPressed={};
 addEventListener('keydown',e=>{const k=e.key.toLowerCase();if(k==='m'&&!keys['m'])Audio.toggleHum();if(!keys[k])justPressed[k]=true;keys[k]=true;if(['arrowup','arrowdown','arrowleft','arrowright',' ','tab'].includes(k))e.preventDefault();});
 addEventListener('keyup',e=>{keys[e.key.toLowerCase()]=false;});
-function setupTouch(){document.querySelectorAll('.tbtn[data-key],.abtn[data-key],.mbtn[data-key]').forEach(btn=>{const k=btn.dataset.key,map={up:'arrowup',down:'arrowdown',left:'arrowleft',right:'arrowright',a:'z',b:'x',start:'enter',select:'tab',v:'v'},mk=map[k]||k;btn.addEventListener('touchstart',e=>{e.preventDefault();if(!keys[mk])justPressed[mk]=true;keys[mk]=true;btn.classList.add('pressed');},{passive:false});btn.addEventListener('touchend',e=>{e.preventDefault();keys[mk]=false;btn.classList.remove('pressed');},{passive:false});btn.addEventListener('touchcancel',()=>{keys[mk]=false;btn.classList.remove('pressed');});});}
+function setupTouch(){document.querySelectorAll('.tbtn[data-key],.abtn[data-key],.mbtn[data-key]').forEach(btn=>{const k=btn.dataset.key,map={up:'arrowup',down:'arrowdown',left:'arrowleft',right:'arrowright',a:'z',b:'x',start:'enter',select:'tab',v:'v'},mk=map[k]||k;
+  const press=e=>{if(e&&e.preventDefault)e.preventDefault();if(!keys[mk])justPressed[mk]=true;keys[mk]=true;btn.classList.add('pressed');};
+  const release=e=>{if(e&&e.preventDefault)e.preventDefault();keys[mk]=false;btn.classList.remove('pressed');};
+  btn.addEventListener('touchstart',press,{passive:false});btn.addEventListener('touchend',release,{passive:false});btn.addEventListener('touchcancel',release);
+  btn.addEventListener('pointerdown',press);btn.addEventListener('pointerup',release);btn.addEventListener('pointercancel',release);btn.addEventListener('pointerleave',release);
+});}
 function isDown(a){switch(a){case'left':return keys['arrowleft']||keys['a'];case'right':return keys['arrowright']||keys['d'];case'up':return keys['arrowup']||keys['w'];case'down':return keys['arrowdown']||keys['s'];case'A':return keys['z']||keys['j'];case'B':return keys['x']||keys['k'];case'start':return keys['enter']||keys[' '];case'select':return keys['tab']||keys['shift'];}return false;}
 function wasPressed(a){switch(a){case'left':return justPressed['arrowleft']||justPressed['a'];case'right':return justPressed['arrowright']||justPressed['d'];case'up':return justPressed['arrowup']||justPressed['w'];case'down':return justPressed['arrowdown']||justPressed['s'];case'A':return justPressed['z']||justPressed['j'];case'B':return justPressed['x']||justPressed['k'];case'start':return justPressed['enter']||justPressed[' '];case'select':return justPressed['tab']||justPressed['shift'];case'validate':return justPressed['v'];}return false;}
 const PW=0.32,PH=1.4;
@@ -537,6 +723,7 @@ let currentRoom='R02',roomTiles=[],clearedTiles={},revealedH={};
 let scouts=[],dialogue=null,syncState={active:false,termA:false,termB:false,timer:0};
 let ventCycle=0,toolEffect=null,toolCooldown=0,completionTimer=0;
 let particles=[],coolTiles=[],syncBeam=null;
+let showerState=null;
 function spawnParticle(p){if(particles.length<400)particles.push(p);}
 function updateParticles(){for(let i=particles.length-1;i>=0;i--){const p=particles[i];p.x+=p.vx;p.y+=p.vy;if(p.grav)p.vy+=p.grav;if(p.drag){p.vx*=p.drag;p.vy*=p.drag;}p.life--;if(p.life<=0)particles.splice(i,1);}for(let i=coolTiles.length-1;i>=0;i--){coolTiles[i].timer--;if(coolTiles[i].timer<=0)coolTiles.splice(i,1);}}
 let fade={active:false,phase:'out',timer:0,dest:null};let ladderTickTimer=0;const FADE_FRAMES=7;
@@ -564,7 +751,7 @@ function loadRoom(roomId,entryCol,entryRow){
   if(roomId==='R03'){scouts.push(createDrone(22,44,14));}
   if(roomId==='R12'){scouts.push(createDrone(22,44,14));}
   if(roomId==='R06'){const bot=createScout(30,17);bot.leftBound=12;bot.rightBound=50;bot.x=30;scouts.push(bot);}
-  syncState={active:false,termA:false,termB:false,timer:0};particles=[];coolTiles=[];syncBeam=null;toolEffect=null;grappleState=null;grappleFailFlash=0;
+  syncState={active:false,termA:false,termB:false,timer:0};particles=[];coolTiles=[];syncBeam=null;toolEffect=null;grappleState=null;grappleFailFlash=0;showerState=null;
   showDialogue(ROOM_DIALOGUE[roomId]||'');
   TT.enterRoom(roomId); // ── TTRPG hook: log entry + set objective ──
 }
@@ -579,6 +766,7 @@ function updatePlayer(){
   if(player.iFrames>0)player.iFrames--;if(toolCooldown>0)toolCooldown--;
   if(toolEffect){toolEffect.timer--;if(toolEffect.timer<=0)toolEffect=null;}
   updateParticles();if(syncBeam){syncBeam.timer--;if(syncBeam.timer<=0)syncBeam=null;}
+  if(updateHealthShower())return;
   // Grapple motion is controlled/scripted to prevent corrupt velocity. Movement input pauses during pull.
   if(updateGrappleMotion())return;
   const footRow=Math.floor(player.y+PH-0.05);const midRow=Math.floor(player.y+PH/2);const pc=Math.round(player.x);
@@ -618,7 +806,58 @@ function updatePlayer(){
   ventCycle=(ventCycle+1)%VENT_CYCLE;
 }
 function hitPlayer(){player.stability--;player.iFrames=IFRAMES;Audio.thud();TT.push('STABILITY HIT ('+player.stability+' left)','bad');if(player.stability<=0)resetRoom();}
-function resetRoom(){player.stability=3;if(player.checkpoint&&player.checkpoint.room===currentRoom){player.x=player.checkpoint.x;player.y=player.checkpoint.y;}else{player.x=2;player.y=18;}player.vy=0;player.vx=0;player.onLadder=false;player.iFrames=IFRAMES;player.coyote=0;snapToFloor();TT.push('SETBACK: returned to entry. Stability reset.','bad');if(currentRoom==='R03'){scouts=[];scouts.push(createDrone(22,44,14));}if(currentRoom==='R12'){scouts=[];scouts.push(createDrone(22,44,14));}if(currentRoom==='R06'){scouts=[];const bot=createScout(30,17);bot.leftBound=12;bot.rightBound=50;bot.x=30;scouts.push(bot);}}
+function resetRoom(){player.stability=3;if(player.checkpoint&&player.checkpoint.room===currentRoom){player.x=player.checkpoint.x;player.y=player.checkpoint.y;}else{player.x=2;player.y=18;}player.vy=0;player.vx=0;player.onLadder=false;player.iFrames=IFRAMES;player.coyote=0;snapToFloor();TT.push('SETBACK: returned to entry. Stability reset.','bad');if(currentRoom==='R03'){scouts=[];scouts.push(createDrone(18,45,15));}if(currentRoom==='R12'){scouts=[];scouts.push(createDrone(18,45,15));}if(currentRoom==='R06'){scouts=[];const bot=createScout(30,17);bot.leftBound=12;bot.rightBound=48;bot.x=30;scouts.push(bot);}}
+
+
+function showerActiveAt(c,r){return showerState&&showerState.active&&showerState.room===currentRoom&&showerState.c===c&&showerState.r===r;}
+function activateHealthShower(c,r){
+  if(showerState&&showerState.active)return true;
+  let standY=player.y;
+  for(let fr=r+1;fr<ROWS;fr++){if(isWall(c,fr)||isSolidTop(c,fr)){standY=fr-PH;break;}}
+  showerState={active:true,room:currentRoom,c,r,timer:132,total:132};
+  player.x=Math.max(PW,Math.min(roomWidth()-PW,c));player.y=standY;player.vx=0;player.vy=0;player.onLadder=false;player.onGround=true;
+  Audio.interact();TT.record('HEALTH SHOWER','curtain closed; recovery cycle started','good');showDialogue('RECOVERY SHOWER ACTIVE.\nCURTAIN CLOSED.');
+  return true;
+}
+function updateHealthShower(){
+  if(!showerState||!showerState.active)return false;
+  showerState.timer--;
+  const oy=HUD_ROWS*T;
+  if(frame%8===0){
+    const cx=(showerState.c+0.5)*T, cy=oy+(showerState.r+0.8)*T;
+    spawnParticle({x:cx+(Math.random()-0.5)*T*0.8,y:cy+Math.random()*T*1.8,vx:(Math.random()-0.5)*0.2,vy:-0.15-Math.random()*0.35,life:28+Math.random()*14,maxLife:42,color:'180,220,255',size:T*0.18,kind:'steam',drag:0.96});
+  }
+  player.x=Math.max(PW,Math.min(roomWidth()-PW,showerState.c));player.vx=0;player.vy=0;player.onGround=true;player.onLadder=false;
+  if(showerState.timer<=0){
+    player.stability=3;TT.roomState[currentRoom+'_showerUsed']=true;TT.record('HEALTH SHOWER','cycle complete; stability restored to full','good');Audio.pass();showDialogue('RECOVERY COMPLETE.\nSTABILITY RESTORED.');showerState=null;return true;
+  }
+  return true;
+}
+function renderHealthShower(oy){
+  if(!showerState||!showerState.active||showerState.room!==currentRoom)return;
+  const x=showerState.c*T,y=oy+showerState.r*T;
+  const prog=1-(showerState.timer/showerState.total);
+  ctx.save();
+  ctx.fillStyle='rgba(18,32,58,0.96)';ctx.fillRect(x-T*0.72,y+T*0.15,T*1.44,T*2.35);
+  ctx.fillStyle='rgba(130,177,255,0.82)';ctx.fillRect(x-T*0.65,y+T*0.22,T*1.3,T*2.22);
+  ctx.fillStyle='rgba(8,12,25,0.38)';for(let i=0;i<4;i++)ctx.fillRect(x-T*0.62+i*T*0.34,y+T*0.24,T*0.08,T*2.18);
+  ctx.strokeStyle='rgba(232,234,246,0.82)';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(x-T*0.72,y+T*0.18);ctx.lineTo(x+T*0.72,y+T*0.18);ctx.stroke();
+  ctx.fillStyle='rgba(180,220,255,0.48)';for(let i=0;i<5;i++){const px=x-T*0.45+i*T*0.22;const py=y+T*0.55+((frame*0.07+i*0.31)%1)*T*1.55;ctx.fillRect(px,py,T*0.04,T*0.26);}
+  ctx.fillStyle='rgba(105,240,174,'+(0.35+0.35*Math.sin(frame*0.18))+')';ctx.fillRect(x-T*0.55,y+T*2.55,T*1.1*prog,T*0.12);
+  ctx.restore();
+}
+function activateRelayAt(c,r,source){
+  const via = source==='SYNC' ? ' via SYNC' : '';
+  if(currentRoom==='R03'){
+    if(c===18&&r===4){syncState.termA=true;TT.roomState.R03_relayA=true;if(!syncState.active){syncState.active=true;syncState.timer=SYNC_TIMER;}Audio.interact();TT.record('RELAY A','activated'+via,'good');showDialogue('RELAY A ACTIVATED.\nREACH RELAY B.');return true;}
+    if(c===54&&r===4){syncState.termB=true;TT.roomState.R03_relayB=true;if(!syncState.active){syncState.active=true;syncState.timer=SYNC_TIMER;}Audio.interact();TT.record('RELAY B','activated'+via,'good');showDialogue('RELAY B ACTIVATED.');return true;}
+  }
+  if(currentRoom==='R06'){
+    if(c===18&&r===4){TT.roomState.R06_relayA=true;Audio.interact();TT.record('RELAY A','activated'+via,'good');showDialogue('RELAY A ACTIVATED.\nFIND RELAY B.');return true;}
+    if(c===54&&r===4){TT.roomState.R06_relayB=true;Audio.interact();TT.record('RELAY B','activated'+via,'good');showDialogue('RELAY B ACTIVATED.');return true;}
+  }
+  return false;
+}
 function handleInteraction(){const pc=Math.round(player.x),pr=Math.floor(player.y+PH/2);const checks=[[pc,pr],[pc,pr+1],[pc,pr-1],[pc-1,pr],[pc+1,pr],[Math.floor(player.x),Math.floor(player.y+PH-0.1)]];const seen=new Set();
   for(const [c,r] of checks){const key=c+','+r;if(seen.has(key))continue;seen.add(key);const t=getTile(c,r);
     if(t==='D'){const trans=TRANSITIONS[currentRoom];const dk=transitionKeyForDoor(c,r);if(trans&&trans[dk]!==undefined){const dest=trans[dk];
@@ -631,15 +870,9 @@ function handleInteraction(){const pc=Math.round(player.x),pr=Math.floor(player.
       if(dest==='COMPLETE'){gameState='COMPLETE';completionTimer=0;Audio.complete();return;}
       Audio.doorChime();TT.push('Route door → '+dest.split('_')[0],'good');startTransition(dest);return;}}
     if(t==='S'){
-      if(currentRoom==='R03'){
-        if(c===18&&r===4){syncState.termA=true;TT.roomState.R03_relayA=true;if(!syncState.active){syncState.active=true;syncState.timer=SYNC_TIMER;}Audio.interact();TT.record('RELAY A','activated','good');showDialogue('RELAY A ACTIVATED.\nREACH RELAY B.');return;}
-        if(c===54&&r===4){syncState.termB=true;TT.roomState.R03_relayB=true;if(!syncState.active){syncState.active=true;syncState.timer=SYNC_TIMER;}Audio.interact();TT.record('RELAY B','activated','good');showDialogue('RELAY B ACTIVATED.');return;}
-      }
-      if(currentRoom==='R06'){
-        if(c===18&&r===4){TT.roomState.R06_relayA=true;Audio.interact();TT.record('RELAY A','activated','good');showDialogue('RELAY A ACTIVATED.\nFIND RELAY B.');return;}
-        if(c===54&&r===4){TT.roomState.R06_relayB=true;Audio.interact();TT.record('RELAY B','activated','good');showDialogue('RELAY B ACTIVATED.');return;}
-      }
+      if(activateRelayAt(c,r,'UP'))return;
       player.checkpoint={room:currentRoom,x:player.x,y:player.y};Audio.interact();TT.push('Checkpoint saved.','info');showDialogue('CHECKPOINT SAVED.\nSTABILITY PRESERVED.');return;}
+    if(t==='U'){activateHealthShower(c,r);return;}
     if(t==='G'){const txt=GLYPH_TEXT[currentRoom+'_'+c+'_'+r];if(txt){Audio.interact();TT.push('Read node: '+txt.replace(/\n/g,' '),'info');showDialogue(txt);}return;}
   }
 }
@@ -664,8 +897,11 @@ function useTool(idx){
       TT.record('SCAN',hitCount?('revealed '+hitCount+' hidden route tile(s)'):'no hidden route in range',hitCount?'good':'info');
       break;
     case'SYNC':
-      {let best=null,bd=1e9;for(let r=0;r<ROWS;r++)for(let c=0;c<roomWidth();c++){if(getTile(c,r)==='S'){const d=Math.hypot(c-player.x,r-(player.y+PH/2));if(d<bd){bd=d;best={c,r};}}}if(best){syncBeam={x0:player.x*T,y0:oy+(player.y+PH/2)*T,x1:best.c*T+T/2,y1:oy+best.r*T+T/2,timer:90};}}
-      TT.record('SYNC','aimed at nearest relay — interact to confirm','info');showDialogue('USE AT A RELAY\nTERMINAL (PRESS UP).');break;
+      {let best=null,bd=1e9;for(let r=0;r<ROWS;r++)for(let c=0;c<roomWidth();c++){if(getTile(c,r)==='S'){const d=Math.hypot(c-player.x,r-(player.y+PH/2));if(d<bd){bd=d;best={c,r};}}}
+      if(best){syncBeam={x0:player.x*T,y0:oy+(player.y+PH/2)*T,x1:best.c*T+T/2,y1:oy+best.r*T+T/2,timer:90};}
+      if(best&&bd<=TOOL_RANGE+0.75&&activateRelayAt(best.c,best.r,'SYNC')){break;}
+      TT.record('SYNC',best?'relay outside access range':'no relay terminal found',best?'info':'bad');showDialogue(best?'SYNC NEEDS RELAY ACCESS.':'NO RELAY TERMINAL FOUND.');}
+      break;
     case'THERMAL':
       inRange((c,r)=>{const t=getTile(c,r);if(t==='V'||t==='~'){roomTiles[r][c]=t==='V'?'_':'.';clearedTiles[currentRoom+'_'+c+'_'+r]=true;hitCount++;coolTiles.push({room:currentRoom,c,r,timer:24,wasVent:t==='V'});const cx=c*T+T/2,cy=oy+r*T+T/2;for(let k=0;k<5;k++){const a=Math.random()*Math.PI*2,sp=0.6+Math.random()*1.4;spawnParticle({x:cx,y:cy,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp-0.4,life:20+Math.random()*10,maxLife:30,color:'120,160,255',size:T*0.22,kind:'steam',drag:0.95});}}});
       TT.record('THERM',hitCount?('cooled '+hitCount+' heat source(s)'):'no heat in range',hitCount?'good':'info');break;
@@ -679,7 +915,7 @@ function useTool(idx){
 }
 function showDialogue(text){dialogue={text,timer:200,reveal:0,len:text.replace(/\n/g,'').length};}
 function updateDialogue(){if(dialogue){dialogue.timer--;if(dialogue.reveal<dialogue.len)dialogue.reveal+=0.6;if(dialogue.timer<=0)dialogue=null;}}
-function render(){ctx.fillStyle=NES.bg;ctx.fillRect(0,0,GW,GH);if(gameState==='TITLE'){renderTitle();return;}if(gameState==='COMPLETE'){renderComplete();return;}const oy=HUD_ROWS*T;updateCamera();ctx.save();ctx.translate(-cameraX*T,0);const startCol=Math.max(0,Math.floor(cameraX)-2),endCol=Math.min(roomWidth(),Math.ceil(cameraX+COLS)+2);for(let r=0;r<ROWS;r++)for(let c=startCol;c<endCol;c++)renderTile(c,r,c*T,oy+r*T);renderGrappleAnchors(oy);for(const s of scouts)renderScout(s,oy);renderCoolTiles(oy);renderPlayer(oy);if(toolEffect)renderToolEffect(oy);renderSyncBeam();renderParticles();ctx.restore();
+function render(){ctx.fillStyle=NES.bg;ctx.fillRect(0,0,GW,GH);if(gameState==='TITLE'){renderTitle();return;}if(gameState==='COMPLETE'){renderComplete();return;}const oy=HUD_ROWS*T;updateCamera();ctx.save();ctx.translate(-cameraX*T,0);const startCol=Math.max(0,Math.floor(cameraX)-2),endCol=Math.min(roomWidth(),Math.ceil(cameraX+COLS)+2);for(let r=0;r<ROWS;r++)for(let c=startCol;c<endCol;c++)renderTile(c,r,c*T,oy+r*T);renderGrappleAnchors(oy);for(const s of scouts)renderScout(s,oy);renderCoolTiles(oy);renderPlayer(oy);renderHealthShower(oy);if(toolEffect)renderToolEffect(oy);renderSyncBeam();renderParticles();ctx.restore();
   // v1.18.1: Preserve the old video frame height. The 20-row corridor occupies the top of the game area; the remaining restored output area stays as dark console/background, not missing content.
   if(typeof DISPLAY_ROWS!=='undefined' && DISPLAY_ROWS>ROWS){
     ctx.fillStyle='rgba(6,10,22,0.92)';
@@ -715,14 +951,15 @@ function render(){ctx.fillStyle=NES.bg;ctx.fillRect(0,0,GW,GH);if(gameState==='T
     ctx.fillStyle=NES.stab; if(frame%40<25)ctx.fillText('PRESS START TO RESUME',GW/2,fy+fs*1.6);
   }
   if(fade.active){let a;if(fade.phase==='out')a=1-(fade.timer/FADE_FRAMES);else a=(fade.timer/FADE_FRAMES);ctx.fillStyle='rgba(10,10,26,'+Math.max(0,Math.min(1,a))+')';ctx.fillRect(0,0,GW,GH);}}
-function tileFrame(t,c,r){const f=frame;switch(t){case'D':return(f%40<20)?1:0;case'S':return Math.floor(f/8)%4;case'G':return Math.floor(f/12)%3;case'X':return(f%14<7)?0:1;case'C':return Math.floor(f/12)%4;case'V':return ventActivePhase()?1:0;case'~':return ventActivePhase()?(Math.floor(f/10)%3):0;case'=':return Math.floor(f/6)%4;case'<':return Math.floor(f/6)%4;default:return 0;}}
+function tileFrame(t,c,r){const f=frame;switch(t){case'D':return(f%40<20)?1:0;case'S':return Math.floor(f/8)%4;case'G':return Math.floor(f/12)%3;case'X':return(f%14<7)?0:1;case'C':return Math.floor(f/12)%4;case'V':return ventActivePhase()?1:0;case'~':return ventActivePhase()?(Math.floor(f/10)%3):0;case'=':return Math.floor(f/6)%4;case'<':return Math.floor(f/6)%4;case'U':return Math.floor(f/10)%4;default:return 0;}}
 function blitTile(t,fr,x,y){const info=tileIndex[t];if(!info)return;const sx=fr*TILE_PX,sy=info.row*TILE_PX;ctx.drawImage(tileset,sx,sy,TILE_PX,TILE_PX,x,y,T,T);}
 function renderTile(c,r,x,y){const t=roomTiles[r]?roomTiles[r][c]:'#';const s=T,f=frame;if(t==='.'||t==='E')return;if(t==='H'){if(f%90<6)blitTile('H',0,x,y);return;}if(t==='~'&&!ventActivePhase()){ctx.fillStyle='rgba(255,109,0,0.12)';ctx.fillRect(x,y,s,s);return;}blitTile(t,tileFrame(t,c,r),x,y);
   switch(t){case'D':{const pulse=0.5+0.5*Math.sin(f*0.12);ctx.fillStyle='rgba(252,231,110,'+(0.10+0.22*pulse)+')';ctx.fillRect(x-s*0.25,y-s*0.25,s*1.5,s*1.5);blitTile('D',tileFrame('D'),x,y);ctx.fillStyle='rgba(252,231,110,'+(0.4+0.6*pulse)+')';ctx.font='bold '+Math.floor(s*0.4)+'px monospace';ctx.textAlign='center';ctx.fillText('▸',x+s*0.5,y+s*0.55);break;}
     case'G':{const rr=(f%40)/40;ctx.strokeStyle='rgba(130,177,255,'+(0.5*(1-rr))+')';ctx.lineWidth=1.5;ctx.beginPath();ctx.arc(x+s/2,y+s/2,s*0.3+rr*s*0.35,0,Math.PI*2);ctx.stroke();const bob=Math.sin(f*0.15)*s*0.1;ctx.fillStyle=NES.glyphLt;ctx.font='bold '+Math.floor(s*0.3)+'px monospace';ctx.textAlign='center';ctx.fillText('▾',x+s/2,y-s*0.15+bob);break;}
     case'X':{ctx.strokeStyle='rgba(255,90,90,'+(0.5+0.5*Math.sin(f*0.5))+')';ctx.lineWidth=1;for(let i=0;i<3;i++){const a=(f*0.2+i*2.1)%(Math.PI*2);const x0=x+s/2,y0=y+s/2;ctx.beginPath();ctx.moveTo(x0,y0);ctx.lineTo(x0+Math.cos(a)*s*0.4,y0+Math.sin(a)*s*0.4);ctx.lineTo(x0+Math.cos(a+0.3)*s*0.5,y0+Math.sin(a+0.3)*s*0.5);ctx.stroke();}break;}
     case'V':{if(ventActivePhase()){for(let i=0;i<5;i++){const ph=(f*0.04+i*0.7)%1;const py2=y-ph*s*1.3;const spread=Math.sin(f*0.05+i)*s*0.18*ph;const al=0.5*(1-ph);ctx.fillStyle='rgba(255,180,90,'+al+')';const sz=s*0.12+ph*s*0.15;ctx.fillRect(x+s*0.4+spread,py2,sz,sz);}}break;}
-    case'~':{if(ventActivePhase()){for(let i=0;i<3;i++){const ph=(f*0.05+i*0.6+c*0.3)%1;ctx.fillStyle='rgba(255,140,80,'+(0.4*(1-ph))+')';const sz=s*0.2+ph*s*0.2;ctx.fillRect(x+s*0.3+Math.sin(f*0.06+i)*s*0.2,y+s-ph*s*0.9,sz,sz);}}break;}}}
+    case'~':{if(ventActivePhase()){for(let i=0;i<3;i++){const ph=(f*0.05+i*0.6+c*0.3)%1;ctx.fillStyle='rgba(255,140,80,'+(0.4*(1-ph))+')';const sz=s*0.2+ph*s*0.2;ctx.fillRect(x+s*0.3+Math.sin(f*0.06+i)*s*0.2,y+s-ph*s*0.9,sz,sz);}}break;}
+    case'U':{const active=showerActiveAt(c,r);if(active){ctx.fillStyle='rgba(180,220,255,0.35)';for(let i=0;i<4;i++){const ph=(f*0.07+i*0.25)%1;ctx.fillRect(x+s*(0.35+i*0.12),y+s*0.45+ph*s*0.42,s*0.05,s*0.42);}}ctx.fillStyle='rgba(105,240,174,'+(active?0.65:0.22)+')';ctx.fillRect(x+s*0.18,y+s*0.12,s*0.64,s*0.08);break;}}}
 const ELI={H:'#fce76e',Hd:'#d4a017',S:'#e0a878',Sd:'#b07b50',W:'#3b6ea5',Wd:'#274d77',B:'#5a4632',Bd:'#3a2c1f',T:'#c5cae9',K:'#1a1a2e',E:'#0a0a1a'};
 const ELI_SPR={idle:['....HHHH....','...HHHHHH...','...HHHHHH...','...KSSSSK...','...SEsSEs...','...SSSSSS...','....SSSS....','..WWWWWWWW..','..WWWWWWWW..','.WWWWWWWWWW.','.BBBBBBBBBB.','.BdBBBBBBdB.','.WWWW..WWWW.','.WWWW..WWWW.','.KKK....KKK.','.KK......KK.'],walk1:['....HHHH....','...HHHHHH...','...HHHHHH...','...KSSSSK...','...SEsSEs...','...SSSSSS...','....SSSS....','..WWWWWWWW..','..WWWWWWWW..','.WWWWWWWWWW.','.BBBBBBBBBB.','.BdBBBBBBdB.','..WWWWWWW...','..WWW.WWWW..','..KK...KKK..','.KK......KK.'],walk2:['....HHHH....','...HHHHHH...','...HHHHHH...','...KSSSSK...','...SEsSEs...','...SSSSSS...','....SSSS....','..WWWWWWWW..','..WWWWWWWW..','.WWWWWWWWWW.','.BBBBBBBBBB.','.BdBBBBBBdB.','...WWWWWWW..','..WWWW.WWW..','..KKK...KK..','.KK......KK.'],climb:['....HHHH....','...HHHHHH...','...HHHHHH...','...SSSSSS...','...SSSSSS...','..WTWWWWTW..','..WWWWWWWW..','.WWWWWWWWWW.','.WWWWWWWWWW.','.BBBBBBBBBB.','..WWWWWWWW..','..WW.WW.WW..','..WW.WW.WW..','..KK.WW.KK..','..KK....KK..','...K....K...']};
 function drawSprite(mtx,px,py,cell,flip){for(let r=0;r<mtx.length;r++){const row=mtx[r];for(let c=0;c<row.length;c++){const ch=row[c];if(ch==='.')continue;let col;switch(ch){case'H':col=ELI.H;break;case'h':case'Hd':col=ELI.Hd;break;case'S':col=ELI.S;break;case's':col=ELI.Sd;break;case'W':col=ELI.W;break;case'w':col=ELI.Wd;break;case'B':col=ELI.B;break;case'd':col=ELI.Bd;break;case'T':col=ELI.T;break;case'K':col=ELI.K;break;case'E':col=ELI.E;break;default:col=ELI.W;}const cx=flip?(row.length-1-c):c;ctx.fillStyle=col;ctx.fillRect(px+cx*cell,py+r*cell,cell+0.5,cell+0.5);}}}
@@ -758,7 +995,7 @@ function toggleTTLog(){
   if(tog)tog.textContent=exp?'TAP TO COLLAPSE ▴':'TAP TO EXPAND ▾';
   renderTTLog();
 }
-function showPlayUI(on){const bar=document.getElementById('toolbar');if(on){if(bar)bar.classList.add('show');}else{if(bar)bar.classList.remove('show');}}
+function showPlayUI(on){const bar=document.getElementById('toolbar'),tt=document.getElementById('ttpanel');if(on){if(bar)bar.classList.add('show');if(tt)tt.classList.add('show');}else{if(bar)bar.classList.remove('show');if(tt)tt.classList.remove('show');}}
 function gameLoop(){frame++;
   switch(gameState){
     case'TITLE':if(wasPressed('start')||wasPressed('A')){startGame();}break;
@@ -768,16 +1005,17 @@ function gameLoop(){frame++;
     case'PAUSED':if(wasPressed('start'))gameState='PLAY';break;
     case'COMPLETE':if(completionTimer>120&&(wasPressed('start')||wasPressed('A'))){gameState='PLAY';player.stability=3;player.checkpoint=null;clearedTiles={};revealedH={};TT.reset();loadRoom('R02');}break;
   }
-  // v1.18.4: validation is enforced at route doors; manual tabletop buttons retired from playable UI.
+  // TTRPG: validation is enforced at route doors; manual validation button remains a future patch option.
   render();
   Object.keys(justPressed).forEach(k=>delete justPressed[k]);
   requestAnimationFrame(gameLoop);
 }
-function startGame(){Audio.init();Audio.resume();Audio.startHum();gameState='PLAY';document.getElementById('title-screen').style.display='none';TT.reset();buildToolbar();showPlayUI(true);loadRoom('R02');}
+function startGame(){Audio.init();Audio.resume();Audio.startHum();gameState='PLAY';const ts=document.getElementById('title-screen');if(ts)ts.style.display='none';if(document.body&&document.body.focus)document.body.focus();TT.reset();buildToolbar();showPlayUI(true);loadRoom('R02');}
 document.getElementById('title-screen').addEventListener('click',startGame);
 document.getElementById('title-screen').addEventListener('touchend',e=>{e.preventDefault();startGame();});
 addEventListener('resize',resize);
-buildTileset();resize();setupTouch();buildToolbar();requestAnimationFrame(gameLoop);
+(function(){const h=document.getElementById('tt-head');if(h){h.addEventListener('click',toggleTTLog);h.addEventListener('touchend',e=>{e.preventDefault();toggleTTLog();});}})();
+buildTileset();resize();setupTouch();buildToolbar();bindTTPanelButtons();requestAnimationFrame(gameLoop);
 </script>
 </body>
 </html>
