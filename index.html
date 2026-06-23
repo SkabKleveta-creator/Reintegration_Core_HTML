@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>Reintegration Core — District 01 · Grappling Hook Hybrid v1.16.0</title>
+<title>Reintegration Core — District 01 · Wide Board Output v1.18.4</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
   *{margin:0;padding:0;box-sizing:border-box;}
@@ -12,7 +12,7 @@
   canvas{display:block;image-rendering:pixelated;image-rendering:crisp-edges;margin-top:0;touch-action:none;}
 
   /* ── Quick Tool Bar (NEW: replaces SELECT-menu detour for access) ── */
-  #toolbar{display:none;width:calc(100% - 12px);max-width:760px;margin:10px auto 0;justify-content:center;gap:6px;z-index:14;padding:0 6px;flex-wrap:wrap;flex:0 0 auto;order:30;}
+  #toolbar{display:none;width:calc(100% - 12px);max-width:860px;margin:12px auto 0;justify-content:center;gap:6px;z-index:14;padding:0 6px;flex-wrap:wrap;flex:0 0 auto;order:30;}
   #toolbar.show{display:flex;}
   .qtool{pointer-events:auto;min-width:62px;background:rgba(20,24,40,0.86);border:1.5px solid rgba(120,130,170,0.4);border-radius:6px;padding:5px 6px 4px;display:flex;flex-direction:column;align-items:center;gap:2px;-webkit-tap-highlight-color:transparent;}
   .qtool .qn{font-size:7px;color:#c5cae9;letter-spacing:.5px;}
@@ -25,10 +25,9 @@
   .qtool .slot.A{background:#5b9bd5;color:#06121f;}
   .qtool .slot.B{background:#ff5a5a;color:#1f0606;}
 
-  /* ── Tabletop side panel: intent log + validate (NEW) ── */
-  /* Inline panel: flows directly under the canvas, never overlaps play or controls. */
-  #ttpanel{display:none;width:calc(100% - 12px);max-width:760px;margin:8px auto 0;background:rgba(13,15,30,0.92);border:1.5px solid rgba(91,155,213,0.4);border-radius:8px;flex-direction:column;overflow:hidden;flex:0 0 auto;order:20;}
-  #ttpanel.show{display:flex;}
+  /* ── Side panel retired in v1.18.4: validation remains internal/door-driven. */
+  #ttpanel{display:none!important;}
+  #ttpanel.show{display:none!important;}
   #tt-head{display:flex;justify-content:space-between;align-items:center;padding:5px 8px;border-bottom:1px solid rgba(91,155,213,0.25);cursor:pointer;-webkit-tap-highlight-color:transparent;}
   #tt-head h3{font-size:7px;color:#8ab4f8;letter-spacing:1px;margin:0;}
   #tt-toggle{font-size:6px;color:rgba(130,180,248,0.7);border:1px solid rgba(91,155,213,0.4);border-radius:3px;padding:2px 6px;}
@@ -53,7 +52,7 @@
   #ttlog::-webkit-scrollbar{width:4px;}
   #ttlog::-webkit-scrollbar-thumb{background:#243140;border-radius:2px;}
 
-  #touch{display:none;position:relative;bottom:auto;left:auto;width:calc(100% - 16px);max-width:760px;margin:12px auto 0;padding:8px 10px calc(14px + env(safe-area-inset-bottom,0px));gap:8px;justify-content:space-between;align-items:flex-end;z-index:10;pointer-events:none;order:40;}
+  #touch{display:none;position:relative;bottom:auto;left:auto;width:calc(100% - 16px);max-width:860px;margin:12px auto 0;padding:8px 10px calc(14px + env(safe-area-inset-bottom,0px));gap:8px;justify-content:space-between;align-items:flex-end;z-index:10;pointer-events:none;order:40;}
   #touch.show{display:flex;}
   .tpad{display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(3,1fr);width:min(36vw,156px);height:min(36vw,156px);gap:4px;pointer-events:auto;}
   .tbtn{background:rgba(200,200,220,0.12);border:1.5px solid rgba(200,200,220,0.25);border-radius:8px;display:flex;align-items:center;justify-content:center;color:rgba(200,200,220,0.6);font-family:'Press Start 2P',monospace;font-size:9px;pointer-events:auto;-webkit-tap-highlight-color:transparent;}
@@ -94,20 +93,9 @@
 <body>
 <div id="wrap">
   <canvas id="game"></canvas>
-  <div id="ttpanel" class="collapsed">
-    <div id="tt-head"><h3>INTENT LOG</h3><span id="tt-toggle">TAP TO EXPAND ▾</span></div>
-    <div id="ttobjective"></div>
-    <div id="ttactions">
-      <button class="ttact" id="ttValidateBtn" type="button">VALIDATE<br>ROOM</button>
-      <button class="ttact" id="ttExportBtn" type="button">EXPORT<br>LOG</button>
-      <button class="ttact" id="ttTableModeBtn" type="button">TABLE<br>MODE OFF</button>
-    </div>
-    <div id="ttprocedure"></div>
-    <div id="ttlog"></div>
-  </div>
   <div id="title-screen">
     <h1>REINTEGRATION<br>CORE</h1>
-    <h2>DISTRICT 01 — TTRPG HYBRID · MOBILE SCALE 1.18.3</h2>
+    <h2>DISTRICT 01 — TTRPG HYBRID · WIDE BOARD 1.18.4</h2>
     <p>PRESS START</p>
     <div class="sub">DIAGNOSE. CONNECT. VALIDATE.<br>ANCHORS ARE NOT ASSUMPTIONS.</div>
   </div>
@@ -134,15 +122,15 @@
   </div>
 </div>
 <script>
-// ═══ REINTEGRATION CORE — D01 — v1.18.3 + MOBILE SCALE AND ACCESS RHYTHM PATCH ═══
+// ═══ REINTEGRATION CORE — D01 — v1.18.4 + WIDE BOARD OUTPUT PATCH ═══
 // Locked engine preserved. TTRPG/tabletop layer plus fixed-anchor Grappling Hook added at marked seams only.
-const COLS=36,ROWS=20,HUD_ROWS=3;
-// DISPLAY_ROWS preserves the prior video output height/ratio while ROWS remains the 20-row lowered-ceiling room logic.
-// This fixes the v1.18.1 visibility drift: lower the ceiling in the map, not the player-facing video frame.
+const COLS=30,ROWS=20,HUD_ROWS=3;
+// DISPLAY_ROWS keeps the logical 20-row corridor visible while the removed side-panel budget lets the board scale larger.
+// Phone doctrine: board/output first; lower UI scrolls below; no forced one-screen fit.
 const DISPLAY_ROWS=20;
 const SCROLLING_ROOM_BASE_WIDTH=64;
 const LOWERED_CEILING_ROWS_REMOVED=10;
-const VIEWPORT_DOCTRINE='36x20 visible mobile corridor / 64x20 logical room';
+const VIEWPORT_DOCTRINE='30x20 visible mobile corridor / 64x20 logical room; side panel retired from playable layout';
 let cameraX=0;
 const NES={bg:'#0a0a1a',wall:'#3a3a4a',wallLt:'#4a4a5c',plat:'#5a5a6c',platLt:'#6a6a7e',ladder:'#b53120',ladRng:'#8a2218',door:'#d4a017',doorLt:'#fce76e',termOn:'#00c853',termOff:'#00703c',glyph:'#448aff',glyphLt:'#82b1ff',hidden:'#1a1a2e',fault:'#ff1744',faultDk:'#b71c1c',catalyst:'#aa00ff',catLt:'#d500f9',vent:'#ff6d00',ventLt:'#ff9100',heat:'#ff3d00',heatLt:'#ff6e40',conv:'#536dfe',convLt:'#8c9eff',convArr:'#c5cae9',player:'#fce76e',playerDk:'#d4a017',scout:'#e040fb',scoutSt:'#7c4dff',scoutRc:'#ff6090',hud:'#c5cae9',hudDim:'#5c6170',hudBg:'#0d0d20',white:'#e8eaf6',stab:'#69f0ae',stabLo:'#ff5252',black:'#000000',dialogBg:'#0d0d20',dialogBd:'#5b9bd5'};
 const ROOM_MAPS={
@@ -278,96 +266,6 @@ R06:[
 '#_______L_________________________L_____________________L______#',
 '################################################################',
 ],
-};
-
-const GLYPH_TEXT={
-  "R02_10_4":"SHORT LADDERS.\nANCHORS CREATE ACCESS.",
-  "R02_40_10":"CLEAR EVERY FAULT\nBEFORE THE EXIT.",
-  "R03_26_10":"TWO RELAYS, FAR APART.\nSET BOTH \u2014 THE BOARD LIES.",
-  "R03_3_17":"A GREEN BOARD IS NOT\nA PROVEN ROUTE.",
-  "R12_18_4":"SCAN MAPS THE SECTOR.\nUSE IT BEFORE THE EXIT.",
-  "R04_3_17":"HEAT VENTS BURST\nON A TIMER. COOL THEM.",
-  "R04_58_17":"THERMAL COOLS V AND ~.\nCLEAR THE COLUMN.",
-  "R05_3_4":"CATALYST BLOCKS\nWALL THE ROUTE.",
-  "R05_58_4":"DAMP DISSOLVES C BLOCKS.\nCLEAR TO PASS.",
-  "R06_34_17":"FAULTS AND RELAYS.\nPROVE THE WHOLE ROUTE.",
-};
-const ROOM_DIALOGUE={
-  R02:'FAULT DETECTED.\nDIAGNOSE, THEN CLEAR.',
-  R03:'RELAY DESYNC.\nBOARD MAY LIE. THE DOOR DOESN\u2019T.',
-  R12:'ROUTE LOCKED.\nSCAN TO RESTORE ACCESS.',
-  R04:'HEAT LEAK.\nCOOL THE VENTS TO PASS.',
-  R05:'CATALYST BUILDUP.\nDAMP THE BLOCKS CLEAR.',
-  R06:'ENGINE APPROACH.\nFAULTS AND RELAYS. PROVE IT ALL.',
-};
-const TRANSITIONS={
-  R02:{'31_17':'R03_0_17'},
-  R03:{'0_17':'R02_31_17','31_17':'R12_0_17'},
-  R12:{'0_17':'R03_31_17','31_17':'R04_0_17'},
-  R04:{'0_17':'R12_31_17','31_17':'R05_0_17'},
-  R05:{'0_17':'R04_31_17','31_17':'R06_0_17'},
-  R06:{'0_17':'R05_31_17','31_17':'COMPLETE'},
-};
-const ALL_TOOLS=[
-  {id:'PULSE',name:'PULSE',abbr:'PLS',desc:'Clear faults / stun scouts'},
-  {id:'SCANNER',name:'SCAN',abbr:'SCN',desc:'Reveal hidden routes'},
-  {id:'GRAPPLE',name:'HOOK',abbr:'HOK',desc:'Fixed-anchor access'},
-  {id:'SYNC',name:'SYNC',abbr:'SYN',desc:'Link relay terminals'},
-  {id:'THERMAL',name:'THERM',abbr:'THR',desc:'Cool vents & plumes'},
-  {id:'CATALYST',name:'DAMP',abbr:'DMP',desc:'Clear catalyst blocks'},
-  {id:'CHKPT',name:'CHKPT',abbr:'CHK',desc:'Activate checkpoints'},
-  {id:'READER',name:'READ',abbr:'RDR',desc:'Read glyph data'},
-];
-// ─── AUDIO (verbatim from locked engine) ───
-const Audio={ctx:null,master:null,hum:null,humGain:null,humOn:true,ready:false,
-  init(){if(this.ready)return;try{const AC=window.AudioContext||window.webkitAudioContext;this.ctx=new AC();this.master=this.ctx.createGain();this.master.gain.value=0.5;this.master.connect(this.ctx.destination);this.ready=true;}catch(e){this.ready=false;}},
-  resume(){if(this.ctx&&this.ctx.state==='suspended')this.ctx.resume();},
-  tone(freq,dur,type='square',vol=0.25,when=0){if(!this.ready)return;const t=this.ctx.currentTime+when;const o=this.ctx.createOscillator();const g=this.ctx.createGain();o.type=type;o.frequency.setValueAtTime(freq,t);g.gain.setValueAtTime(0.0001,t);g.gain.exponentialRampToValueAtTime(vol,t+0.005);g.gain.exponentialRampToValueAtTime(0.0001,t+dur);o.connect(g);g.connect(this.master);o.start(t);o.stop(t+dur+0.02);},
-  slide(f0,f1,dur,type='square',vol=0.3){if(!this.ready)return;const t=this.ctx.currentTime;const o=this.ctx.createOscillator();const g=this.ctx.createGain();o.type=type;o.frequency.setValueAtTime(f0,t);o.frequency.exponentialRampToValueAtTime(Math.max(20,f1),t+dur);g.gain.setValueAtTime(vol,t);g.gain.exponentialRampToValueAtTime(0.0001,t+dur);o.connect(g);g.connect(this.master);o.start(t);o.stop(t+dur+0.02);},
-  noise(dur,vol=0.3,filterFreq=800){if(!this.ready)return;const t=this.ctx.currentTime;const n=Math.floor(this.ctx.sampleRate*dur);const buf=this.ctx.createBuffer(1,n,this.ctx.sampleRate);const d=buf.getChannelData(0);for(let i=0;i<n;i++)d[i]=(Math.random()*2-1);const src=this.ctx.createBufferSource();src.buffer=buf;const f=this.ctx.createBiquadFilter();f.type='lowpass';f.frequency.value=filterFreq;const g=this.ctx.createGain();g.gain.setValueAtTime(vol,t);g.gain.exponentialRampToValueAtTime(0.0001,t+dur);src.connect(f);f.connect(g);g.connect(this.master);src.start(t);src.stop(t+dur+0.02);},
-  tool(id){this.resume();switch(id){case'PULSE':this.tone(660,0.08,'square',0.22);this.tone(990,0.07,'square',0.18,0.05);break;case'SCANNER':this.tone(880,0.06,'triangle',0.2);this.tone(1320,0.06,'triangle',0.18,0.04);break;case'GRAPPLE':this.tone(520,0.05,'triangle',0.18);this.slide(760,420,0.16,'square',0.16);this.tone(980,0.05,'sine',0.14,0.12);break;case'SYNC':this.tone(523,0.07,'sine',0.22);this.tone(784,0.09,'sine',0.2,0.06);break;case'THERMAL':this.slide(500,180,0.18,'sawtooth',0.18);break;case'CATALYST':this.tone(440,0.05,'square',0.2);this.tone(370,0.08,'square',0.2,0.05);break;case'CHKPT':this.tone(659,0.07,'sine',0.22);this.tone(988,0.1,'sine',0.2,0.07);break;case'READER':this.tone(440,0.04,'sine',0.16);this.tone(330,0.10,'sine',0.18,0.05);this.tone(220,0.14,'sine',0.16,0.12);break;default:this.tone(600,0.07,'square',0.2);}},
-  thud(){this.resume();this.slide(180,50,0.22,'square',0.32);this.noise(0.12,0.2,400);},
-  doorChime(){this.resume();this.tone(523,0.08,'sine',0.22);this.tone(659,0.08,'sine',0.22,0.07);this.tone(784,0.12,'sine',0.22,0.14);},
-  ladderTick(){this.resume();this.tone(1200,0.025,'square',0.08);},
-  interact(){this.resume();this.tone(740,0.05,'triangle',0.18);this.tone(880,0.05,'triangle',0.16,0.04);},
-  stun(){this.resume();this.slide(900,200,0.2,'sawtooth',0.22);this.noise(0.1,0.15,1200);},
-  complete(){this.resume();const seq=[523,659,784,1047,1319];seq.forEach((f,i)=>this.tone(f,0.18,'square',0.24,i*0.13));},
-  fail(){this.resume();this.slide(400,120,0.3,'sawtooth',0.25);this.noise(0.15,0.18,300);},
-  pass(){this.resume();this.tone(659,0.07,'sine',0.22);this.tone(880,0.07,'sine',0.2,0.06);this.tone(1175,0.14,'sine',0.22,0.12);},
-  startHum(){if(!this.ready||!this.humOn||this.hum)return;const t=this.ctx.currentTime;this.hum=this.ctx.createOscillator();this.humGain=this.ctx.createGain();this.hum.type='sine';this.hum.frequency.value=55;const lfo=this.ctx.createOscillator();const lfoG=this.ctx.createGain();lfo.frequency.value=0.15;lfoG.gain.value=6;lfo.connect(lfoG);lfoG.connect(this.hum.frequency);this.humGain.gain.value=0.06;this.hum.connect(this.humGain);this.humGain.connect(this.master);this.hum.start(t);lfo.start(t);this._lfo=lfo;},
-  stopHum(){if(this.hum){try{this.hum.stop();this._lfo.stop();}catch(e){}this.hum=null;this.humGain=null;}},
-  toggleHum(){this.humOn=!this.humOn;if(this.humOn)this.startHum();else this.stopHum();},
-};
-// ═══════════════════════════════════════════════════════════════
-// TTRPG LAYER (NEW) — intent log, validation, objectives, quick tools
-// Pure addition. Does not modify movement/collision.
-// ═══════════════════════════════════════════════════════════════
-const TT={
-  log:[],            // {text,kind}
-  roomState:{},      // per-room flags the validator reads
-  tableMode:false,   // optional: reduces reflex pressure for tabletop walkthroughs
-  objectives:{
-    R02:'DIAGNOSE the fault. Clear every X with PULSE, then reach the exit — the door proves the route is clean.',
-    R03:'Board reads SYNCED. Do not trust it. Activate BOTH relays; the exit door tests the real link.',
-    R12:'Map the route. SCAN the sector, use fixed anchors where useful, then reach the exit.',
-    R04:'Heat leak. Cool every vent and plume with THERMAL, then reach the exit.',
-    R05:'Catalyst buildup. Clear every block with DAMP, then reach the exit.',
-    R06:'Capstone: clear all faults, activate both relays, use anchors where useful, then prove the exit route.',
-  },
-  procedures:{
-    R02:{title:'R02 · Fault Diagnosis',reported:'Fault detected. The path may look open, but unresolved X markers make the route unsafe.',decision:'Pick what is a real fault versus map noise. Use PULSE to clear or isolate every live fault.',tool:'PULSE = corrective action. READER/Glyphs = context only.',gate:'Validate passes only when no X faults remain.',fail:'Any remaining fault means the door holds. The route is not proven.',access:'HOOK may connect only to fixed anchors. It can help reposition for fault clearance, but it does not validate the repair.'},
-    R03:{title:'R03 · Relay Verification',reported:'The board may claim SYNCED before the handoff is actually complete.',decision:'Verify both endpoints instead of trusting reported green status.',tool:'SYNC + terminal interaction confirms relays A and B.',gate:'Validate passes only when both relays are truly set.',fail:'One relay creates false confidence. The door exposes the lie.',access:'HOOK can help reach relay approaches only where an authored anchor exists. It cannot fake relay verification.'},
-    R12:{title:'R12 · Route Mapping',reported:'The route is locked because continuity is not mapped.',decision:'Scan before committing. Decide what route evidence is sufficient.',tool:'SCAN reveals/records route continuity.',gate:'Validate passes only after the sector is scanned/mapped.',fail:'Unmapped continuity cannot be treated as reliable.',access:'HOOK supports mapped route access; SCAN still governs whether the route is trusted.'},
-    R04:{title:'R04 · Heat Containment',reported:'Heat sources create route pressure. Moving through them is not the same as solving them.',decision:'Contain the pressure before declaring passage safe.',tool:'THERMAL cools vents and plumes.',gate:'Validate passes only when heat sources are cleared.',fail:'Residual heat means the route remains dangerous.',access:'HOOK may cross to fixed anchors, but heat must still be contained before validation.'},
-    R05:{title:'R05 · Catalyst Clearance',reported:'Catalyst blocks obstruct the route physically/systemically.',decision:'Clear the obstruction before treating a planned path as available.',tool:'DAMP clears catalyst blocks.',gate:'Validate passes only when catalyst obstruction is gone.',fail:'The route may be imagined, but access is still blocked.',access:'HOOK cannot attach to catalyst blocks. Clear obstruction or use authored anchors only.'},
-    R06:{title:'R06 · Capstone Route Validation',reported:'The engine approach combines faults, relays, and route proof.',decision:'Do not solve one subsystem and call the whole route fixed.',tool:'PULSE clears faults; SYNC/terminals verify relays.',gate:'Validate passes only when all faults are clear and both relays are set.',fail:'Any unresolved fault or relay gap blocks final validation.',access:'HOOK is access support only. Final proof still requires faults clear and relays verified.'},
-  },
-  // What each room needs to actually be "repaired" — validation checks reality, not belief.
-  push(text,kind){ this.log.push({text,kind:kind||'info'}); if(this.log.length>40)this.log.shift(); renderTTLog(); },
-  reset(){ this.log=[]; this.roomState={}; },
-  enterRoom(id){ this.push('— ENTER '+id+' —','info'); setObjective(this.objectives[id]||''); renderProcedureCard(id); },
-  // record a tool action + its observed effect
-  record(toolId, effectText, kind){ this.push(toolId+': '+effectText, kind||'info'); },
 };
 
 function setObjective(t){ const el=document.getElementById('ttobjective'); if(el)el.textContent=t?('OBJECTIVE: '+t):''; }
@@ -617,10 +515,10 @@ function transitionKeyForDoor(c,r){
   if(c>=roomWidth()-1)return '31_'+r; // legacy transition side-key: right edge, regardless of room width
   return c+'_'+r;
 }
-function resize(){const vw=innerWidth,vh=innerHeight,isMobile=vw<700;const touchEl=document.getElementById('touch'),metaEl=document.getElementById('metabtns'),barEl=document.getElementById('toolbar'),ttEl=document.getElementById('ttpanel');
+function resize(){const vw=innerWidth,vh=innerHeight,isMobile=vw<700;const touchEl=document.getElementById('touch'),metaEl=document.getElementById('metabtns'),barEl=document.getElementById('toolbar');
   if(isMobile){touchEl.classList.add('show');metaEl.classList.add('show');}else{touchEl.classList.remove('show');metaEl.classList.remove('show');}
-  // Mobile scale pass: prioritize board readability. Lower UI scrolls below instead of crushing the viewport.
-  const playH=isMobile?vh*0.66:vh*0.74,playW=vw*(isMobile?0.98:0.92),totalRows=DISPLAY_ROWS+HUD_ROWS;
+  // v1.18.4 display pass: side panel is gone, so the board gets the vertical budget. Lower UI scrolls below.
+  const playH=isMobile?vh*0.78:vh*0.80,playW=vw*(isMobile?0.98:0.94),totalRows=DISPLAY_ROWS+HUD_ROWS;
   T=Math.floor(Math.min(playW/COLS,playH/totalRows));if(T<6)T=6;GW=COLS*T;GH=totalRows*T;
   canvas.width=GW;canvas.height=GH;canvas.style.width=GW+'px';canvas.style.height=GH+'px';ctx.imageSmoothingEnabled=false;
 }
@@ -860,7 +758,7 @@ function toggleTTLog(){
   if(tog)tog.textContent=exp?'TAP TO COLLAPSE ▴':'TAP TO EXPAND ▾';
   renderTTLog();
 }
-function showPlayUI(on){const bar=document.getElementById('toolbar'),tt=document.getElementById('ttpanel');if(on){bar.classList.add('show');tt.classList.add('show');}else{bar.classList.remove('show');tt.classList.remove('show');}}
+function showPlayUI(on){const bar=document.getElementById('toolbar');if(on){if(bar)bar.classList.add('show');}else{if(bar)bar.classList.remove('show');}}
 function gameLoop(){frame++;
   switch(gameState){
     case'TITLE':if(wasPressed('start')||wasPressed('A')){startGame();}break;
@@ -870,7 +768,7 @@ function gameLoop(){frame++;
     case'PAUSED':if(wasPressed('start'))gameState='PLAY';break;
     case'COMPLETE':if(completionTimer>120&&(wasPressed('start')||wasPressed('A'))){gameState='PLAY';player.stability=3;player.checkpoint=null;clearedTiles={};revealedH={};TT.reset();loadRoom('R02');}break;
   }
-  // TTRPG: validation is enforced at route doors; manual validation button remains a future patch option.
+  // v1.18.4: validation is enforced at route doors; manual tabletop buttons retired from playable UI.
   render();
   Object.keys(justPressed).forEach(k=>delete justPressed[k]);
   requestAnimationFrame(gameLoop);
@@ -879,8 +777,7 @@ function startGame(){Audio.init();Audio.resume();Audio.startHum();gameState='PLA
 document.getElementById('title-screen').addEventListener('click',startGame);
 document.getElementById('title-screen').addEventListener('touchend',e=>{e.preventDefault();startGame();});
 addEventListener('resize',resize);
-(function(){const h=document.getElementById('tt-head');if(h){h.addEventListener('click',toggleTTLog);h.addEventListener('touchend',e=>{e.preventDefault();toggleTTLog();});}})();
-buildTileset();resize();setupTouch();buildToolbar();bindTTPanelButtons();requestAnimationFrame(gameLoop);
+buildTileset();resize();setupTouch();buildToolbar();requestAnimationFrame(gameLoop);
 </script>
 </body>
 </html>
