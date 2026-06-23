@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>Reintegration Core — District 01 · Grappling Hook Hybrid v1.16.0</title>
+<title>Reintegration Core — District 01 · Wide View v1.18.2</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
   *{margin:0;padding:0;box-sizing:border-box;}
@@ -66,10 +66,10 @@
   .mbtn{padding:6px 14px;background:rgba(200,200,220,0.08);border:1px solid rgba(200,200,220,0.2);border-radius:4px;color:rgba(200,200,220,0.5);font-family:'Press Start 2P',monospace;font-size:6px;pointer-events:auto;-webkit-tap-highlight-color:transparent;}
   .mbtn:active{background:rgba(200,200,220,0.25);color:#fff;}
   #title-screen{position:absolute;top:0;left:0;width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:100;background:#0a0a1a;cursor:pointer;}
-  #title-screen h1{color:#5b9bd5;font-size:11px;letter-spacing:2px;margin-bottom:6px;text-align:center;line-height:1.8;}
-  #title-screen h2{color:#8ab4f8;font-size:7px;letter-spacing:1px;margin-bottom:30px;}
-  #title-screen p{color:rgba(200,200,220,0.5);font-size:7px;animation:blink 1.2s infinite;}
-  #title-screen .sub{color:rgba(200,200,220,0.3);font-size:6px;margin-top:20px;line-height:2;}
+  #title-screen h1{color:#5b9bd5;font-size:clamp(28px,4.5vw,62px);letter-spacing:4px;margin-bottom:16px;text-align:center;line-height:1.35;text-shadow:0 0 22px rgba(91,155,213,.42);}
+  #title-screen h2{color:#8ab4f8;font-size:clamp(12px,1.35vw,20px);letter-spacing:2px;margin-bottom:34px;text-align:center;}
+  #title-screen p{color:rgba(200,200,220,0.72);font-size:clamp(10px,1.1vw,16px);animation:blink 1.2s infinite;}
+  #title-screen .sub{color:rgba(200,200,220,0.42);font-size:clamp(9px,.95vw,14px);margin-top:24px;line-height:2;letter-spacing:1px;text-align:center;}
   @keyframes blink{0%,100%{opacity:1;}50%{opacity:0.2;}}
 </style>
 </head>
@@ -89,7 +89,7 @@
   </div>
   <div id="title-screen">
     <h1>REINTEGRATION<br>CORE</h1>
-    <h2>DISTRICT 01 — TTRPG HYBRID + SCROLL 1.18.0</h2>
+    <h2>DISTRICT 01 — TTRPG HYBRID · WIDE VIEW 1.18.2</h2>
     <p>PRESS START</p>
     <div class="sub">DIAGNOSE. CONNECT. VALIDATE.<br>ANCHORS ARE NOT ASSUMPTIONS.</div>
   </div>
@@ -118,12 +118,12 @@
 <script>
 // ═══ REINTEGRATION CORE — D01 — v1.16.1 + FIXED-ANCHOR GRAPPLING HOOK LADDER-CLEARANCE PATCH ═══
 // Locked engine preserved. TTRPG/tabletop layer plus fixed-anchor Grappling Hook added at marked seams only.
-const COLS=32,ROWS=20,HUD_ROWS=3;
-// DISPLAY_ROWS preserves the prior video output height/ratio while ROWS remains the 20-row lowered-ceiling room logic.
-// This fixes the v1.18.1 visibility drift: lower the ceiling in the map, not the player-facing video frame.
-const DISPLAY_ROWS=30;
+const COLS=48,ROWS=20,HUD_ROWS=3;
+// DISPLAY_ROWS now matches the lowered 20-row corridor. Output is widened instead of padded with dead vertical space.
+const DISPLAY_ROWS=20;
 const SCROLLING_ROOM_BASE_WIDTH=64;
 const LOWERED_CEILING_ROWS_REMOVED=10;
+const VIEWPORT_DOCTRINE='48x20 visible corridor / 64x20 logical room';
 let cameraX=0;
 const NES={bg:'#0a0a1a',wall:'#3a3a4a',wallLt:'#4a4a5c',plat:'#5a5a6c',platLt:'#6a6a7e',ladder:'#b53120',ladRng:'#8a2218',door:'#d4a017',doorLt:'#fce76e',termOn:'#00c853',termOff:'#00703c',glyph:'#448aff',glyphLt:'#82b1ff',hidden:'#1a1a2e',fault:'#ff1744',faultDk:'#b71c1c',catalyst:'#aa00ff',catLt:'#d500f9',vent:'#ff6d00',ventLt:'#ff9100',heat:'#ff3d00',heatLt:'#ff6e40',conv:'#536dfe',convLt:'#8c9eff',convArr:'#c5cae9',player:'#fce76e',playerDk:'#d4a017',scout:'#e040fb',scoutSt:'#7c4dff',scoutRc:'#ff6090',hud:'#c5cae9',hudDim:'#5c6170',hudBg:'#0d0d20',white:'#e8eaf6',stab:'#69f0ae',stabLo:'#ff5252',black:'#000000',dialogBg:'#0d0d20',dialogBd:'#5b9bd5'};
 const ROOM_MAPS={
@@ -261,16 +261,16 @@ R06:[
 ],
 };
 const GLYPH_TEXT={
-  'R02_9_3':'CLIMB LADDERS TO\nREACH OFFSET LEDGES.',
-  'R02_28_17':'CLEAR EVERY FAULT\nBEFORE THE EXIT.',
-  'R03_20_16':'TWO RELAYS, FAR APART.\nSET BOTH — THE BOARD LIES.',
-  'R03_3_17':'A GREEN BOARD IS NOT\nA PROVEN ROUTE.',
-  'R12_18_3':'SCAN MAPS THE SECTOR.\nUSE IT BEFORE THE EXIT.',
-  'R04_2_17':'HEAT VENTS BURST\nON A TIMER. COOL THEM.',
-  'R04_58_17':'THERMAL COOLS V AND ~.\nCLEAR THE COLUMN.',
-  'R05_2_3':'CATALYST BLOCKS\nWALL THE ROUTE.',
-  'R05_58_3':'DAMP DISSOLVES C BLOCKS.\nCLEAR TO PASS.',
-  'R06_30_17':'FAULTS AND RELAYS.\nPROVE THE WHOLE ROUTE.',
+  "R02_9_3":"CLIMB LADDERS TO\nREACH OFFSET LEDGES.",
+  "R02_28_17":"CLEAR EVERY FAULT\nBEFORE THE EXIT.",
+  "R03_20_16":"TWO RELAYS, FAR APART.\nSET BOTH — THE BOARD LIES.",
+  "R03_3_17":"A GREEN BOARD IS NOT\nA PROVEN ROUTE.",
+  "R12_18_3":"SCAN MAPS THE SECTOR.\nUSE IT BEFORE THE EXIT.",
+  "R04_2_17":"HEAT VENTS BURST\nON A TIMER. COOL THEM.",
+  "R04_58_17":"THERMAL COOLS V AND ~.\nCLEAR THE COLUMN.",
+  "R05_2_3":"CATALYST BLOCKS\nWALL THE ROUTE.",
+  "R05_58_3":"DAMP DISSOLVES C BLOCKS.\nCLEAR TO PASS.",
+  "R06_30_17":"FAULTS AND RELAYS.\nPROVE THE WHOLE ROUTE.",
 };
 const ROOM_DIALOGUE={
   R02:'FAULT DETECTED.\nDIAGNOSE, THEN CLEAR.',
@@ -600,7 +600,7 @@ function transitionKeyForDoor(c,r){
 function resize(){const vw=innerWidth,vh=innerHeight,isMobile=vw<700;const touchEl=document.getElementById('touch'),metaEl=document.getElementById('metabtns'),barEl=document.getElementById('toolbar'),ttEl=document.getElementById('ttpanel');
   if(isMobile){touchEl.classList.add('show');metaEl.classList.add('show');}else{touchEl.classList.remove('show');metaEl.classList.remove('show');}
   // Canvas budget leaves room below for the inline intent log + (mobile) the fixed control stack.
-  const playH=isMobile?vh*0.46:vh*0.74,playW=vw*(isMobile?0.98:0.74),totalRows=DISPLAY_ROWS+HUD_ROWS;
+  const playH=isMobile?vh*0.48:vh*0.62,playW=vw*(isMobile?0.98:0.92),totalRows=DISPLAY_ROWS+HUD_ROWS;
   T=Math.floor(Math.min(playW/COLS,playH/totalRows));if(T<6)T=6;GW=COLS*T;GH=totalRows*T;
   canvas.width=GW;canvas.height=GH;canvas.style.width=GW+'px';canvas.style.height=GH+'px';ctx.imageSmoothingEnabled=false;
 }
@@ -761,7 +761,7 @@ function useTool(idx){
 function showDialogue(text){dialogue={text,timer:200,reveal:0,len:text.replace(/\n/g,'').length};}
 function updateDialogue(){if(dialogue){dialogue.timer--;if(dialogue.reveal<dialogue.len)dialogue.reveal+=0.6;if(dialogue.timer<=0)dialogue=null;}}
 function render(){ctx.fillStyle=NES.bg;ctx.fillRect(0,0,GW,GH);if(gameState==='TITLE'){renderTitle();return;}if(gameState==='COMPLETE'){renderComplete();return;}const oy=HUD_ROWS*T;updateCamera();ctx.save();ctx.translate(-cameraX*T,0);const startCol=Math.max(0,Math.floor(cameraX)-2),endCol=Math.min(roomWidth(),Math.ceil(cameraX+COLS)+2);for(let r=0;r<ROWS;r++)for(let c=startCol;c<endCol;c++)renderTile(c,r,c*T,oy+r*T);renderGrappleAnchors(oy);for(const s of scouts)renderScout(s,oy);renderCoolTiles(oy);renderPlayer(oy);if(toolEffect)renderToolEffect(oy);renderSyncBeam();renderParticles();ctx.restore();
-  // v1.18.1: Preserve the old video frame height. The 20-row corridor occupies the top of the game area; the remaining restored output area stays as dark console/background, not missing content.
+  // v1.18.2: no restored dead-air band. The visual output is widened to show the scrolling corridor.
   if(typeof DISPLAY_ROWS!=='undefined' && DISPLAY_ROWS>ROWS){
     ctx.fillStyle='rgba(6,10,22,0.92)';
     ctx.fillRect(0, oy+ROWS*T, GW, (DISPLAY_ROWS-ROWS)*T);
