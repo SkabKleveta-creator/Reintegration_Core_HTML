@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>Reintegration Core — District 01 · Playability Recovery v1.18.5</title>
+<title>Reintegration Core — District 01 · 12-Room Corridor Expansion v1.18.10</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
   *{margin:0;padding:0;box-sizing:border-box;}
@@ -109,7 +109,7 @@
   </div>
   <div id="title-screen">
     <h1>REINTEGRATION<br>CORE</h1>
-    <h2>DISTRICT 01 — PLAYABILITY RECOVERY 1.18.5</h2>
+    <h2>DISTRICT 01 — 12-ROOM CORRIDOR 1.18.10</h2>
     <p>PRESS START</p>
     <div class="sub">DIAGNOSE. CONNECT. VALIDATE.<br>ANCHORS ARE NOT ASSUMPTIONS.</div>
   </div>
@@ -136,7 +136,7 @@
   </div>
 </div>
 <script>
-// ═══ REINTEGRATION CORE — D01 — v1.18.5 PLAYABILITY RECOVERY ═══
+// ═══ REINTEGRATION CORE — D01 — v1.18.10 12-ROOM CORRIDOR EXPANSION ═══
 // Locked engine preserved. TTRPG/tabletop layer plus fixed-anchor Grappling Hook added at marked seams only.
 const COLS=32,ROWS=20,HUD_ROWS=3;
 // DISPLAY_ROWS preserves the prior video output height/ratio while ROWS remains the 20-row lowered-ceiling room logic.
@@ -153,20 +153,20 @@ R02:[
 '#..............................................................#',
 '#..............................................................#',
 '#..............................................................#',
-'#.........G....................................................#',
+'#.........G...................X................................#',
 '#______________________________________________________________#',
 '#.................L...........................L................#',
 '#.................L...........................L................#',
 '#.................L...........................L................#',
 '#.................L...........................L................#',
-'#.................L.....................G.....L................#',
+'#.................L.....X...............G.....L.......X........#',
 '#_________________L___________________________L________________#',
 '#.......L.........................L.....................L......#',
 '#.......L.........................L.....................L......#',
 '#.......L.........................L.....................L......#',
 '#.......L.........................L.....................L......#',
 '#.......L.........................L.....................L......#',
-'D.......L...........S.........X...L.................X...L......D',
+'D.......L....X......S.........X...L.........X.......X...L......D',
 '#_______L_________________________L_____________________L______#',
 '################################################################',
 ],
@@ -218,21 +218,21 @@ R04:[
 '################################################################',
 '#..............................................................#',
 '#..............................................................#',
-'#..............................................................#',
-'#..............................................................#',
+'#.................................~............................#',
+'#.................................V............................#',
 '#______________________________________________________________#',
 '#.................L...........................L................#',
 '#.................L...........................L................#',
 '#.................L...........................L................#',
-'#.................L...........................L................#',
-'#.................L...........................L................#',
+'#.................L.....~.....................L.......~........#',
+'#.................L.....V.....................L.......V........#',
 '#_________________L___________________________L________________#',
 '#.......L.........................L.....................L......#',
 '#.......L.........................L.....................L......#',
 '#.......L.........................L.....................L......#',
 '#.......L.........................L.....................L......#',
-'#.......L...................~.....L.........~...........L......#',
-'D..G....L...................V.....L.........V...........L.G....D',
+'#.......L...........~.......~.....L....~....~...........L......#',
+'D..G....L............V......V.....L....V....V...........L.G....D',
 '#_______L_________________________L_____________________L______#',
 '################################################################',
 ],
@@ -241,20 +241,20 @@ R05:[
 '#..............................................................#',
 '#..............................................................#',
 '#..............................................................#',
-'#..G......................................................G....#',
+'#..G........................C.............................G....#',
 '#______________________________________________________________#',
 '#.................L...........................L................#',
 '#.................L...........................L................#',
 '#.................L...........................L................#',
 '#.................L...........................L................#',
-'#.................L...........................L................#',
+'#.................L...........C...............L.....C..........#',
 '#_________________L___________________________L________________#',
 '#.......L.........................L.....................L......#',
 '#.......L.........................L.....................L......#',
 '#.......L.........................L.....................L......#',
 '#.......L.........................L.....................L......#',
 '#.......L.........................L.....................L......#',
-'D.......L...................CCC...L.........CCC.........L......D',
+'D.......L............CC.....CCC...L....CC...CCC.........L......D',
 '#_______L_________________________L_____________________L______#',
 '################################################################',
 ],
@@ -263,55 +263,167 @@ R06:[
 '#..............................................................#',
 '#..............................................................#',
 '#..............................................................#',
-'#.................S...................................S........#',
+'#.................S...........X.......................S........#',
 '#______________________________________________________________#',
 '#.................L...........................L................#',
 '#.................L...........................L................#',
 '#.................L...........................L................#',
 '#.................L...........................L................#',
-'#.................L...........................L................#',
+'#.................L.......X...................L.X..............#',
 '#_________________L___________________________L________________#',
 '#.......L.........................L.....................L......#',
 '#.......L.........................L.....................L......#',
 '#.......L.........................L.....................L......#',
 '#.......L.........................L.....................L......#',
 '#.......L.........................L.....................L......#',
-'D.......L.....................X.....G.......X...........L......D',
+'D.......L............X........X.....G..X....X...........L......D',
 '#_______L_________________________L_____________________L______#',
 '################################################################',
 ],
+
 R07:[
 '################################################################',
 '#..............................................................#',
 '#..............................................................#',
 '#..............................................................#',
-'#.......................................................G......D',
-'#.........................................__L__________________#',
-'#...............................#...........L..................#',
-'#...............................#...........L..................#',
-'#...............................#...........L..................#',
-'#....................___L______________........................#',
-'#.......................L......................................#',
-'#.......................L......................................#',
-'#............U..........L.......#..............................#',
-'#....___L____________...........#..............................#',
-'#.......L.......................#..............................#',
-'#.......L.......................#..............................#',
-'#...G...L.......................#..............................#',
-'D.......L.......................#..............................#',
-'#_______L______________________________________________________#',
+'#.......G......................................................D',
+'#______________________________________________________________#',
+'#.........................L.....################################',
+'#.........................L.....################################',
+'#.........................L.....################################',
+'#.........................L.....################################',
+'#...........__________________..################################',
+'#.................L.............################################',
+'#.................L.............################################',
+'#.................L.............################################',
+'#..___L______________...........################################',
+'#.....L.........................################################',
+'#.....L.........................################################',
+'D.....L...G........U............################################',
+'#_______________________________################################',
+'################################################################',
+],
+
+R08:[
+'################################################################',
+'#..............................................................#',
+'#..............................................................#',
+'#..............................................................#',
+'#...GC........S.....X...........................X.....C........#',
+'#______________________________________________________________#',
+'#.......L...................L...................L..............#',
+'#.......L...................L...................L..............#',
+'#.......L...................L...................L..............#',
+'#.......L...................L...................L.~............#',
+'#.......L.......C.....G.....L.....S.X.........C.L.V.....X......#',
+'#_______L___________________L___________________L______________#',
+'#.......L...................L...................L..............#',
+'#.......L...................L...................L..............#',
+'#.......L...................L...................L..............#',
+'#.......L...................L...................L..............#',
+'#.......L...................L........~..........L~.............#',
+'D.......L...........X...CC..L.........V...X.CCC.L.V.X..S..G....D',
+'#______________________________________________________________#',
+'################################################################',
+],
+R09:[
+'################################################################',
+'#..............................................................#',
+'#..............................................................#',
+'#..............................................................#',
+'#...G...............S.............X............................#',
+'#______________________________________________________________#',
+'#......L....................L....................L.............#',
+'#......L....................L....................L.............#',
+'#......L....................L....................L.............#',
+'#......L....................L....................L.............#',
+'#......L.......X............L..HHH..........S....L.............#',
+'#______L____________________L____________________L_____________#',
+'#......L....................L....................L.............#',
+'#......L....................L....................L.............#',
+'#......L....................L....................L.............#',
+'#......L....................L....................L.............#',
+'#......L....................L....................L.............#',
+'D......L....................L....................L..X.....G....D',
+'#______L____________________L____________________L_____________#',
+'################################################################',
+],
+R10:[
+'################################################################',
+'#..............................................................#',
+'#..............................................................#',
+'#.................................~...................~........#',
+'#...G.........S...................V...................V........#',
+'#______________________________________________________________#',
+'#......L....................L....................L.............#',
+'#......L....................L....................L.............#',
+'#......L....................L....................L.............#',
+'#......L.............~......L....................L...~.........#',
+'#......L.............V......L.....S..............L...V.........#',
+'#______L____________________L____________________L_____________#',
+'#......L....................L....................L.............#',
+'#......L....................L....................L.............#',
+'#......L....................L....................L.............#',
+'#......L....................L....................L.............#',
+'#......L........~...........L..........~.........L.............#',
+'D......L........V...........L..........V.........L.....S...G...D',
+'#______L____________________L____________________L_____________#',
+'################################################################',
+],
+R11:[
+'################################################################',
+'#..............................................................#',
+'#..............................................................#',
+'#..............................................................#',
+'#...G.............S...............C............................#',
+'#______________________________________________________________#',
+'#......L....................L....................L.............#',
+'#......L....................L....................L.............#',
+'#......L....................L....................L.............#',
+'#......L....................L....................L.............#',
+'#......L............C.......L.......X.....S......L....C........#',
+'#______L____________________L____________________L_____________#',
+'#......L....................L....................L.............#',
+'#......L....................L....................L.............#',
+'#......L....................L....................L.............#',
+'#......L....................L....................L.............#',
+'#......L....................L....................L.............#',
+'D......L......C..........X..L...C............X...L.....C...G...D',
+'#______L____________________L____________________L_____________#',
+'################################################################',
+],
+R13:[
+'################################################################',
+'#..............................................................#',
+'#..............................................................#',
+'#..............................................................#',
+'#...G.........S.........C.............S................X.......#',
+'#______________________________________________________________#',
+'#......L....................L....................L.............#',
+'#......L....................L....................L.............#',
+'#......L....................L....................L.............#',
+'#......L....................L....................L.............#',
+'#......L..........C.........L...S.......X........L..S..........#',
+'#______L____________________L____________________L_____________#',
+'#......L....................L....................L.............#',
+'#......L....................L....................L.............#',
+'#......L....................L....................L.............#',
+'#......L....................L....................L.............#',
+'#......L....................L.......~............L.............#',
+'D......L......X...........C.L.......V.........C..L......S...G..D',
+'#______L____________________L____________________L_____________#',
 '################################################################',
 ],
 };
 
-// ── v1.18.6 SHAFT + HEALTH SHOWER RECOVERY ──
+// ── v1.18.10 12-ROOM CORRIDOR EXPANSION ──
 // Surgical restore only: these blocks were dependencies of the v1.18.3 playable base.
 // They keep the live UI/tabletop DOM safe without reintroducing the visible Intent Log panel.
 const ALL_TOOLS=[
   {id:'PULSE',name:'PULSE',desc:'Clear faults / stun scouts'},
   {id:'SCANNER',name:'SCAN',desc:'Reveal hidden route'},
   {id:'GRAPPLE',name:'HOOK',desc:'Fixed anchors only'},
-  {id:'SYNC',name:'SYNC',desc:'Aim at relay'},
+  {id:'SYNC',name:'SYNC',desc:'Access relay'},
   {id:'THERMAL',name:'THERM',desc:'Cool heat / vents'},
   {id:'CATALYST',name:'DAMP',desc:'Clear catalyst blocks'},
   {id:'CHKPT',name:'SAVE',desc:'Set checkpoint'},
@@ -325,7 +437,12 @@ const TRANSITIONS={
   R04:{'0_17':'R12_63_17','31_17':'R05_0_17'},
   R05:{'0_17':'R04_63_17','31_17':'R06_0_17'},
   R06:{'0_17':'R05_63_17','31_17':'R07_0_17'},
-  R07:{'0_17':'R06_63_17','31_4':'COMPLETE'}
+  R07:{'0_17':'R06_63_17','31_4':'R08_0_17'},
+  R08:{'0_17':'R07_63_4','31_17':'R09_0_17'},
+  R09:{'0_17':'R08_63_17','31_17':'R10_0_17'},
+  R10:{'0_17':'R09_63_17','31_17':'R11_0_17'},
+  R11:{'0_17':'R10_63_17','31_17':'R13_0_17'},
+  R13:{'0_17':'R11_63_17','31_17':'COMPLETE'}
 };
 
 const ROOM_DIALOGUE={
@@ -335,7 +452,12 @@ const ROOM_DIALOGUE={
   R04:'THERMAL BREACH.\nCOOL ACTIVE HEAT SOURCES BEFORE EXIT.',
   R05:'CATALYST BLOCKAGE.\nDAMPEN BLOCKS TO RESTORE THE ROUTE.',
   R06:'CAPSTONE ROUTE.\nCLEAR FAULTS, CONFIRM RELAYS, THEN VALIDATE.',
-  R07:'VERTICAL SHAFT.\nBROKEN LADDERS REQUIRE FIXED ANCHOR RECOVERY.'
+  R07:'SHAFT RECOVERY.\nMOVE UP FIRST. CROSS RIGHT ONLY ON THE UPPER DECK.',
+  R08:'INTEGRATION GAUNTLET.\nCLEAR MIXED FAILURES AND CONFIRM THREE RELAYS.',
+  R09:'AUDIT MESH.\nCLEAR FAULTS, SCAN THE HIDDEN ROUTE, CONFIRM RELAYS.',
+  R10:'THERMAL RELAY.\nCOOL HEAT SOURCES AND CONFIRM THREE RELAYS.',
+  R11:'CATALYST FORK.\nDAMP BLOCKS, CLEAR FAULTS, CONFIRM RELAYS.',
+  R13:'FINAL INTEGRATION CORRIDOR.\nPROVE EVERY SYSTEM BEFORE COMPLETION.'
 };
 
 const GLYPH_TEXT={
@@ -349,8 +471,29 @@ const GLYPH_TEXT={
   'R05_3_4':'CATALYST BLOCKS ARE REAL OBSTRUCTIONS.',
   'R05_58_4':'CLEAR THE ROUTE.\nTHEN LET THE DOOR JUDGE.',
   'R06_36_17':'FINAL CHECKPOINT.\nFAULTS AND RELAYS BOTH MATTER.',
-  'R07_4_16':'BROKEN LADDER DOES NOT MEAN BROKEN ROUTE.\nUSE AUTHORED ANCHORS TO RECOVER UPWARD.',
-  'R07_56_4':'UPWARD ACCESS PROVEN.\nTHE EXIT IS HIGH BECAUSE THE SYSTEM FAILED LOW.'
+  'R07_10_17':'BROKEN LADDER DOES NOT MEAN BROKEN ROUTE.\nCLIMB, ANCHOR, RECOVER UPWARD.',
+  'R07_8_4':'UPWARD ACCESS PROVEN.\nTHE EXIT IS ABOVE THE FAILURE, NOT PAST IT.',
+  'R08_4_4':'INTEGRATION IS NOT A HALLWAY.\nEVERY SYSTEM HAS TO HOLD TOGETHER.',
+  'R08_22_10':'THREE RELAYS. MIXED FAILURES. ONE PROVEN ROUTE.',
+  'R08_58_17':'FINAL HANDOFF CHECK.\nCLEAR THE PHYSICAL ROUTE BEFORE TRUSTING THE DOOR.',
+  'R09_4_4':'AUDIT DRIFT HIDES IN CLEAN-LOOKING ROUTES.\nSCAN BEFORE YOU SIGN.',
+  'R09_58_17':'FAULTS CLEARED WITHOUT MAPPING ARE STILL ONLY PARTIAL PROOF.',
+  'R10_4_4':'THERMAL STATE IS A ROUTE CONDITION.\nCOOL IT BEFORE YOU TRUST IT.',
+  'R10_59_17':'RELAY CONFIRMATION MUST SURVIVE HEAT AND MOTION.',
+  'R11_4_4':'CATALYST BLOCKS ARE NOT BACKGROUND ART.\nTHEY ARE PHYSICAL OBSTRUCTIONS.',
+  'R11_59_17':'THE FORK ONLY CLOSES WHEN THE MATERIAL ROUTE IS CLEAR.',
+  'R13_4_4':'FINAL INTEGRATION MEANS EVERY FAILURE CLASS IS ACCOUNTED FOR.',
+  'R13_60_17':'THE LAST DOOR DOES NOT CARE WHAT THE BOARD CLAIMS.\nIT TESTS THE ROUTE.'
+};
+
+const RELAY_LAYOUT={
+  R03:[{c:18,r:4,key:'R03_relayA',name:'A'},{c:54,r:4,key:'R03_relayB',name:'B'}],
+  R06:[{c:18,r:4,key:'R06_relayA',name:'A'},{c:54,r:4,key:'R06_relayB',name:'B'}],
+  R08:[{c:14,r:4,key:'R08_relayA',name:'A'},{c:34,r:10,key:'R08_relayB',name:'B'},{c:55,r:17,key:'R08_relayC',name:'C'}],
+  R09:[{c:20,r:4,key:'R09_relayA',name:'A'},{c:44,r:10,key:'R09_relayB',name:'B'}],
+  R10:[{c:14,r:4,key:'R10_relayA',name:'A'},{c:34,r:10,key:'R10_relayB',name:'B'},{c:55,r:17,key:'R10_relayC',name:'C'}],
+  R11:[{c:18,r:4,key:'R11_relayA',name:'A'},{c:42,r:10,key:'R11_relayB',name:'B'}],
+  R13:[{c:14,r:4,key:'R13_relayA',name:'A'},{c:38,r:4,key:'R13_relayB',name:'B'},{c:32,r:10,key:'R13_relayC',name:'C'},{c:52,r:10,key:'R13_relayD',name:'D'},{c:56,r:17,key:'R13_relayE',name:'E'}]
 };
 
 const TT={
@@ -364,16 +507,26 @@ const TT={
     R04:'Cool all active heat/vent sources before exit.',
     R05:'Remove catalyst blocks before claiming the path is clear.',
     R06:'Clear faults and activate both relays for capstone validation.',
-    R07:'Climb the broken shaft, use fixed anchors, and reach the upper exit.'
+    R07:'Climb the shaft, then reach the upper-right exit.',
+    R08:'Clear mixed obstacles and activate all three relays before exit.',
+    R09:'Clear faults, scan hidden route data, and confirm both relays.',
+    R10:'Cool all heat sources and confirm all three relays.',
+    R11:'Dampen catalyst blocks, clear faults, and confirm both relays.',
+    R13:'Clear final mixed failures and confirm all five relays.'
   },
   procedures:{
     R02:{title:'R02 — Fault Containment',reported:'Faults visible in the route.',decision:'Clear actual fault tiles before exiting.',tool:'A/PULSE clears faults; B-tool remains selectable.',access:'Fixed grapple anchors support route recovery only.',gate:'Forward door calls validateRoom().',fail:'Any X tile remains live.'},
-    R03:{title:'R03 — Relay Confirmation',reported:'System may report synced early.',decision:'Confirm Relay A and Relay B manually.',tool:'SYNC points toward relay; UP confirms terminal.',access:'Fixed anchors create access rhythm between decks.',gate:'Both relay state flags must be true.',fail:'False green if only one or neither relay is set.'},
+    R03:{title:'R03 — Relay Confirmation',reported:'System may report synced early.',decision:'Confirm Relay A and Relay B manually.',tool:'SYNC or UP confirms terminal access.',access:'Fixed anchors create access rhythm between decks.',gate:'Both relay state flags must be true.',fail:'Door holds if one or neither relay is set.'},
     R12:{title:'R12 — Route Mapping',reported:'Path state is unknown.',decision:'Scan before trusting corridor state.',tool:'SCANNER reveals hidden route tiles.',access:'Anchors assist vertical/horizontal repositioning.',gate:'R12_scanned must be true.',fail:'Door holds until sector scan is completed.'},
     R04:{title:'R04 — Thermal Control',reported:'Heat sources compromise traversal.',decision:'Cool vents/heat before exit.',tool:'THERM removes V/~ heat sources in range.',access:'Anchors support bypass and recovery around heat.',gate:'No V or ~ heat sources remain.',fail:'Any active heat source remains in room state.'},
     R05:{title:'R05 — Catalyst Dampening',reported:'Catalyst blocks physically obstruct route.',decision:'Remove C blocks before validating.',tool:'DAMP removes catalyst blocks.',access:'Anchors support access but do not delete blocks.',gate:'No C blocks remain.',fail:'Any catalyst block remains.'},
     R06:{title:'R06 — Capstone Proof',reported:'Multiple system faults remain.',decision:'Clear faults and confirm both relays.',tool:'PULSE clears X; relay interaction confirms state.',access:'Fixed anchors support final route recovery.',gate:'No faults and both relay flags true.',fail:'Any fault or relay gap remains.'},
-    R07:{title:'R07 — Vertical Shaft Recovery',reported:'The shaft route failed low; ladders are broken in segments.',decision:'Use ladders where intact and fixed grapple anchors where broken.',tool:'GRAPPLE creates upward access only through authored anchors; Health Shower restores stability.',access:'Broken ladders are explicit; anchors support recovery without arbitrary wall attachment.',gate:'Reach the upper exit platform.',fail:'Door held if Eli has not actually reached the upper shaft exit.'}
+    R07:{title:'R07 — Shaft Access',reported:'The access shaft failed vertically; ladders are broken in segments.',decision:'Move upward first; the lower and middle right side remain blocked. Cross right only after reaching the upper deck.',tool:'GRAPPLE creates upward access through authored anchors only; Health Shower restores stability.',access:'Lower/mid landings are rest points; the only rightward route is the upper deck to the high exit.',gate:'Reach the upper-right shaft exit platform.',fail:'Door held if Eli has not reached the high right-side exit.'},
+    R08:{title:'R08 — Integration Gauntlet',reported:'Mixed failures remain across the floor plan.',decision:'Clear faults, heat, catalyst blocks, and confirm all three relays.',tool:'PULSE clears faults; THERM cools heat; DAMP clears catalyst; SYNC or UP confirms relays.',access:'Fixed anchors provide recovery and deck access only.',gate:'No physical obstacles remain and Relay A/B/C are confirmed.',fail:'Any live obstacle or relay gap remains.'},
+    R09:{title:'R09 — Audit Mesh',reported:'Faults and hidden route data overlap.',decision:'Clear live faults, scan the hidden route, and confirm both relays.',tool:'PULSE clears faults; SCAN proves hidden route state; SYNC/UP confirms relays.',access:'Anchors keep multi-deck access recoverable.',gate:'No faults, scan confirmed, Relay A/B true.',fail:'Any fault, missing scan, or relay gap remains.'},
+    R10:{title:'R10 — Thermal Relay',reported:'Thermal state is disrupting relay confidence.',decision:'Cool every heat source and confirm all three relays.',tool:'THERM clears V/~; SYNC/UP confirms relays.',access:'Anchors support deck changes under thermal pressure.',gate:'No heat and Relay A/B/C true.',fail:'Any heat source or relay gap remains.'},
+    R11:{title:'R11 — Catalyst Fork',reported:'Catalyst blocks and faults split the route.',decision:'Dampen blocks, clear faults, and confirm relays.',tool:'DAMP clears C; PULSE clears X; SYNC/UP confirms relays.',access:'Anchors prevent dead-end recovery failures.',gate:'No catalyst, no faults, Relay A/B true.',fail:'Any physical obstruction or relay gap remains.'},
+    R13:{title:'R13 — Final Integration Corridor',reported:'All failure classes are present.',decision:'Clear faults, catalyst, heat, and confirm all relays before completion.',tool:'Use PULSE, DAMP, THERM, and SYNC/UP in combination.',access:'Anchors support final left-to-right integration route.',gate:'No mixed obstacles and Relay A/B/C/D/E true.',fail:'Any live obstacle or relay gap remains.'}
   },
   reset(){
     this.log=[];
@@ -511,7 +664,12 @@ const GRAPPLE_ANCHORS={
   R04:[{id:'R04-A1',x:3.0,y:16.2,landX:3.0,landY:16.6,label:'entry safe point'},{id:'R04-A2',x:14.0,y:9.2,landX:14.0,landY:9.6,label:'heat bypass access'},{id:'R04-A3',x:28.0,y:3.2,landX:28.0,landY:3.6,label:'upper cooling access'},{id:'R04-A4',x:42.0,y:16.2,landX:42.0,landY:16.6,label:'vent approach'},{id:'R04-A5',x:60.0,y:9.2,landX:60.0,landY:9.6,label:'far safety anchor'}],
   R05:[{id:'R05-A1',x:3.0,y:16.2,landX:3.0,landY:16.6,label:'entry floor anchor'},{id:'R05-A2',x:14.0,y:9.2,landX:14.0,landY:9.6,label:'catalyst bypass'},{id:'R05-A3',x:28.0,y:3.2,landX:28.0,landY:3.6,label:'upper clearance access'},{id:'R05-A4',x:42.0,y:16.2,landX:42.0,landY:16.6,label:'block approach'},{id:'R05-A5',x:60.0,y:9.2,landX:60.0,landY:9.6,label:'far deck anchor'}],
   R06:[{id:'R06-A1',x:3.0,y:16.2,landX:3.0,landY:16.6,label:'entry floor anchor'},{id:'R06-A2',x:14.0,y:9.2,landX:14.0,landY:9.6,label:'relay handoff'},{id:'R06-A3',x:28.0,y:3.2,landX:28.0,landY:3.6,label:'upper capstone access'},{id:'R06-A4',x:42.0,y:16.2,landX:42.0,landY:16.6,label:'fault approach'},{id:'R06-A5',x:60.0,y:3.2,landX:60.0,landY:3.6,label:'far relay anchor'}],
-  R07:[{id:'R07-A1',x:6.0,y:16.2,landX:6.0,landY:16.6,label:'shaft entry recovery'},{id:'R07-A2',x:20.0,y:10.2,landX:25.0,landY:7.6,label:'broken ladder bypass to mid platform'},{id:'R07-A3',x:40.0,y:6.2,landX:45.0,landY:3.6,label:'upper shaft access'},{id:'R07-A4',x:56.0,y:3.2,landX:56.0,landY:3.6,label:'upper exit recovery'}],
+  R07:[{id:'R07-A1',x:6.0,y:16.2,landX:6.0,landY:16.6,label:'shaft entry ladder recovery'},{id:'R07-A2',x:13.0,y:12.2,landX:13.0,landY:12.6,label:'lower shaft broken-ladder bypass'},{id:'R07-A3',x:23.0,y:8.2,landX:23.0,landY:8.6,label:'mid shaft upward recovery'},{id:'R07-A4',x:9.0,y:4.2,landX:9.0,landY:3.6,label:'upper shaft deck access'},{id:'R07-A5',x:58.0,y:4.2,landX:58.0,landY:3.6,label:'upper-right exit handoff'}],
+  R08:[{id:'R08-A1',x:3.0,y:16.2,landX:3.0,landY:16.6,label:'entry recovery anchor'},{id:'R08-A2',x:14.0,y:9.2,landX:14.0,landY:9.6,label:'left gauntlet deck'},{id:'R08-A3',x:32.0,y:3.2,landX:32.0,landY:3.6,label:'upper center relay deck'},{id:'R08-A4',x:44.0,y:16.2,landX:44.0,landY:16.6,label:'hazard recovery anchor'},{id:'R08-A5',x:60.0,y:9.2,landX:60.0,landY:9.6,label:'exit deck anchor'}],
+  R09:[{id:'R09-A1',x:3.0,y:16.2,landX:3.0,landY:16.6,label:'entry audit anchor'},{id:'R09-A2',x:16.0,y:9.2,landX:16.0,landY:9.6,label:'lower mesh recovery'},{id:'R09-A3',x:36.0,y:3.2,landX:36.0,landY:3.6,label:'upper fault access'},{id:'R09-A4',x:45.0,y:9.2,landX:45.0,landY:9.6,label:'relay mesh access'},{id:'R09-A5',x:60.0,y:16.2,landX:60.0,landY:16.6,label:'exit proof anchor'}],
+  R10:[{id:'R10-A1',x:3.0,y:16.2,landX:3.0,landY:16.6,label:'thermal entry anchor'},{id:'R10-A2',x:17.0,y:3.2,landX:17.0,landY:3.6,label:'upper relay access'},{id:'R10-A3',x:35.0,y:9.2,landX:35.0,landY:9.6,label:'mid heat access'},{id:'R10-A4',x:43.0,y:16.2,landX:43.0,landY:16.6,label:'lower cooling access'},{id:'R10-A5',x:60.0,y:9.2,landX:60.0,landY:9.6,label:'exit deck recovery'}],
+  R11:[{id:'R11-A1',x:3.0,y:16.2,landX:3.0,landY:16.6,label:'entry fork anchor'},{id:'R11-A2',x:16.0,y:3.2,landX:16.0,landY:3.6,label:'upper relay fork'},{id:'R11-A3',x:35.0,y:9.2,landX:35.0,landY:9.6,label:'mid catalyst access'},{id:'R11-A4',x:43.0,y:16.2,landX:43.0,landY:16.6,label:'lower fault recovery'},{id:'R11-A5',x:60.0,y:9.2,landX:60.0,landY:9.6,label:'exit fork anchor'}],
+  R13:[{id:'R13-A1',x:3.0,y:16.2,landX:3.0,landY:16.6,label:'final entry anchor'},{id:'R13-A2',x:16.0,y:3.2,landX:16.0,landY:3.6,label:'upper final relay'},{id:'R13-A3',x:34.0,y:9.2,landX:34.0,landY:9.6,label:'mid integration access'},{id:'R13-A4',x:45.0,y:16.2,landX:45.0,landY:16.6,label:'lower mixed failure anchor'},{id:'R13-A5',x:60.0,y:9.2,landX:60.0,landY:9.6,label:'final exit anchor'}],
 };
 let grappleState=null;
 let grappleFailFlash=0;
@@ -584,40 +742,51 @@ function renderGrappleAnchors(oy){
 
 // ── VALIDATION: proof before progress, made digital ──
 // A room is proven only when its real state passes. "Green board" never counts as proof.
+function countCurrentTiles(chars){
+  let n=0;
+  for(let r=0;r<ROWS;r++)for(let c=0;c<roomWidth();c++){ if(chars.includes(getTile(c,r))) n++; }
+  return n;
+}
+function allRelaysConfirmed(id){
+  const relays=RELAY_LAYOUT[id]||[];
+  if(!relays.length)return true;
+  return relays.every(r=>!!TT.roomState[r.key]);
+}
+function missingRelayNames(id){
+  return (RELAY_LAYOUT[id]||[]).filter(r=>!TT.roomState[r.key]).map(r=>r.name);
+}
 function validateRoom(){
   if(gameState!=='PLAY')return;
   const id=currentRoom;
   let pass=false, detail='';
+  const faults=()=>countCurrentTiles(['X']);
+  const cat=()=>countCurrentTiles(['C']);
+  const heat=()=>countCurrentTiles(['V','~']);
+  const relayDetail=()=>{const m=missingRelayNames(id); return m.length?('Relay '+m.join('/')+' incomplete.'):'';};
   if(id==='R02'){
-    let faults=0; for(let r=0;r<ROWS;r++)for(let c=0;c<roomWidth();c++)if(getTile(c,r)==='X')faults++;
-    pass = faults===0;
-    detail = pass ? 'No faults remain. Route verified clean.' : (faults+' fault(s) still live. Not proven.');
+    const f=faults(); pass = f===0; detail = pass ? 'No faults remain. Route verified clean.' : (f+' fault(s) still live. Not proven.');
   } else if(id==='R03'){
-    const a=!!TT.roomState.R03_relayA, b=!!TT.roomState.R03_relayB;
-    pass = a && b;
-    if(pass) detail='Both relays confirmed. Sync is real, not just reported.';
-    else if(a||b) detail='Board says SYNCED — but only '+(a?'A':'B')+' is truly set. False green.';
-    else detail='Board says SYNCED. Neither relay is actually set. The green is a lie.';
+    pass = allRelaysConfirmed(id); detail = pass ? 'Both relays confirmed. Sync is real, not just reported.' : 'Board says SYNCED — but '+relayDetail()+' False green.';
   } else if(id==='R12'){
-    pass = !!TT.roomState.R12_scanned;
-    detail = pass ? 'Route mapped and confirmed open.' : 'Route unmapped. SCAN the sector first.';
+    pass = !!TT.roomState.R12_scanned; detail = pass ? 'Route mapped and confirmed open.' : 'Route unmapped. SCAN the sector first.';
   } else if(id==='R04'){
-    let heat=0; for(let r=0;r<ROWS;r++)for(let c=0;c<roomWidth();c++){const t=getTile(c,r);if(t==='V'||t==='~')heat++;}
-    pass = heat===0;
-    detail = pass ? 'All vents cooled. Passage safe.' : (heat+' heat source(s) still active.');
+    const h=heat(); pass = h===0; detail = pass ? 'All vents cooled. Passage safe.' : (h+' heat source(s) still active.');
   } else if(id==='R05'){
-    let cat=0; for(let r=0;r<ROWS;r++)for(let c=0;c<roomWidth();c++)if(getTile(c,r)==='C')cat++;
-    pass = cat===0;
-    detail = pass ? 'All catalyst blocks cleared.' : (cat+' catalyst block(s) remain.');
+    const c=cat(); pass = c===0; detail = pass ? 'All catalyst blocks cleared.' : (c+' catalyst block(s) remain.');
   } else if(id==='R06'){
-    let faults=0; for(let r=0;r<ROWS;r++)for(let c=0;c<roomWidth();c++)if(getTile(c,r)==='X')faults++;
-    const a=!!TT.roomState.R06_relayA, b=!!TT.roomState.R06_relayB;
-    pass = faults===0 && a && b;
-    if(pass) detail='Faults clear, both relays set. Engine route proven.';
-    else detail=(faults?faults+' fault(s) live. ':'')+((!a||!b)?'Relays incomplete.':'');
+    const f=faults(); pass = f===0 && allRelaysConfirmed(id); detail = pass ? 'Faults clear, relays set. Engine route proven.' : (f?f+' fault(s) live. ':'')+relayDetail();
   } else if(id==='R07'){
-    pass = player.y <= 4.2;
-    detail = pass ? 'Upper shaft exit reached. Vertical route proven.' : 'Upper shaft exit not reached. Climb and anchor recovery still incomplete.';
+    pass = player.y <= 4.2 && player.x >= 57; detail = pass ? 'Upper-right shaft exit reached. Vertical route proven.' : 'High right-side shaft exit not reached. Climb up, then cross the cleared upper deck.';
+  } else if(id==='R08'){
+    const f=faults(), c=cat(), h=heat(); pass = f===0 && c===0 && h===0 && allRelaysConfirmed(id); detail = pass ? 'Mixed obstacles clear and all three relays confirmed.' : (f?f+' fault(s) live. ':'')+(c?c+' catalyst block(s) remain. ':'')+(h?h+' heat source(s) active. ':'')+relayDetail();
+  } else if(id==='R09'){
+    const f=faults(); pass = f===0 && !!TT.roomState.R09_scanned && allRelaysConfirmed(id); detail = pass ? 'Audit mesh clear, hidden route scanned, relays confirmed.' : (f?f+' fault(s) live. ':'')+(!TT.roomState.R09_scanned?'Hidden route not scanned. ':'')+relayDetail();
+  } else if(id==='R10'){
+    const h=heat(); pass = h===0 && allRelaysConfirmed(id); detail = pass ? 'Thermal sources cooled and relays confirmed.' : (h?h+' heat source(s) active. ':'')+relayDetail();
+  } else if(id==='R11'){
+    const f=faults(), c=cat(); pass = f===0 && c===0 && allRelaysConfirmed(id); detail = pass ? 'Catalyst fork clear, faults removed, relays confirmed.' : (f?f+' fault(s) live. ':'')+(c?c+' catalyst block(s) remain. ':'')+relayDetail();
+  } else if(id==='R13'){
+    const f=faults(), c=cat(), h=heat(); pass = f===0 && c===0 && h===0 && allRelaysConfirmed(id); detail = pass ? 'Final integration route proven. All systems hold.' : (f?f+' fault(s) live. ':'')+(c?c+' catalyst block(s) remain. ':'')+(h?h+' heat source(s) active. ':'')+relayDetail();
   } else {
     detail='No validation procedure for this sector.';
   }
@@ -664,7 +833,7 @@ function selectB(id){
 const canvas=document.getElementById('game');const ctx=canvas.getContext('2d');ctx.imageSmoothingEnabled=false;
 let T=16,GW,GH,frame=0;let gameState='TITLE';
 const TILE_PX=16;
-const TILE_FRAMES={'#':1,'_':1,'L':1,'D':2,'S':4,'G':3,'X':2,'C':4,'V':2,'~':3,'=':4,'<':4,'H':1,'U':4};
+const TILE_FRAMES={'#':1,'_':1,'L':1,'D':2,'S':4,'G':3,'X':2,'C':4,'V':2,'~':3,'=':4,'<':4,'H':1,'U':2};
 const TILE_ORDER=['#','_','L','D','S','G','X','C','V','~','=','<','H','U'];
 let tileset=null,tileIndex={};
 function buildTileset(){const maxFrames=Math.max(...Object.values(TILE_FRAMES));const cols=maxFrames,rows=TILE_ORDER.length;const oc=document.createElement('canvas');oc.width=cols*TILE_PX;oc.height=rows*TILE_PX;const g=oc.getContext('2d');TILE_ORDER.forEach((t,row)=>{tileIndex[t]={row,frames:TILE_FRAMES[t]};for(let fr=0;fr<TILE_FRAMES[t];fr++){const ox=fr*TILE_PX,oy=row*TILE_PX;drawTileArt(g,t,fr,ox,oy);}});tileset=oc;}
@@ -681,7 +850,7 @@ function drawTileArt(g,t,fr,ox,oy){const P=(px,py,w,h,c)=>{g.fillStyle=c;g.fillR
   case'~':{const a=[0.5,0.35,0.45][fr];P(0,0,16,16,'rgba(255,61,0,'+a+')');P(2,2,12,12,'rgba(255,'+(110+fr*20)+',64,'+(a*0.8)+')');break;}
   case'=':{P(0,0,16,7,NES.plat);P(0,0,16,2,NES.platLt);P(0,6,16,3,NES.conv);const aoff=fr*4;for(let axx=-4;axx<16;axx+=8){const a=((axx+aoff)%16+16)%16;P(a,6,3,3,NES.convArr);P(a+1,7,2,1,NES.conv);}break;}
   case'<':{P(0,0,16,7,NES.plat);P(0,0,16,2,NES.platLt);P(0,6,16,3,NES.convLt);const aoff=fr*4;for(let axx=-4;axx<16;axx+=8){const a=((16-(axx+aoff))%16+16)%16;P(a,6,3,3,NES.convArr);P(a-1,7,2,1,NES.convLt);}break;}
-  case'U':{P(0,0,16,16,'rgba(20,30,50,0.18)');P(1,1,14,14,'rgba(30,42,66,0.62)');P(1,1,14,1,'rgba(130,177,255,0.32)');P(3,2,10,2,'rgba(130,177,255,0.34)');P(4,4,3,2,'rgba(197,202,233,0.75)');P(7,5,5,1,'rgba(197,202,233,0.75)');P(11,5,2,2,'rgba(130,177,255,0.95)');P(5,7,1,5,'rgba(130,177,255,'+([0.25,0.45,0.65,0.45][fr])+')');P(8,8,1,4,'rgba(130,177,255,'+([0.2,0.35,0.55,0.35][fr])+')');P(11,8,1,5,'rgba(130,177,255,'+([0.25,0.4,0.6,0.4][fr])+')');P(2,13,12,2,'rgba(8,12,25,0.55)');break;}
+  case'U':{P(0,0,16,16,'rgba(18,32,58,0.10)');P(3,2,7,2,'#c5cae9');P(9,2,2,5,'#8ab4f8');P(8,6,5,2,'#5b9bd5');P(5,9,2,2,'rgba(180,220,255,0.75)');P(8,9,2,2,'rgba(180,220,255,0.55)');P(11,9,2,2,'rgba(180,220,255,0.35)');if(fr===1){P(5,11,1,4,'rgba(180,220,255,0.55)');P(8,11,1,4,'rgba(180,220,255,0.45)');P(11,11,1,4,'rgba(180,220,255,0.35)');}break;}
   case'H':{P(0,0,16,16,'rgba(90,90,140,0.10)');break;}
 }}
 function roomWidth(){return roomTiles&&roomTiles[0]?roomTiles[0].length:COLS;}
@@ -719,18 +888,18 @@ const ELI_VISUAL_SCALE=1.22; // visual-only enlargement; collision box stays sta
 const PULSE_TOOL=ALL_TOOLS.find(t=>t.id==='PULSE');
 const B_TOOLS=ALL_TOOLS.filter(t=>t.id!=='PULSE'); // swappable B-tools; PULSE remains fixed on A
 let player={x:2,y:18,vx:0,vy:0,facing:1,onLadder:false,onGround:false,coyote:0,stability:3,pocket:[PULSE_TOOL, B_TOOLS[0]],iFrames:0,checkpoint:null,animFrame:0,animTimer:0};
+let showerState=null;
 let currentRoom='R02',roomTiles=[],clearedTiles={},revealedH={};
 let scouts=[],dialogue=null,syncState={active:false,termA:false,termB:false,timer:0};
 let ventCycle=0,toolEffect=null,toolCooldown=0,completionTimer=0;
 let particles=[],coolTiles=[],syncBeam=null;
-let showerState=null;
 function spawnParticle(p){if(particles.length<400)particles.push(p);}
 function updateParticles(){for(let i=particles.length-1;i>=0;i--){const p=particles[i];p.x+=p.vx;p.y+=p.vy;if(p.grav)p.vy+=p.grav;if(p.drag){p.vx*=p.drag;p.vy*=p.drag;}p.life--;if(p.life<=0)particles.splice(i,1);}for(let i=coolTiles.length-1;i>=0;i--){coolTiles[i].timer--;if(coolTiles[i].timer<=0)coolTiles.splice(i,1);}}
 let fade={active:false,phase:'out',timer:0,dest:null};let ladderTickTimer=0;const FADE_FRAMES=7;
 function startTransition(dest){fade={active:true,phase:'out',timer:FADE_FRAMES,dest:dest};}
 function updateFade(){if(!fade.active)return;fade.timer--;if(fade.phase==='out'&&fade.timer<=0){const p=fade.dest.split('_');loadRoom(p[0],parseInt(p[1]),parseInt(p[2]));fade.phase='in';fade.timer=FADE_FRAMES;}else if(fade.phase==='in'&&fade.timer<=0){fade.active=false;fade.dest=null;}}
 const SPEED=0.085,CLIMB=0.075,GRAVITY=0.045,MAX_FALL=0.4;
-const CONV_FORCE=0.035,IFRAMES=60,SCOUT_SPEED=0.028,VENT_CYCLE=180,SYNC_TIMER=300;
+const CONV_FORCE=0.035,IFRAMES=60,SCOUT_SPEED=0.028,VENT_CYCLE=180,SYNC_TIMER=300; // relays are persistent; timer retained only for legacy visual state compatibility
 const TOOL_RANGE=3,TOOL_COOLDOWN=20,COYOTE=6;
 function getTile(c,r){if(c<0||c>=roomWidth()||r<0||r>=ROWS)return '#';return roomTiles[r]&&roomTiles[r][c]!==undefined?roomTiles[r][c]:'#';}
 function isWall(c,r){return getTile(c,r)==='#';}
@@ -748,9 +917,17 @@ function loadRoom(roomId,entryCol,entryRow){
   cameraX=clampCamera(player.x-COLS*0.48);
   player.vy=0;player.vx=0;player.onLadder=false;player.coyote=0;snapToFloor();
   scouts=[];
-  if(roomId==='R03'){scouts.push(createDrone(22,44,14));}
-  if(roomId==='R12'){scouts.push(createDrone(22,44,14));}
-  if(roomId==='R06'){const bot=createScout(30,17);bot.leftBound=12;bot.rightBound=50;bot.x=30;scouts.push(bot);}
+  if(roomId==='R02'){const bot=createScout(36,17);bot.leftBound=22;bot.rightBound=50;scouts.push(bot);const mid=createScout(28,10);mid.leftBound=20;mid.rightBound=42;scouts.push(mid);scouts.push(createDrone(12,44,4));}
+  if(roomId==='R03'){scouts.push(createDrone(18,36,14));scouts.push(createDrone(38,58,14));scouts.push(createDrone(12,34,4));scouts.push(createDrone(28,52,9));}
+  if(roomId==='R12'){scouts.push(createDrone(18,38,14));const bot=createScout(50,17);bot.leftBound=38;bot.rightBound=58;scouts.push(bot);scouts.push(createDrone(10,32,4));scouts.push(createDrone(34,58,9));}
+  if(roomId==='R04'){const b1=createScout(24,17);b1.leftBound=12;b1.rightBound=34;scouts.push(b1);const b2=createScout(50,17);b2.leftBound=38;b2.rightBound=58;scouts.push(b2);const mid=createScout(28,10);mid.leftBound=20;mid.rightBound=44;scouts.push(mid);scouts.push(createDrone(14,46,4));}
+  if(roomId==='R05'){const b1=createScout(20,17);b1.leftBound=10;b1.rightBound=32;scouts.push(b1);const b2=createScout(50,17);b2.leftBound=40;b2.rightBound=58;scouts.push(b2);const mid=createScout(30,10);mid.leftBound=20;mid.rightBound=44;scouts.push(mid);scouts.push(createDrone(14,46,4));}
+  if(roomId==='R06'){const bot=createScout(30,17);bot.leftBound=12;bot.rightBound=50;bot.x=30;scouts.push(bot);scouts.push(createDrone(36,54,14));scouts.push(createDrone(12,36,4));scouts.push(createDrone(34,58,9));}
+  if(roomId==='R08'){const b1=createScout(18,17);b1.leftBound=10;b1.rightBound=26;scouts.push(b1);const b2=createScout(42,17);b2.leftBound=32;b2.rightBound=54;scouts.push(b2);const mid=createScout(34,10);mid.leftBound=26;mid.rightBound=50;scouts.push(mid);scouts.push(createDrone(18,48,14));scouts.push(createDrone(10,34,4));scouts.push(createDrone(30,58,9));}
+  if(roomId==='R09'){const b1=createScout(18,17);b1.leftBound=10;b1.rightBound=32;scouts.push(b1);const mid=createScout(42,10);mid.leftBound=30;mid.rightBound=58;scouts.push(mid);scouts.push(createDrone(12,40,4));scouts.push(createDrone(28,58,9));}
+  if(roomId==='R10'){const b1=createScout(18,17);b1.leftBound=10;b1.rightBound=34;scouts.push(b1);const b2=createScout(48,17);b2.leftBound=38;b2.rightBound=60;scouts.push(b2);const mid=createScout(34,10);mid.leftBound=24;mid.rightBound=50;scouts.push(mid);scouts.push(createDrone(12,42,4));scouts.push(createDrone(30,58,9));}
+  if(roomId==='R11'){const b1=createScout(22,17);b1.leftBound=10;b1.rightBound=34;scouts.push(b1);const b2=createScout(50,17);b2.leftBound=40;b2.rightBound=60;scouts.push(b2);const mid=createScout(40,10);mid.leftBound=26;mid.rightBound=58;scouts.push(mid);scouts.push(createDrone(12,40,4));scouts.push(createDrone(30,56,9));}
+  if(roomId==='R13'){const b1=createScout(20,17);b1.leftBound=10;b1.rightBound=34;scouts.push(b1);const b2=createScout(50,17);b2.leftBound=38;b2.rightBound=60;scouts.push(b2);const mid=createScout(36,10);mid.leftBound=24;mid.rightBound=58;scouts.push(mid);scouts.push(createDrone(10,40,4));scouts.push(createDrone(30,60,9));scouts.push(createDrone(12,54,14));}
   syncState={active:false,termA:false,termB:false,timer:0};particles=[];coolTiles=[];syncBeam=null;toolEffect=null;grappleState=null;grappleFailFlash=0;showerState=null;
   showDialogue(ROOM_DIALOGUE[roomId]||'');
   TT.enterRoom(roomId); // ── TTRPG hook: log entry + set objective ──
@@ -802,11 +979,11 @@ function updatePlayer(){
   if(wasPressed('up'))handleInteraction();
   if(wasPressed('A')&&toolCooldown<=0)useTool(0);
   if(wasPressed('B')&&toolCooldown<=0)useTool(1);
-  if(syncState.active){syncState.timer--;if(syncState.timer<=0)syncState={active:false,termA:false,termB:false,timer:0};if(syncState.termA&&syncState.termB){showDialogue('RELAY SYNCHRONIZED.\nROUTE RESTORED.');syncState={active:false,termA:false,termB:false,timer:0};}}
+  if(syncState.active&&syncState.termA&&syncState.termB){showDialogue('RELAYS CONFIRMED.\nROUTE RESTORED.');syncState.active=false;}
   ventCycle=(ventCycle+1)%VENT_CYCLE;
 }
 function hitPlayer(){player.stability--;player.iFrames=IFRAMES;Audio.thud();TT.push('STABILITY HIT ('+player.stability+' left)','bad');if(player.stability<=0)resetRoom();}
-function resetRoom(){player.stability=3;if(player.checkpoint&&player.checkpoint.room===currentRoom){player.x=player.checkpoint.x;player.y=player.checkpoint.y;}else{player.x=2;player.y=18;}player.vy=0;player.vx=0;player.onLadder=false;player.iFrames=IFRAMES;player.coyote=0;snapToFloor();TT.push('SETBACK: returned to entry. Stability reset.','bad');if(currentRoom==='R03'){scouts=[];scouts.push(createDrone(18,45,15));}if(currentRoom==='R12'){scouts=[];scouts.push(createDrone(18,45,15));}if(currentRoom==='R06'){scouts=[];const bot=createScout(30,17);bot.leftBound=12;bot.rightBound=48;bot.x=30;scouts.push(bot);}}
+function resetRoom(){player.stability=3;if(player.checkpoint&&player.checkpoint.room===currentRoom){player.x=player.checkpoint.x;player.y=player.checkpoint.y;}else{player.x=2;player.y=18;}player.vy=0;player.vx=0;player.onLadder=false;player.iFrames=IFRAMES;player.coyote=0;snapToFloor();TT.push('SETBACK: returned to entry. Stability reset.','bad');const rid=currentRoom;loadRoom(rid,Math.round(player.x),Math.floor(player.y));player.iFrames=IFRAMES;}
 
 
 function showerActiveAt(c,r){return showerState&&showerState.active&&showerState.room===currentRoom&&showerState.c===c&&showerState.r===r;}
@@ -848,16 +1025,19 @@ function renderHealthShower(oy){
 }
 function activateRelayAt(c,r,source){
   const via = source==='SYNC' ? ' via SYNC' : '';
-  if(currentRoom==='R03'){
-    if(c===18&&r===4){syncState.termA=true;TT.roomState.R03_relayA=true;if(!syncState.active){syncState.active=true;syncState.timer=SYNC_TIMER;}Audio.interact();TT.record('RELAY A','activated'+via,'good');showDialogue('RELAY A ACTIVATED.\nREACH RELAY B.');return true;}
-    if(c===54&&r===4){syncState.termB=true;TT.roomState.R03_relayB=true;if(!syncState.active){syncState.active=true;syncState.timer=SYNC_TIMER;}Audio.interact();TT.record('RELAY B','activated'+via,'good');showDialogue('RELAY B ACTIVATED.');return true;}
-  }
-  if(currentRoom==='R06'){
-    if(c===18&&r===4){TT.roomState.R06_relayA=true;Audio.interact();TT.record('RELAY A','activated'+via,'good');showDialogue('RELAY A ACTIVATED.\nFIND RELAY B.');return true;}
-    if(c===54&&r===4){TT.roomState.R06_relayB=true;Audio.interact();TT.record('RELAY B','activated'+via,'good');showDialogue('RELAY B ACTIVATED.');return true;}
+  const relays=RELAY_LAYOUT[currentRoom]||[];
+  const hit=relays.find(p=>p.c===c&&p.r===r);
+  if(hit){
+    TT.roomState[hit.key]=true;
+    syncState.active=true;
+    Audio.interact();
+    TT.record('RELAY '+hit.name,'activated'+via,'good');
+    showDialogue('RELAY '+hit.name+' ACTIVATED.\nSTATE CONFIRMED.');
+    return true;
   }
   return false;
 }
+
 function handleInteraction(){const pc=Math.round(player.x),pr=Math.floor(player.y+PH/2);const checks=[[pc,pr],[pc,pr+1],[pc,pr-1],[pc-1,pr],[pc+1,pr],[Math.floor(player.x),Math.floor(player.y+PH-0.1)]];const seen=new Set();
   for(const [c,r] of checks){const key=c+','+r;if(seen.has(key))continue;seen.add(key);const t=getTile(c,r);
     if(t==='D'){const trans=TRANSITIONS[currentRoom];const dk=transitionKeyForDoor(c,r);if(trans&&trans[dk]!==undefined){const dest=trans[dk];
@@ -893,7 +1073,7 @@ function useTool(idx){
       break;
     case'SCANNER':
       inRange((c,r)=>{if(getTile(c,r)==='H'){roomTiles[r][c]='_';revealedH[currentRoom+'_'+c+'_'+r]=true;hitCount++;const cx=c*T+T/2,cy=oy+r*T+T/2;spawnParticle({x:cx,y:cy,vx:0,vy:0,life:24,maxLife:24,color:'130,177,255',size:T,kind:'reveal'});}});
-      if(currentRoom==='R12')TT.roomState.R12_scanned=true;
+      if(currentRoom==='R12'||currentRoom==='R09')TT.roomState[currentRoom+'_scanned']=true;
       TT.record('SCAN',hitCount?('revealed '+hitCount+' hidden route tile(s)'):'no hidden route in range',hitCount?'good':'info');
       break;
     case'SYNC':
@@ -925,7 +1105,6 @@ function render(){ctx.fillStyle=NES.bg;ctx.fillRect(0,0,GW,GH);if(gameState==='T
     ctx.beginPath();ctx.moveTo(0, oy+ROWS*T+0.5);ctx.lineTo(GW, oy+ROWS*T+0.5);ctx.stroke();
   }
   renderHUD();if(dialogue)renderDialogue(oy);
-  if(syncState.active){const barW=(syncState.timer/SYNC_TIMER)*(GW-T*4);ctx.fillStyle=syncState.timer<60?NES.fault:NES.termOn;ctx.fillRect(T*2,oy-T*0.4,barW,T*0.3);ctx.strokeStyle=NES.hudDim;ctx.lineWidth=1;ctx.strokeRect(T*2,oy-T*0.4,GW-T*4,T*0.3);}
   if(gameState==='PAUSED'){
     ctx.fillStyle='rgba(8,8,20,0.92)'; ctx.fillRect(0,0,GW,GH);
     const fs=Math.max(7,Math.floor(T*0.55));
@@ -951,15 +1130,14 @@ function render(){ctx.fillStyle=NES.bg;ctx.fillRect(0,0,GW,GH);if(gameState==='T
     ctx.fillStyle=NES.stab; if(frame%40<25)ctx.fillText('PRESS START TO RESUME',GW/2,fy+fs*1.6);
   }
   if(fade.active){let a;if(fade.phase==='out')a=1-(fade.timer/FADE_FRAMES);else a=(fade.timer/FADE_FRAMES);ctx.fillStyle='rgba(10,10,26,'+Math.max(0,Math.min(1,a))+')';ctx.fillRect(0,0,GW,GH);}}
-function tileFrame(t,c,r){const f=frame;switch(t){case'D':return(f%40<20)?1:0;case'S':return Math.floor(f/8)%4;case'G':return Math.floor(f/12)%3;case'X':return(f%14<7)?0:1;case'C':return Math.floor(f/12)%4;case'V':return ventActivePhase()?1:0;case'~':return ventActivePhase()?(Math.floor(f/10)%3):0;case'=':return Math.floor(f/6)%4;case'<':return Math.floor(f/6)%4;case'U':return Math.floor(f/10)%4;default:return 0;}}
+function tileFrame(t,c,r){const f=frame;switch(t){case'D':return(f%40<20)?1:0;case'S':return Math.floor(f/8)%4;case'G':return Math.floor(f/12)%3;case'X':return(f%14<7)?0:1;case'C':return Math.floor(f/12)%4;case'V':return ventActivePhase()?1:0;case'~':return ventActivePhase()?(Math.floor(f/10)%3):0;case'=':return Math.floor(f/6)%4;case'<':return Math.floor(f/6)%4;case'U':return Math.floor(f/20)%2;default:return 0;}}
 function blitTile(t,fr,x,y){const info=tileIndex[t];if(!info)return;const sx=fr*TILE_PX,sy=info.row*TILE_PX;ctx.drawImage(tileset,sx,sy,TILE_PX,TILE_PX,x,y,T,T);}
 function renderTile(c,r,x,y){const t=roomTiles[r]?roomTiles[r][c]:'#';const s=T,f=frame;if(t==='.'||t==='E')return;if(t==='H'){if(f%90<6)blitTile('H',0,x,y);return;}if(t==='~'&&!ventActivePhase()){ctx.fillStyle='rgba(255,109,0,0.12)';ctx.fillRect(x,y,s,s);return;}blitTile(t,tileFrame(t,c,r),x,y);
   switch(t){case'D':{const pulse=0.5+0.5*Math.sin(f*0.12);ctx.fillStyle='rgba(252,231,110,'+(0.10+0.22*pulse)+')';ctx.fillRect(x-s*0.25,y-s*0.25,s*1.5,s*1.5);blitTile('D',tileFrame('D'),x,y);ctx.fillStyle='rgba(252,231,110,'+(0.4+0.6*pulse)+')';ctx.font='bold '+Math.floor(s*0.4)+'px monospace';ctx.textAlign='center';ctx.fillText('▸',x+s*0.5,y+s*0.55);break;}
     case'G':{const rr=(f%40)/40;ctx.strokeStyle='rgba(130,177,255,'+(0.5*(1-rr))+')';ctx.lineWidth=1.5;ctx.beginPath();ctx.arc(x+s/2,y+s/2,s*0.3+rr*s*0.35,0,Math.PI*2);ctx.stroke();const bob=Math.sin(f*0.15)*s*0.1;ctx.fillStyle=NES.glyphLt;ctx.font='bold '+Math.floor(s*0.3)+'px monospace';ctx.textAlign='center';ctx.fillText('▾',x+s/2,y-s*0.15+bob);break;}
     case'X':{ctx.strokeStyle='rgba(255,90,90,'+(0.5+0.5*Math.sin(f*0.5))+')';ctx.lineWidth=1;for(let i=0;i<3;i++){const a=(f*0.2+i*2.1)%(Math.PI*2);const x0=x+s/2,y0=y+s/2;ctx.beginPath();ctx.moveTo(x0,y0);ctx.lineTo(x0+Math.cos(a)*s*0.4,y0+Math.sin(a)*s*0.4);ctx.lineTo(x0+Math.cos(a+0.3)*s*0.5,y0+Math.sin(a+0.3)*s*0.5);ctx.stroke();}break;}
     case'V':{if(ventActivePhase()){for(let i=0;i<5;i++){const ph=(f*0.04+i*0.7)%1;const py2=y-ph*s*1.3;const spread=Math.sin(f*0.05+i)*s*0.18*ph;const al=0.5*(1-ph);ctx.fillStyle='rgba(255,180,90,'+al+')';const sz=s*0.12+ph*s*0.15;ctx.fillRect(x+s*0.4+spread,py2,sz,sz);}}break;}
-    case'~':{if(ventActivePhase()){for(let i=0;i<3;i++){const ph=(f*0.05+i*0.6+c*0.3)%1;ctx.fillStyle='rgba(255,140,80,'+(0.4*(1-ph))+')';const sz=s*0.2+ph*s*0.2;ctx.fillRect(x+s*0.3+Math.sin(f*0.06+i)*s*0.2,y+s-ph*s*0.9,sz,sz);}}break;}
-    case'U':{const active=showerActiveAt(c,r);if(active){ctx.fillStyle='rgba(180,220,255,0.35)';for(let i=0;i<4;i++){const ph=(f*0.07+i*0.25)%1;ctx.fillRect(x+s*(0.35+i*0.12),y+s*0.45+ph*s*0.42,s*0.05,s*0.42);}}ctx.fillStyle='rgba(105,240,174,'+(active?0.65:0.22)+')';ctx.fillRect(x+s*0.18,y+s*0.12,s*0.64,s*0.08);break;}}}
+    case'~':{if(ventActivePhase()){for(let i=0;i<3;i++){const ph=(f*0.05+i*0.6+c*0.3)%1;ctx.fillStyle='rgba(255,140,80,'+(0.4*(1-ph))+')';const sz=s*0.2+ph*s*0.2;ctx.fillRect(x+s*0.3+Math.sin(f*0.06+i)*s*0.2,y+s-ph*s*0.9,sz,sz);}}break;}}}
 const ELI={H:'#fce76e',Hd:'#d4a017',S:'#e0a878',Sd:'#b07b50',W:'#3b6ea5',Wd:'#274d77',B:'#5a4632',Bd:'#3a2c1f',T:'#c5cae9',K:'#1a1a2e',E:'#0a0a1a'};
 const ELI_SPR={idle:['....HHHH....','...HHHHHH...','...HHHHHH...','...KSSSSK...','...SEsSEs...','...SSSSSS...','....SSSS....','..WWWWWWWW..','..WWWWWWWW..','.WWWWWWWWWW.','.BBBBBBBBBB.','.BdBBBBBBdB.','.WWWW..WWWW.','.WWWW..WWWW.','.KKK....KKK.','.KK......KK.'],walk1:['....HHHH....','...HHHHHH...','...HHHHHH...','...KSSSSK...','...SEsSEs...','...SSSSSS...','....SSSS....','..WWWWWWWW..','..WWWWWWWW..','.WWWWWWWWWW.','.BBBBBBBBBB.','.BdBBBBBBdB.','..WWWWWWW...','..WWW.WWWW..','..KK...KKK..','.KK......KK.'],walk2:['....HHHH....','...HHHHHH...','...HHHHHH...','...KSSSSK...','...SEsSEs...','...SSSSSS...','....SSSS....','..WWWWWWWW..','..WWWWWWWW..','.WWWWWWWWWW.','.BBBBBBBBBB.','.BdBBBBBBdB.','...WWWWWWW..','..WWWW.WWW..','..KKK...KK..','.KK......KK.'],climb:['....HHHH....','...HHHHHH...','...HHHHHH...','...SSSSSS...','...SSSSSS...','..WTWWWWTW..','..WWWWWWWW..','.WWWWWWWWWW.','.WWWWWWWWWW.','.BBBBBBBBBB.','..WWWWWWWW..','..WW.WW.WW..','..WW.WW.WW..','..KK.WW.KK..','..KK....KK..','...K....K...']};
 function drawSprite(mtx,px,py,cell,flip){for(let r=0;r<mtx.length;r++){const row=mtx[r];for(let c=0;c<row.length;c++){const ch=row[c];if(ch==='.')continue;let col;switch(ch){case'H':col=ELI.H;break;case'h':case'Hd':col=ELI.Hd;break;case'S':col=ELI.S;break;case's':col=ELI.Sd;break;case'W':col=ELI.W;break;case'w':col=ELI.Wd;break;case'B':col=ELI.B;break;case'd':col=ELI.Bd;break;case'T':col=ELI.T;break;case'K':col=ELI.K;break;case'E':col=ELI.E;break;default:col=ELI.W;}const cx=flip?(row.length-1-c):c;ctx.fillStyle=col;ctx.fillRect(px+cx*cell,py+r*cell,cell+0.5,cell+0.5);}}}
