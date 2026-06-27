@@ -1,173 +1,268 @@
-# Reintegration Core — District 01
+# Reintegration Core — Isometric Arcade
 
-## Current Build: v1.18.6 — Shaft + Health Shower Recovery
+## Current Build: v0.4.3 — Validation Feedback Pass
 
-### BLUF
+Playable page:
 
-`v1.18.6` is the current working build for **Reintegration Core — District 01**. It extends the v1.18.5 playability recovery baseline by adding one new upward traversal room, `R07`, built around broken ladder segments, fixed-anchor grappling, and a Health Shower recovery interaction.
-
-This build should be treated as **mechanically checked but still pending live phone playtest**.
+https://skabkleveta-creator.github.io/Reintegration_Core_HTML/
 
 ---
 
-## Current Design Locks
+## BLUF
 
-Do not change these without a deliberate version bump:
+**Reintegration Core** is now an **isometric systems-repair arcade crawler**.
 
+The game is no longer being developed as the old side-view traversal branch. It should continue as a phone-first, single-file HTML5 Canvas arcade prototype where Eli moves through authored isometric facility sectors, diagnoses system failures, uses bounded repair tools, validates each sector, and advances only when the route is actually proven.
+
+Core doctrine:
+
+> A system is not fixed because it looks fixed. It is fixed when the evidence validates.
+
+Current maturity posture:
+
+> `v0.4.3` is the current arcade candidate. It adds clearer validation feedback through a compact Proof Deck so the player can see what is still blocking sector validation before reaching the exit.
+
+This build is **mechanically checked by static/code audit** and still needs live browser and phone playtesting.
+
+---
+
+## Current Direction
+
+Reintegration Core should continue as:
+
+* an isometric systems-repair arcade crawler
+* a playable proof-of-repair engine
+* a phone-first browser game
+* a bounded-tool intervention game
+* a validation-first progression prototype
+
+It should **not** drift into:
+
+* a generic platformer
+* a shooter
+* a TTRPG port
+* a visual mockup / UI shell
+* a lore-first worldbuilding project
+* a traversal-upgrade game
+
+---
+
+## Current Sector Chain
+
+The current isometric branch uses a 16-sector District 01 route:
+
+`R02 → R03 → R12 → R04 → R05 → R06 → R07 → R08 → R09 → R10 → R11 → R20 → R21 → R22 → R23 → R13 → COMPLETE`
+
+Current sector identities:
+
+| Sector | Name | Primary Proof Theme |
+|---|---|---|
+| R02 | Ingress Utility Deck | Fault cleanup |
+| R03 | Relay Channel | Relay confirmation |
+| R12 | Scan Layer | Hidden route scanning |
+| R04 | Thermal Intake | Heat stabilization |
+| R05 | Catalyst Basin | Catalyst dampening |
+| R06 | Fault Gallery | Faults + relays |
+| R07 | Fault Recovery | Fault-line cleanup |
+| R08 | Integration Gauntlet | Mixed failures + relays |
+| R09 | Audit Mesh | Faults + scan + relays |
+| R10 | Thermal Relay | Heat + relays |
+| R11 | Catalyst Fork | Catalyst + faults + relays |
+| R20 | Branch Junction | Fault cleanup in bay structure |
+| R21 | Sealed Annex | Relay proof / locked annex |
+| R22 | Long Causeway | Heat stabilization across distance |
+| R23 | Convergence Hub | Mixed failures in open hub |
+| R13 | Final Integration Corridor | Final all-system proof |
+
+---
+
+## Locked Posture
+
+Do not change these without a deliberate version bump and explicit design decision:
+
+* No HOOK
 * No jump
 * No boost
-* Fixed-anchor grapple only
-* 64×20 logical rooms
-* 32×20 visible corridor
-* Phone browser priority
-* Vertical page scrolling allowed
-* Door-driven validation
-* Intent Log/tabletop panel hidden from live playable UI, not destructively removed
-* Ladder/access rhythm preserved from v1.18.3 recovery base
-* Glyphs may be next to ladders, but never on or vertically over ladder columns
+* No generic shooting
+* No arbitrary traversal upgrade
+* Tools are interventions, not weapons
+* Doors validate proof before advancement
+* Glyphs / evidence nodes preserve judgment
+* Relays are confirmation nodes, not decoration
+* Health Shower remains a recovery station
+* Phone playability matters
+* Keep the separate-room, validate-to-advance architecture unless explicitly ordered otherwise
+
+Important correction:
+
+> HOOK was removed by design. Do not reintroduce fixed-anchor grapple or anchor tiles unless a new branch explicitly authorizes it.
 
 ---
 
-## Current Room Flow
+## Current Tool Doctrine
 
-Current District 01 route:
+Tools are bounded interventions. They are not weapons.
 
-`R02 → R03 → R12 → R04 → R05 → R06 → R07 → COMPLETE`
-
-### R07 — Vertical Shaft
-
-`R07` is an upward movement room designed to test vertical access without adding jump or boost.
-
-Core purpose:
-
-* Demonstrates upward movement through a shaft
-* Uses broken ladder segments to create partial access, not full ladder solutions
-* Requires fixed-anchor grappling to continue upward
-* Preserves the access doctrine: authored anchors, readable routes, no arbitrary wall attachment
-* Validates when Eli reaches the upper shaft exit platform
+| Tool | Purpose | Design Meaning |
+|---|---|---|
+| A / PULSE | Clears live fault tiles and stuns bots | Interrupt visible system corruption / pressure |
+| B / SCAN | Reveals hidden route data | Find what the visible layer hides |
+| B / SYNC | Confirms relay state | Confirmation must change real state |
+| B / THERM | Cools heat / vent sources | Stabilize runaway system pressure |
+| B / DAMP | Clears catalyst blocks | Reduce amplification / material obstruction |
+| B / READ | Reads evidence / glyph nodes | Preserve interpretation and judgment |
+| Y / USE | Interacts with doors, relays, showers, glyphs | Commit to evidence or attempt validation |
+| R / TOOL+ | Rotates selected B-tool | Choose the correct intervention |
 
 ---
 
-## New Mechanic: Health Shower
+## Controls
 
-`v1.18.6` adds a Health Shower recovery point.
+### Mobile
 
-### Behavior
+* Floating left joystick: move Eli
+* A: PULSE
+* B: selected repair tool
+* Y: interact / use / validate at exit
+* R: rotate selected B-tool
+* Tool tray: tap a tool to select it
 
-The Health Shower appears as a wall-mounted shower faucet tile.
+### Keyboard
 
-When Eli activates it:
-
-1. Eli stands in front of the shower.
-2. The curtain closes.
-3. Eli is hidden behind the curtain.
-4. The shower visibly runs.
-5. Player input is temporarily locked.
-6. When the recovery cycle completes, Eli’s Stability restores to full.
-
-### Recovery Result
-
-* Stability restores to `3`
-* The shower does not add combat, inventory, or health-pack logic
-* It functions as a readable environmental recovery station
-
-Player-facing intent:
-
-> Recovery is part of the system, not a reward crate.
+* WASD / arrow keys: move
+* Space / Z / J: PULSE
+* X / K: selected B-tool
+* E / Y: interact / use
+* R / Tab: rotate tool
+* Enter / Escape: start / prompt current objective / restart after completion
 
 ---
 
-## v1.18.6 Change Summary
+## v0.4.3 Change Summary
+
+Primary maturity target:
+
+> Validation feedback pass.
 
 Added:
 
-* New room `R07`
-* Upward shaft traversal
-* Broken ladder route structure
-* Additional fixed grapple anchors for shaft movement
-* Health Shower tile and interaction
-* Curtain-hidden shower recovery animation
-* R07 validation condition tied to reaching the upper shaft platform
-* R07 glyphs and dialogue
-* R06 route extension into R07
-* R07 completion route to District Complete
+* Compact Proof Deck below the HUD
+* Live sector objective display
+* Live validation blocker chips
+* Next-action hint based on remaining proof blockers
+* Failed validation messages that include the next proof action
+* Immediate proof-state refresh after PULSE clears faults
 
-Corrected during check:
+Preserved:
 
-* R07 grapple landing points were moved off ladder columns and onto valid adjacent platform positions
-* Glyph placement was checked against ladder-column rules
-* Glyph text keys were checked against visible glyph positions
-* Sync/relay logic from v1.18.5 remains preserved
-
----
-
-## Acceptance Checks Completed
-
-The following checks passed before this README update:
-
-* All rooms remain 64×20 logical size
-* Visible corridor remains 32×20
-* R06 transitions into R07
-* R07 loads successfully
-* R07 high exit completes the district
-* R07 shaft route is mechanically traversable
-* Health Shower activates
-* Curtain closes during shower recovery
-* Eli is hidden during shower recovery
-* Stability restores to full after shower completion
-* R07 validates only after reaching the upper shaft platform
-* No glyphs are placed on ladder tiles
-* No glyphs are vertically over ladder columns
-* All visible glyphs have matching dialogue text
-* No orphan glyph dialogue keys were detected
+* Isometric room architecture
+* Separate-room sector chain
+* Validate-to-advance flow
+* No HOOK posture
+* No jump / no boost
+* Tool-as-intervention doctrine
+* Health Shower recovery role
+* Evidence/glyph role
+* Relay proof role
 
 ---
 
-## Known Testing Status
+## Current QA Status
 
-### Passed
+### Static/code checks completed for v0.4.3
 
-* Boot-level recovery checks
-* Desktop smoke checks
-* Mobile-layout smoke checks
-* R02 → R03 route recovery
-* R03 relay/SYNC recovery
-* Glyph/ladder placement checks
-* R07 assisted traversal check
-* Health Shower recovery check
+* JavaScript syntax check passed
+* Runtime smoke test with mocked DOM/canvas passed
+* Game start enters `PLAY` state
+* Starts in `R02`
+* 16-sector chain resolves to `COMPLETE`
+* `ORDER` matches the sector chain
+* All sectors are rectangular
+* Every sector has one spawn `P`
+* Every sector has one exit `E`
+* Every sector has Health Shower `U`
+* Every sector has evidence/glyph `G`
+* Rule-required tiles exist per sector
+* Exit remains reachable after required cleanup
+* Faults / heat / catalyst / relays / glyphs / showers remain targetable
+* `HOOK` string absent
+* Anchor tile `A` absent from all maps
+* Proof Deck functions are present
 
-### Still Required
+### Still required
 
-Live playtest on actual phone browser:
+Live browser and phone playtest:
 
-* Touch control comfort
-* Shaft readability
-* Grapple timing feel
-* Whether the broken ladder route is obvious enough
-* Whether the Health Shower interaction is discoverable
-* Whether vertical scrolling and mobile controls remain comfortable during R07
+* actual phone control comfort
+* joystick feel
+* tool tray usability
+* Proof Deck vertical space on small screens
+* whether NEXT hints help without over-handholding
+* whether the 16-sector chain feels too long
+* bot pressure and patrol feel
+* sector readability under movement pressure
+* final sector payoff
+* complete start-to-finish win/restart flow in browser
+
+Do not claim phone-tested until it has actually been played on a phone.
 
 ---
 
-## Current Development Rule
+## Arcade Maturity Snapshot
 
-Do not tune visuals, expand mechanics, or add another room until the v1.18.6 phone playtest confirms:
+| Category | Current Score | Notes |
+|---|---:|---|
+| Core loop clarity | 4 / 5 | Observe, repair, validate, advance is now clearer |
+| Isometric map readability | 3 / 5 | Needs sector readability pass |
+| Sector identity | 4 / 5 | Larger varied sectors are structurally distinct |
+| Tool usefulness | 4 / 5 | Tools map to actual proof work |
+| Validation clarity | 4 / 5 | Proof Deck improves blocker visibility |
+| Evidence/glyph usefulness | 3 / 5 | Evidence exists but can matter more mechanically |
+| Mobile control feel | 3 / 5 | UI exists, live phone feel unverified |
+| Hazard/bot pressure | 3 / 5 | Needs tuning after playtest |
+| Progression pacing | 3 / 5 | 16 sectors may be long |
+| Win/restart flow | 4 / 5 | Mechanically present, live browser test required |
+| Visual arcade polish | 3 / 5 | Functional isometric presentation, needs identity pass |
+| Replayability / fun factor | 3 / 5 | Repair logic is sound; arcade tension needs tuning |
 
-1. Eli can move comfortably on phone.
-2. Grapple access works without fighting the controls.
-3. The upward shaft is readable.
-4. The Health Shower is understandable.
-5. The district can still be completed from R02 through R07.
+---
+
+## Recommended Next Build Loop
+
+Recommended next target:
+
+> `v0.4.4 — Sector Readability Pass`
+
+Focus:
+
+* improve floor/wall separation
+* improve hazard visibility
+* improve relay visibility
+* improve exit visibility
+* improve glyph/evidence readability
+* improve sector identity without changing validation logic
+
+Do not change tools, sector chain, validation rules, or controls unless a readability failure requires it.
 
 ---
 
 ## Build Doctrine
 
-This build is not a platformer expansion.
+Reintegration Core should feel like a playable proof system.
 
-It remains a systems-repair traversal prototype where Eli observes, routes, stabilizes, validates, and moves through authored access points.
+Every sector should ask:
 
-The grapple is not a movement toy.
-The ladder is not a decorative tile.
-The shower is not a pickup.
+1. What is broken?
+2. How does Eli know?
+3. Which tool proves or repairs it?
+4. What pressure makes the choice matter?
+5. What validates the outcome?
+
+If a sector cannot answer those questions, it is not mature enough.
+
 The door is still the proof gate.
+The glyph is still evidence.
+The relay is still confirmation.
+The shower is still recovery.
+The tool is still intervention.
+Green is still not proof.
