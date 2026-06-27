@@ -1,561 +1,215 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>Reintegration Core — District 01 · Visual Modernization v1.22</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+<title>Reintegration Core — Isometric Arcade v0.4.3</title>
 <style>
-  /*
-    Visual modernization: flat controls and clean type.
-    This build preserves the mechanical baseline from v1.19 while updating the
-    visual styling to a flatter, custom-keyboard inspired interface.
+*{box-sizing:border-box;margin:0;padding:0}html,body{width:100%;min-height:100%;background:#03070c;color:#e6f6ff;font-family:system-ui,-apple-system,Segoe UI,sans-serif;overflow-x:hidden;touch-action:pan-y;user-select:none}#wrap{min-height:100svh;display:flex;flex-direction:column;align-items:center;padding:8px 8px calc(18px + env(safe-area-inset-bottom));background:radial-gradient(circle at 50% 0%,rgba(85,208,255,.12),transparent 38%),linear-gradient(180deg,#07131c,#03070c 70%)}canvas{width:min(100%,960px);height:auto;border:1px solid rgba(122,184,216,.22);border-radius:16px;background:#06101a;box-shadow:0 26px 70px rgba(0,0,0,.58);touch-action:none}#title{position:fixed;inset:0;background:radial-gradient(circle at 50% 35%,rgba(85,208,255,.16),transparent 42%),linear-gradient(180deg,#07131c,#020509);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;z-index:30;padding:24px}#title h1{font-size:clamp(36px,7vw,86px);line-height:.95;letter-spacing:.08em;text-transform:uppercase;color:#e9f8ff;text-shadow:0 0 34px rgba(85,208,255,.28)}#title h2{margin-top:18px;font-size:clamp(12px,2vw,20px);letter-spacing:.18em;text-transform:uppercase;color:#62dfff}#title p{margin-top:34px;color:#aac3d0;letter-spacing:.16em;font-weight:700;animation:blink 1.2s infinite}.sub{margin-top:24px;color:rgba(210,231,242,.45);font-size:13px;line-height:1.8;letter-spacing:.12em}@keyframes blink{50%{opacity:.25}}#hudbar{width:min(100%,960px);display:flex;gap:8px;align-items:center;justify-content:space-between;margin:8px 0 6px;flex-wrap:wrap}.pill{border:1px solid rgba(112,172,205,.28);border-radius:999px;padding:7px 12px;background:rgba(8,16,26,.74);font-size:12px;font-weight:700;letter-spacing:.08em;color:#ccecff}.pill.good{border-color:rgba(105,240,174,.42);color:#8effc9}.pill.bad{border-color:rgba(255,99,119,.42);color:#ff8fa0}#tools{width:min(100%,960px);display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:8px}.tool{min-width:70px;flex:1 1 86px;max-width:132px;border:1px solid rgba(112,172,205,.28);border-radius:12px;padding:8px;background:linear-gradient(180deg,rgba(15,27,40,.96),rgba(7,12,20,.96));text-align:center;color:#cfefff;box-shadow:inset 0 1px 0 rgba(255,255,255,.05)}.tool b{display:block;font-size:12px;letter-spacing:.12em}.tool span{display:block;font-size:9px;opacity:.56;margin-top:2px}.tool.sel{border-color:#ff5b74;box-shadow:0 0 0 1px rgba(255,91,116,.22),0 0 16px rgba(255,91,116,.17)}.tool.sugg{border-color:#63f0b7;box-shadow:0 0 0 1px rgba(99,240,183,.3),0 0 14px rgba(99,240,183,.22)}.tool.sugg b{color:#8effc9}#touch{width:min(100%,960px);display:grid;grid-template-columns:minmax(128px,180px) 1fr minmax(90px,125px);gap:10px;align-items:end;margin-top:10px}.pad{display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(3,1fr);gap:6px}.btn{min-height:42px;border:1px solid rgba(112,172,205,.28);border-radius:12px;background:linear-gradient(180deg,rgba(15,27,40,.92),rgba(7,12,20,.96));color:#dff6ff;display:flex;align-items:center;justify-content:center;text-align:center;font-weight:800;letter-spacing:.08em;-webkit-tap-highlight-color:transparent}.btn.blank{opacity:0;pointer-events:none}.btn.pressed,.btn:active{background:rgba(85,208,255,.25)}.actcol{display:flex;flex-direction:column;gap:10px}.act{min-height:74px;border-radius:18px}.smallrow{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}.small{min-height:38px;padding:0 14px;font-size:12px}.hidden{display:none!important}
+/* HITL-style floating controls overlay */
+.controls{position:fixed;inset:0;z-index:20;pointer-events:none}
+.joyZone{position:absolute;left:10px;bottom:14px;width:190px;height:180px;pointer-events:auto;touch-action:none}
+.joyBase{position:absolute;left:34px;bottom:28px;width:120px;height:120px;border-radius:50%;border:1px solid rgba(85,208,255,.26);background:radial-gradient(circle,rgba(17,43,61,.5),rgba(4,12,20,.32));box-shadow:0 10px 30px rgba(0,0,0,.34),inset 0 0 24px rgba(85,208,255,.06)}
+.joyKnob{position:absolute;left:50%;top:50%;width:60px;height:60px;margin:-30px 0 0 -30px;border-radius:50%;border:1px solid rgba(99,240,183,.55);background:linear-gradient(180deg,rgba(34,72,98,.88),rgba(8,22,34,.82));box-shadow:0 6px 20px rgba(0,0,0,.44),inset 0 0 16px rgba(85,208,255,.14)}
+.actions{position:absolute;right:10px;bottom:14px;width:220px;height:184px;pointer-events:auto}
+.btn{position:absolute;width:62px;height:62px;border-radius:21px;display:grid;place-items:center;text-align:center;color:#eaffff;font-weight:900;font-size:15px;letter-spacing:.04em;border:1px solid rgba(85,208,255,.32);background:linear-gradient(180deg,rgba(19,42,62,.74),rgba(4,12,20,.64));box-shadow:0 10px 26px rgba(0,0,0,.36),inset 0 0 18px rgba(85,208,255,.06);backdrop-filter:blur(7px);pointer-events:auto;touch-action:none;-webkit-tap-highlight-color:transparent}
+.btn small{font-size:9px;opacity:.7;letter-spacing:.06em}
+.btn.pressed,.btn:active{border-color:rgba(99,240,183,.78);transform:scale(.96);box-shadow:0 0 22px rgba(85,208,255,.26),inset 0 0 18px rgba(99,240,183,.16)}
+.act-a{right:2px;bottom:62px;width:72px;height:72px;border-radius:25px;border-color:rgba(255,91,116,.45)}
+.act-b{right:84px;bottom:96px}
+.act-y{right:86px;bottom:18px;color:#8effc9;border-color:rgba(99,240,183,.4)}
+.act-r{right:156px;bottom:60px}
+@media(max-width:760px){.actions{transform:scale(.92);transform-origin:bottom right}.joyZone{transform:scale(.92);transform-origin:bottom left}}
 
-    Key differences from earlier versions:
-    - Uses Roboto Mono for all UI text for improved readability.
-    - Removes retro pixelation from the canvas to break the 8‑bit mold.
-    - Flattens all interactive elements (toolbar, touch pad, A/B and meta buttons) with subtle borders and no raised shadows.
-    - Introduces a darker, more industrial colour palette that still fits the sci‑fi maintenance theme.
-    - Maintains responsive sizing and safe‑area handling for mobile screens.
-  */
-  @import url('https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;700&display=swap');
-  *{margin:0;padding:0;box-sizing:border-box;}
-  html,body{
-    width:100%;
-    min-height:100%;
-    background:#0c1833;
-    color:#cdd3e7;
-    font-family:'Roboto Mono',monospace;
-    overflow-x:hidden;
-    overflow-y:auto;
-    touch-action:pan-y;
-    user-select:none;
-    -webkit-user-select:none;
-  }
-  /* Layout container: flex column for canvas, toolbar and touch controls */
-  #wrap{
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    justify-content:flex-start;
-    width:100%;
-    min-height:100svh;
-    height:auto;
-    position:relative;
-    padding-top:env(safe-area-inset-top,0px);
-    padding-bottom:calc(28px + env(safe-area-inset-bottom,0px));
-    overflow:visible;
-  }
-  /* Game canvas: no pixelation for modern look */
-  canvas{
-    display:block;
-    margin-top:0;
-    max-width:100%;
-    height:auto;
-    touch-action:none;
-  }
-  /* ── Quick Tool Bar ── */
-  #toolbar{
-    display:none;
-    width:calc(100% - 12px);
-    max-width:760px;
-    margin:10px auto 0;
-    justify-content:center;
-    gap:6px;
-    z-index:14;
-    padding:0 6px;
-    flex-wrap:wrap;
-    flex:0 0 auto;
-    order:30;
-  }
-  #toolbar.show{display:flex;}
-  /* Quick tool buttons: flat, keyboard‑like keys with subtle border */
-  .qtool{
-    pointer-events:auto;
-    min-width:62px;
-    background:#121a33;
-    border:1px solid #394870;
-    border-radius:8px;
-    padding:6px 6px 5px;
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    gap:3px;
-    -webkit-tap-highlight-color:transparent;
-    transition:background 0.1s,border-color 0.1s;
-  }
-  .qtool .qn{
-    font-size:7px;
-    color:#cdd3e7;
-    letter-spacing:.5px;
-  }
-  .qtool .qd{
-    font-size:5px;
-    color:rgba(205,210,235,0.55);
-    line-height:1.25;
-    text-align:center;
-  }
-  .qtool:active{
-    background:#1f2a4e;
-    border-color:#4d5b83;
-  }
-  /* Equipped tool states use tinted borders to denote slot A/B */
-  .qtool.eqA{border-color:#5b9bd5;}
-  .qtool.eqB{border-color:#ff5a5a;}
-  .qtool.fired{background:#ffffff;color:#121a33;}
-  .qtool .slot{
-    font-size:5px;
-    padding:1px 4px;
-    border-radius:2px;
-    margin-top:1px;
-  }
-  .qtool .slot.A{
-    background:#5b9bd5;
-    color:#06121f;
-  }
-  .qtool .slot.B{
-    background:#ff5a5a;
-    color:#1f0606;
-  }
-  /* ── Tabletop Panel (Intent Log) ── */
-  #ttpanel{
-    display:none!important;
-    width:calc(100% - 12px);
-    max-width:760px;
-    margin:8px auto 0;
-    background:rgba(13,15,30,0.92);
-    border:1.5px solid rgba(91,155,213,0.4);
-    border-radius:8px;
-    flex-direction:column;
-    overflow:hidden;
-    flex:0 0 auto;
-    order:20;
-  }
-  #ttpanel.show{display:none!important;}
-  #tt-head{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    padding:5px 8px;
-    border-bottom:1px solid rgba(91,155,213,0.25);
-    cursor:pointer;
-    -webkit-tap-highlight-color:transparent;
-  }
-  #tt-head h3{
-    font-size:7px;
-    color:#8ab4f8;
-    letter-spacing:1px;
-    margin:0;
-  }
-  #tt-toggle{
-    font-size:6px;
-    color:rgba(130,180,248,0.7);
-    border:1px solid rgba(91,155,213,0.4);
-    border-radius:3px;
-    padding:2px 6px;
-  }
-  #ttobjective{
-    font-size:6px;
-    color:rgba(252,231,110,0.9);
-    padding:5px 8px;
-    line-height:1.45;
-    border-bottom:1px solid rgba(91,155,213,0.15);
-  }
-  #ttactions{
-    display:grid;
-    grid-template-columns:repeat(3,1fr);
-    gap:4px;
-    padding:5px 8px;
-    border-bottom:1px solid rgba(91,155,213,0.15);
-  }
-  .ttact{
-    font-size:5px;
-    line-height:1.3;
-    color:#d9ecff;
-    background:rgba(20,24,40,0.86);
-    border:1px solid rgba(91,155,213,0.45);
-    border-radius:4px;
-    padding:6px 4px;
-    min-height:30px;
-    -webkit-tap-highlight-color:transparent;
-  }
-  .ttact:active{background:rgba(91,155,213,0.28);}
-  .ttact.on{
-    border-color:#69f0ae;
-    color:#b8ffe9;
-    box-shadow:0 0 6px rgba(105,240,174,0.35);
-  }
-  #ttprocedure{
-    display:none;
-    padding:5px 8px;
-    border-bottom:1px solid rgba(91,155,213,0.15);
-    background:rgba(6,10,20,0.42);
-  }
-  #ttpanel.expanded #ttprocedure{display:block;}
-  #ttprocedure .pcard-title{
-    font-size:6px;
-    color:#69f0ae;
-    letter-spacing:.6px;
-    margin-bottom:4px;
-  }
-  #ttprocedure .pcard-line{
-    font-size:5.5px;
-    line-height:1.45;
-    color:rgba(220,235,255,0.82);
-    margin-bottom:3px;
-  }
-  #ttprocedure b{color:#fce76e;font-weight:normal;}
-  #ttlog{padding:4px 8px;display:flex;flex-direction:column;gap:3px;}
-  #ttpanel.collapsed #ttlog{max-height:none;overflow:visible;}
-  #ttpanel.expanded #ttlog{max-height:30vh;overflow-y:auto;}
-  .ttline{
-    font-size:6px;
-    line-height:1.4;
-    color:rgba(200,210,235,0.8);
-    border-left:2px solid #2E6F8E;
-    padding-left:5px;
-  }
-  .ttline.good{border-color:#69f0ae;color:#b8ffe9;}
-  .ttline.bad{border-color:#ff5252;color:#ffb3b3;}
-  .ttline.judge{border-color:#fce76e;color:#fce76e;}
-  #ttlog::-webkit-scrollbar{width:4px;}
-  #ttlog::-webkit-scrollbar-thumb{background:#243140;border-radius:2px;}
-  /* ── Touch Controls ── */
-  #touch{
-    display:none;
-    position:relative;
-    bottom:auto;
-    left:auto;
-    width:calc(100% - 16px);
-    max-width:760px;
-    margin:12px auto 0;
-    padding:8px 10px calc(14px + env(safe-area-inset-bottom,0px));
-    gap:8px;
-    justify-content:space-between;
-    align-items:flex-end;
-    z-index:10;
-    pointer-events:none;
-    order:40;
-  }
-  #touch.show{display:flex;}
-  .tpad{
-    display:grid;
-    grid-template-columns:repeat(3,1fr);
-    grid-template-rows:repeat(3,1fr);
-    width:min(36vw,156px);
-    height:min(36vw,156px);
-    gap:4px;
-    pointer-events:auto;
-  }
-  .tbtn{
-    background:#121a33;
-    border:1px solid #394870;
-    border-radius:8px;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    color:#cdd3e7;
-    font-size:9px;
-    pointer-events:auto;
-    -webkit-tap-highlight-color:transparent;
-    transition:background 0.1s,border-color 0.1s,color 0.1s;
-  }
-  .tbtn:active,.tbtn.pressed{
-    background:#1f2a4e;
-    border-color:#4d5b83;
-    color:#ffffff;
-  }
-  .tbtn.blank{
-    background:transparent;
-    border-color:transparent;
-    pointer-events:none;
-  }
-  .abtn{
-    width:min(18vw,76px);
-    height:min(18vw,76px);
-    border-radius:50%;
-    background:#121a33;
-    border:1px solid #394870;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    color:#cdd3e7;
-    font-size:12px;
-    pointer-events:auto;
-    -webkit-tap-highlight-color:transparent;
-    transition:background 0.1s,border-color 0.1s,color 0.1s;
-  }
-  .abtn:active,.abtn.pressed{
-    background:#1f2a4e;
-    border-color:#4d5b83;
-    color:#ffffff;
-  }
-  #actbtns{display:flex;flex-direction:column;gap:6px;align-items:center;pointer-events:auto;}
-  #metabtns{display:flex;gap:6px;align-items:center;justify-content:center;pointer-events:auto;position:relative;bottom:auto;left:auto;transform:none;z-index:11;margin:8px auto 0;order:35;}
-  .mbtn{
-    padding:6px 14px;
-    background:#121a33;
-    border:1px solid #394870;
-    border-radius:6px;
-    color:#cdd3e7;
-    font-size:6px;
-    pointer-events:auto;
-    -webkit-tap-highlight-color:transparent;
-    transition:background 0.1s,border-color 0.1s,color 0.1s;
-  }
-  .mbtn:active{
-    background:#1f2a4e;
-    border-color:#4d5b83;
-    color:#ffffff;
-  }
-  /* Title screen styling */
-  #title-screen{
-    position:fixed;
-    top:0;
-    left:0;
-    width:100%;
-    height:100svh;
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    justify-content:center;
-    z-index:100;
-    background:#0c1833;
-    cursor:pointer;
-  }
-  #title-screen h1{
-    color:#5b9bd5;
-    font-size:clamp(28px,4.5vw,62px);
-    letter-spacing:4px;
-    margin-bottom:16px;
-    text-align:center;
-    line-height:1.35;
-    text-shadow:0 0 22px rgba(91,155,213,.42);
-  }
-  #title-screen h2{
-    color:#8ab4f8;
-    font-size:clamp(12px,1.35vw,20px);
-    letter-spacing:2px;
-    margin-bottom:34px;
-    text-align:center;
-  }
-  #title-screen p{
-    color:rgba(200,200,220,0.72);
-    font-size:clamp(10px,1.1vw,16px);
-    animation:blink 1.2s infinite;
-  }
-  #title-screen .sub{
-    color:rgba(200,200,220,0.42);
-    font-size:clamp(9px,.95vw,14px);
-    margin-top:24px;
-    line-height:2;
-    letter-spacing:1px;
-    text-align:center;
-  }
-  @keyframes blink{0%,100%{opacity:1;}50%{opacity:0.2;}}
-  /* Responsive tweaks for smaller screens */
-  @media (max-width: 768px){
-    html,body{height:auto;min-height:100svh;overflow-y:auto;overflow-x:hidden;}
-    #wrap{height:auto;min-height:100svh;overflow:visible;padding-bottom:calc(28px + env(safe-area-inset-bottom,0px));}
-    canvas{margin-top:6px;max-width:calc(100vw - 8px);height:auto;}
-    #ttpanel{display:none!important;margin-top:0;}
-    #toolbar{margin-top:10px;}
-    #touch{margin-top:10px;}
-    #metabtns{margin-top:8px;}
-    #touch.show{display:flex;}
-    #metabtns.show{display:flex;}
-    .qtool{min-width:30%;padding:8px 7px 7px;border-radius:9px;}
-    .qtool .qn{font-size:9px;}
-    .qtool .qd{font-size:6px;}
-    #tt-head h3{font-size:10px;}
-    #ttobjective{font-size:8px;line-height:1.55;padding:10px 12px;}
-    .ttact{font-size:7px;min-height:48px;border-radius:8px;}
-    .ttline{font-size:8px;}
-    .mbtn{font-size:8px;padding:9px 20px;border-radius:8px;}
-  }
+/* v0.4.3 validation feedback pass: compact proof deck, not tabletop log. */
+#proofdeck{width:min(100%,960px);border:1px solid rgba(112,172,205,.24);border-radius:14px;background:linear-gradient(180deg,rgba(9,18,29,.84),rgba(5,10,18,.76));box-shadow:inset 0 1px 0 rgba(255,255,255,.04);padding:9px 12px;margin:0 0 8px;color:#dff6ff}
+.proofTop{display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:5px}
+.proofTop b{font-size:12px;letter-spacing:.14em;color:#62dfff;text-transform:uppercase}.proofTop span{font-size:11px;letter-spacing:.10em;color:#8effc9;font-weight:800;text-transform:uppercase}
+#proofObjective{font-size:12px;line-height:1.35;color:rgba(218,239,250,.76);margin-bottom:7px}
+#proofChips{display:flex;gap:6px;flex-wrap:wrap}.proofChip{border:1px solid rgba(112,172,205,.28);border-radius:999px;padding:5px 9px;font-size:11px;font-weight:800;letter-spacing:.08em;background:rgba(7,13,22,.72);color:#ccecff}.proofChip.ok{border-color:rgba(105,240,174,.44);color:#8effc9}.proofChip.bad{border-color:rgba(255,99,119,.42);color:#ff9aaa}.proofChip.neutral{border-color:rgba(247,186,85,.42);color:#ffd58a}
+@media(max-width:720px){#proofdeck{padding:8px 9px;margin-bottom:6px}.proofTop b{font-size:11px}.proofTop span{font-size:10px}#proofObjective{font-size:11px}.proofChip{font-size:10px;padding:5px 7px}}
+
 </style>
 </head>
 <body>
 <div id="wrap">
+  <div id="title"><h1>REINTEGRATION<br>CORE</h1><h2>ISOMETRIC SYSTEMS-REPAIR ARCADE v0.4.3.2.2</h2><p>PRESS START</p><div class="sub">OBSERVE. DIAGNOSE. STABILIZE. VALIDATE.<br>GREEN IS NOT PROOF.</div></div>
+  <div id="hudbar"><div class="pill" id="roomPill">D01</div><div class="pill bad" id="validPill">UNVERIFIED</div><div class="pill" id="stbPill">STB 3/3</div><div class="pill" id="toolPill">B: SCAN</div></div>
+  <div id="proofdeck"><div class="proofTop"><b id="proofTitle">PROOF DECK</b><span id="proofNext">NEXT: OBSERVE</span></div><div id="proofObjective">Sector objective will appear here.</div><div id="proofChips"></div></div>
   <canvas id="game"></canvas>
-  <!-- Intent Log panel (initially hidden) -->
-  <div id="ttpanel" class="collapsed">
-    <div id="tt-head"><h3>INTENT LOG</h3><span id="tt-toggle">TAP TO EXPAND ▾</span></div>
-    <div id="ttobjective"></div>
-    <div id="ttactions">
-      <button class="ttact" id="ttValidateBtn" type="button">VALIDATE<br>ROOM</button>
-      <button class="ttact" id="ttExportBtn" type="button">EXPORT<br>LOG</button>
-      <button class="ttact" id="ttTableModeBtn" type="button">TABLE<br>MODE OFF</button>
+  <div id="tools"></div>
+  <div class="controls" id="controls">
+    <div class="joyZone" id="joyZone"><div class="joyBase" id="joyBase"><div class="joyKnob" id="joyKnob"></div></div></div>
+    <div class="actions">
+      <div class="btn act-a" data-key="a">A<br><small>PULSE</small></div>
+      <div class="btn act-b" data-key="b">B<br><small>TOOL</small></div>
+      <div class="btn act-y" data-key="interact">Y<br><small>USE</small></div>
+      <div class="btn act-r" data-key="rotate">R<br><small>TOOL+</small></div>
     </div>
-    <div id="ttprocedure"></div>
-    <div id="ttlog"></div>
-  </div>
-  <!-- Toolbar for quick tool selection -->
-  <div id="toolbar"></div>
-  <!-- Touch controls (directional pad and A/B buttons) -->
-  <div id="touch">
-    <div class="tpad" id="dpad">
-      <!-- Directional buttons will be injected by script -->
-    </div>
-    <div id="actbtns">
-      <button class="abtn" id="btnA" type="button">A</button>
-      <button class="abtn" id="btnB" type="button">B</button>
-    </div>
-  </div>
-  <!-- Meta buttons like START; will be revealed as needed -->
-  <div id="metabtns"></div>
-  <!-- Title screen overlay -->
-  <div id="title-screen">
-    <h1>REINTEGRATION CORE</h1>
-    <h2>District 01</h2>
-    <p>Tap to begin</p>
-    <div class="sub">v1.22 — Visual Modernization</div>
   </div>
 </div>
 <script>
-(() => {
-  /*
-    Game logic and rendering preserved from v1.19 baseline.
-    The only modifications below relate to UI setup and flattened controls.
-    All mechanics (movement, grapple, validation, etc.) remain unchanged.
-  */
-  const canvas = document.getElementById('game');
-  const ctx = canvas.getContext('2d');
-  // Use device pixel ratio for crisp rendering on high‑density displays
-  const DPR = window.devicePixelRatio || 1;
-  // Room size constants (logical)
-  const COLS = 64;
-  const ROWS = 20;
-  // Visible corridor dimensions (always 32×20)
-  const VISIBLE_COLS = 32;
-  const VISIBLE_ROWS = 20;
-  // Tile size in pixels (will be scaled by DPR at runtime)
-  const TILE_SIZE = 8;
-  // Canvas sizing: adjust based on visible corridor
-  function resizeCanvas() {
-    const width = VISIBLE_COLS * TILE_SIZE;
-    const height = VISIBLE_ROWS * TILE_SIZE;
-    canvas.width = width * DPR;
-    canvas.height = height * DPR;
-    canvas.style.width = `${width}px`;
-    canvas.style.height = `${height}px`;
-    ctx.scale(DPR, DPR);
-  }
-  window.addEventListener('resize', resizeCanvas);
-  resizeCanvas();
-  /*
-    Simplified player and environment setup.
-    For brevity, this example provides just enough scaffolding to
-    demonstrate the UI layer. Full gameplay logic (movement,
-    collision, ladder/grapple, hazards, room progression, etc.)
-    should be taken from the existing baseline and injected here.
-  */
-  class Player {
-    constructor() {
-      this.x = 2;
-      this.y = 17;
-      this.width = 0.8;
-      this.height = 1.6;
-      this.color = '#5b9bd5';
-    }
-    draw() {
-      ctx.fillStyle = this.color;
-      ctx.fillRect(this.x * TILE_SIZE, this.y * TILE_SIZE - this.height * TILE_SIZE, this.width * TILE_SIZE, this.height * TILE_SIZE);
-    }
-  }
-  const player = new Player();
-  function clear() {
-    ctx.fillStyle = '#0c1833';
-    ctx.fillRect(0, 0, canvas.width / DPR, canvas.height / DPR);
-  }
-  function gameLoop() {
-    clear();
-    player.draw();
-    requestAnimationFrame(gameLoop);
-  }
-  requestAnimationFrame(gameLoop);
-  /*
-    Touch controls and quick tools injection. In a full build, these would
-    be wired to in-game actions (move, grapple, scan, etc.). Here we
-    attach minimal interactions for demonstration.
-  */
-  function initControls() {
-    const toolbar = document.getElementById('toolbar');
-    const tools = [
-      { id: 'TOOL_A', name: 'SCAN', desc: 'Reveal hidden routes' },
-      { id: 'TOOL_B', name: 'SYNC', desc: 'Access relays' },
-      { id: 'TOOL_C', name: 'DASH', desc: 'No boost (locked)' },
-      { id: 'TOOL_D', name: 'SHLD', desc: 'Shield (coming soon)' },
-    ];
-    tools.forEach(tool => {
-      const el = document.createElement('div');
-      el.className = 'qtool';
-      el.innerHTML = `<span class="qn">${tool.name}</span><span class="qd">${tool.desc}</span>`;
-      el.addEventListener('click', () => {
-        alert(`Selected tool: ${tool.name}`);
-      });
-      toolbar.appendChild(el);
-    });
-    toolbar.classList.add('show');
-    // Initialize touch pad
-    const dpad = document.getElementById('dpad');
-    const directions = [
-      { dir: 'up', symbol: '▲' },
-      { dir: 'left', symbol: '◀' },
-      { dir: 'blank', symbol: '' },
-      { dir: 'right', symbol: '▶' },
-      { dir: 'down', symbol: '▼' },
-    ];
-    // Insert nine buttons: the arrangement: [up, blank, scan], [left, blank, right], [blank, down, blank]. We'll map them manually.
-    const tbtnSymbols = [
-      { id: 'up', symbol: '▲' },
-      { id: 'blank1', symbol: '' },
-      { id: 'scan', symbol: '🔍' },
-      { id: 'left', symbol: '◀' },
-      { id: 'center', symbol: '' },
-      { id: 'right', symbol: '▶' },
-      { id: 'blank2', symbol: '' },
-      { id: 'down', symbol: '▼' },
-      { id: 'blank3', symbol: '' },
-    ];
-    tbtnSymbols.forEach(btn => {
-      const b = document.createElement('button');
-      b.className = 'tbtn';
-      if (btn.id.startsWith('blank')) {
-        b.classList.add('blank');
-      }
-      b.textContent = btn.symbol;
-      b.addEventListener('touchstart', e => {
-        b.classList.add('pressed');
-      });
-      b.addEventListener('touchend', e => {
-        b.classList.remove('pressed');
-      });
-      dpad.appendChild(b);
-    });
-    // Show touch controls on mobile devices
-    if (window.matchMedia('(max-width: 768px)').matches) {
-      document.getElementById('touch').classList.add('show');
-      // Add meta buttons (e.g. START) only for mobile
-      const metabtns = document.getElementById('metabtns');
-      const startBtn = document.createElement('button');
-      startBtn.className = 'mbtn';
-      startBtn.textContent = 'START';
-      startBtn.addEventListener('click', () => alert('Start button pressed'));
-      metabtns.appendChild(startBtn);
-      metabtns.classList.add('show');
-    }
-  }
-  initControls();
-  // Title screen: hide on tap or key press
-  const titleScreen = document.getElementById('title-screen');
-  function hideTitle() {
-    titleScreen.style.display = 'none';
-  }
-  titleScreen.addEventListener('click', hideTitle);
-  window.addEventListener('keydown', e => {
-    if (e.code === 'Enter') hideTitle();
-  });
-})();
+'use strict';
+const SECTORS = {"R02":{"name":"Ingress Utility Deck","objective":"Clear live faults before the door will trust the route.","rule":"faults","next":"R03","glyphs":["ROUTES ARE NOT ASSUMPTIONS.","The route is not fixed because it looks clean."],"map":["###########################","#P........................#","#..G......................#","#....X.....X......X....X..#","#.........................#","#.####.#######.#######.##.#","#.........................#","#.......X...B...X....X....E","#.........................#","#.#######.#######.#######.#","#.........................#","#.....X......X......X.....#","#.U.......................#","#.........................#","###########################"]},"R03":{"name":"Relay Channel","objective":"Confirm both relays. Green display is not proof.","rule":"relays","next":"R12","glyphs":["A green board is not proof.","Sync changes state or it is theater."],"map":["#########################","#P......................#","#..G........B...........#","#.......................#","#......S.........S......#","#.......#########.......#","#.......#.......#.......#","#.......#.......#.......#","#.......#.......#.......E","#.......#.......#.......#","#.......#.......#.......#","#.......#########.......#","#......S.........S......#","#.......................#","#.U.........B........G..#","#.......................#","#########################"]},"R12":{"name":"Scan Layer","objective":"Scan hidden route data before trusting passage state.","rule":"scan","next":"R04","glyphs":["Scan before trust.","Unmapped routes remain unproven."],"map":["#######################","#P.G..................#","#....#...#...#...#....#","#....H...#...#...#....#","#....#...#...#...#....#","#....#...#...#...#....#","#....#...H...#...#....#","#....#...#...#........#","#....#...#...#...#....#","#....#...#.......#....#","#....#...#...#...#....#","#....#.......#...#....#","#....#...#...#...H....#","#........#...#...#....#","#.U..#...#...#...#....#","#.....................E","#######################"]},"R04":{"name":"Thermal Intake","objective":"Cool all active heat and vent sources before handoff.","rule":"heat","next":"R05","glyphs":["Thermal state is a route condition.","Cooling is validation, not comfort."],"map":["#######################","#P....................#","#..G.......V..........#","#...V.............V...#","#.....................#","#.....................#","#........######.......#","#........#....#.......#","#..V........B......V..E","#........#....#.......#","#........#....#.......#","#.........####........#","#.....................#","#...V.............V...#","#.U........V..........#","#.....................#","#######################"]},"R05":{"name":"Catalyst Basin","objective":"Dampen catalyst blocks. They are physical obstructions.","rule":"catalyst","next":"R06","glyphs":["Catalyst blocks are not background art.","Reduce amplification before validation."],"map":["#########################","#P......................#","#..G.........#.......B..#","#............#..CC......#","#....CC......#..C.......#","#....C.......#..........#","#............#..........#","#.......................E","#.........CC............#","#.........C..#.....CC...#","#............#.....C....#","#.......C....#C.........#","#.U..........#..........#","#.......................#","#########################"]},"R06":{"name":"Fault Gallery","objective":"Clear faults and confirm both relays for capstone validation.","rule":"faults_relays","next":"R07","glyphs":["Partial repair is a future failure.","The door tests the route, not the report."],"map":["###########################","#P........................#","#.U.####.####.####.####...#","#...#X.#.#S.#.#X.#.#S.#...#","#...#.##.#.##.#.##.#.##...#","#.........................#","#.........................#","#..G.........B............E","#.........................#","#...#.##.#.##.#.##.#.##...#","#...#X.#.#..#.#X.#.#..#...#","#...####.####.####.####...#","#.........................#","#.........................#","###########################"]},"R07":{"name":"Fault Recovery","objective":"Clear the live faults before the door will trust the route.","rule":"faults","next":"R08","glyphs":["Broken access is not failed access.","Clear the faults the route depends on."],"map":["#######################","#P....................#","#..G..................#","#...##................#","#..X..........X.......#","#.....##..............#","#......X..............#","#.......##............#","#..........X..........#","#.........##..........#","#..............X......#","#..........B##........#","#.....X...........X...#","#.............##......#","#.U...................#","#...............##....E","#######################"]},"R08":{"name":"Integration Gauntlet","objective":"Clear mixed failures and confirm all three relays.","rule":"mixed3","next":"R09","glyphs":["Integration is not a hallway.","Every system has to hold together."],"map":["#########################","#.......................#","#.########.....########.#","#.#......#.....#......#.#","#.#.....X#.....#V.....#.#","#.#.....X.......V.....#.#","#.#......#.....#......#.#","#.########.....########.#","#...........B...........#","#P.U........G...........E","#...........B...........#","#.########.....########.#","#.#....C.#.....#......#.#","#.#...C.........S....S#.#","#.#......#.....#S.....#.#","#.#......#.....#......#.#","#.########.....########.#","#.......................#","#########################"]},"R09":{"name":"Audit Mesh","objective":"Clear faults, scan hidden route data, and confirm both relays.","rule":"audit","next":"R10","glyphs":["Audit drift hides in clean-looking routes.","Scan before you sign."],"map":["#######################","#P....................#","#..G..................#","#..#.#.#.S.#.#.#.#.#..#","#.....................#","#..#.H.X.#.#.H.#.S.#..#","#.....................#","#..#.#.#.H.X.#.#.#.#..#","#.....................#","#..#.#.#.#.B.#.H.#.#..#","#.....................#","#..#.#.H.#.#.#.X.H.#..#","#.....................#","#..#.X.#.#.H.S.#.#.#..#","#.U...................#","#.....................E","#######################"]},"R10":{"name":"Thermal Relay","objective":"Cool thermal sources and confirm all three relays.","rule":"thermal_relays","next":"R11","glyphs":["Thermal pressure corrupts relay confidence.","Cool it before you trust it."],"map":["###########################","#.........................#","#..#########.G.#########..#","#..#.......#...#.......#..#","#..#.S.....#...#...S...#..#","#..#...V...#...#...V...#..#","#..#.......#...#.......#..#","#P.....B...........B......E","#..#.......#...#.......#..#","#..#.....V.#...#.....V.#..#","#..#.......#...#.......#..#","#..#.....S.#...#.....S.#..#","#..#########.U.#########..#","#.........................#","###########################"]},"R11":{"name":"Catalyst Fork","objective":"Dampen blocks, clear faults, and confirm both relays.","rule":"catalyst_fork","next":"R20","glyphs":["The fork only closes when material route is clear.","Faults and catalyst must both be accounted for."],"map":["#########################","#.......................#","#..G.....###B####.......#","#.......................#","#....C...#......#..X....#","#........########.......#","#.......................#","#.......................#","#P.....C....S..S.....X..E","#.......................#","#.......................#","#........########.......#","#....C.............X....#","#........#......#.......#","#.U......########.......#","#.......................#","#########################"]},"R13":{"name":"Final Integration Corridor","objective":"Clear final mixed failures and confirm all five relays.","rule":"final","next":"COMPLETE","glyphs":["Final integration means every failure class is accounted for.","The last door tests the route."],"map":["#############################","#...........................#","#.U.X.......V.......X...C...#","#...........................#","#.....###.....###.....###...#","#.....#.#.S...#.#.S...#.#...#","#.....###.....###.....###...#","#...........................#","#...........................#","#P........X.B.G...B.......D.E","#...........................#","#...........................#","#.....###.....###.....###...#","#.....#.#.S...#.#.S...#.#...#","#.....###.....###.....###...#","#...........................#","#...C.............V.......S.#","#...........................#","#############################"]},"R20":{"name":"Branch Junction","objective":"Clear the faults in the open bays. The exit door opens once the route validates.","rule":"faults","next":"R21","glyphs":["A door that opens on green still lied before it opened.","Prove it, then pass."],"map":["###########################","#P........................#","#..G..................#...#","#....X.....X.B...X....#...#","#.....................#...#","#.....................#...#","#.##.###.###.###.###.##...#","#.....................#...#","#.....................D...E","#.....X.....X.....X...#...#","#.....................#...#","#.....................#...#","#........X.....X......#...#","#.....................#...#","#.U...................#...#","#.........................#","###########################"]},"R21":{"name":"Sealed Annex","objective":"Confirm every relay in the open annex. The locked door opens on full relay proof.","rule":"relays","next":"R22","glyphs":["Locks are not malice. They are unproven trust.","Confirm, then cross."],"map":["#########################","#P......................#","#..G................#...#","#...................#...#","#....S......S.....S.#...#","#...................#...#","#...................#...#","#...................#...#","#............B......K...E","#...................#...#","#...................#...#","#....S......S.....S.#...#","#...................#...#","#...................#...#","#.U.................#...#","#.......................#","#########################"]},"R22":{"name":"Long Causeway","objective":"Cool every heat source in the open bays, then take the door to the exit.","rule":"heat","next":"R23","glyphs":["Distance hides drift.","Cool the whole span, not the near end."],"map":["###############################","#.U..V...V...V...V...V...V....#","#.............................#","#.###.####.####.####.####.###.#","#.............................#","#.............................#","#P.G...........B..............E","#.............................#","#.............................#","#.###.####.####.####.####.###.#","#.............................#","#....V...V...V...V...V...V....#","###############################"]},"R23":{"name":"Convergence Hub","objective":"Account for every failure class in the open hub, then cross the gates to exit.","rule":"mixed3","next":"R13","glyphs":["Convergence is where partial fixes meet and fail together.","Every wing or none."],"map":["###########################","#.........................#","#............B............#","#............X............#","#...X.................V...#","#.........................#","#........####.####........#","#........#.......#........#","#........#.......#........#","#P.U.........G....D.......E","#........#.......#........#","#........#.......#........#","#........####.####........#","#.........................#","#...C.................S...#","#.....................S...#","#............C............#","#............B............#","###########################"]}};
+const ORDER = ["R02","R03","R12","R04","R05","R06","R07","R08","R09","R10","R11","R20","R21","R22","R23","R13"];
+const TOOLS = [
+  {id:'SCAN',name:'SCAN',desc:'Reveal hidden route'},
+  {id:'SYNC',name:'SYNC',desc:'Confirm relay'},
+  {id:'THERM',name:'THERM',desc:'Cool heat'},
+  {id:'DAMP',name:'DAMP',desc:'Clear catalyst'},
+  {id:'READ',name:'READ',desc:'Read evidence'}
+];
+const canvas=document.getElementById('game'), ctx=canvas.getContext('2d');
+const hud={room:document.getElementById('roomPill'),valid:document.getElementById('validPill'),stb:document.getElementById('stbPill'),tool:document.getElementById('toolPill'),proof:document.getElementById('proofdeck'),proofTitle:document.getElementById('proofTitle'),proofNext:document.getElementById('proofNext'),proofObjective:document.getElementById('proofObjective'),proofChips:document.getElementById('proofChips')};
+let W=0,H=0,DPR=1,tileW=56,tileH=28,originX=0,originY=0,frame=0,state='TITLE';
+let current='R02', grid=[], width=0,height=0, flags={}, message=null, particles=[], bots=[], cooldown=0, selected=0, checkpoint=null, completed=false;
+let player={x:1.5,y:1.5,vx:0,vy:0,stb:3,inv:0,face:1};
+const keys={},just={};
+function cloneGrid(id){return SECTORS[id].map.map(r=>r.split(''));}
+function room(){return SECTORS[current];}
+function tile(c,r){if(c<0||r<0||c>=width||r>=height)return '#'; return grid[r][c];}
+function setTile(c,r,v){if(c>=0&&r>=0&&c<width&&r<height)grid[r][c]=v;}
+function key(c,r){return current+'_'+c+'_'+r;}
+function isSolid(t){return t==='#'||t==='C'||(t==='H'&&!flags[key(Math.floor(player.x),Math.floor(player.y))]);}
+function doorOpen(c,r){const t=tile(c,r);if(t==='D')return !!flags[current+'_validated'];if(t==='K')return !!flags[key(c,r)+'_unlocked'];return true;}
+function solidAt(x,y){const c=Math.floor(x), r=Math.floor(y), t=tile(c,r); if(t==='D'||t==='K')return !doorOpen(c,r); return t==='#'||t==='C'||t==='H';}
+function nearTiles(range=1.7){const out=[];const pc=Math.floor(player.x), pr=Math.floor(player.y);for(let r=pr-Math.ceil(range);r<=pr+Math.ceil(range);r++)for(let c=pc-Math.ceil(range);c<=pc+Math.ceil(range);c++){if(Math.hypot(c+0.5-player.x,r+0.5-player.y)<=range)out.push([c,r,tile(c,r)]);}return out;}
+function show(text,kind='info',dur=180){message={text,kind,t:dur};}
+function logParticle(x,y,color,count=8){for(let i=0;i<count;i++){particles.push({x,y,vx:(Math.random()-.5)*.08,vy:(Math.random()-.5)*.08,life:25+Math.random()*20,color});}}
+function findSpawn(ch='P'){for(let r=0;r<height;r++)for(let c=0;c<width;c++)if(grid[r][c]===ch)return {x:c+.5,y:r+.5};return {x:1.5,y:1.5};}
+function loadRoom(id, keepCheckpoint=false){current=id;grid=cloneGrid(id);height=grid.length;width=grid[0].length;flags[current+'_validated']=false;bots=[];for(let r=0;r<height;r++)for(let c=0;c<width;c++){const t=grid[r][c];if(t==='B'){bots.push({x:c+.5,y:r+.5,dir:1,axis:(bots.length%2?'y':'x'),min:Math.max(1,(bots.length%2?r:c)-2),max:Math.min((bots.length%2?height:width)-2,(bots.length%2?r:c)+3),stun:0});setTile(c,r,'.');}}
+  const sp=keepCheckpoint&&checkpoint&&checkpoint.room===id?checkpoint:findSpawn('P');player.x=sp.x;player.y=sp.y;player.vx=player.vy=0;player.inv=40;show(room().objective,'info',210);updateHUD();}
+function count(chars){let n=0;for(let r=0;r<height;r++)for(let c=0;c<width;c++)if(chars.includes(tile(c,r)))n++;return n;}
+function relayCount(){let total=0,on=0;for(let r=0;r<height;r++)for(let c=0;c<width;c++)if(tile(c,r)==='S'){total++; if(flags[key(c,r)+'_relay'])on++;}return {total,on};}
+function validate(){const rule=room().rule; const rel=relayCount(); let pass=false,detail='';
+  const faults=count(['X']), cat=count(['C']), heat=count(['V']);
+  const scanned=!!flags[current+'_scanned'];
+  if(rule==='faults'){pass=faults===0;detail=pass?'No live faults remain.':faults+' fault(s) still live.';}
+  else if(rule==='relays'){pass=rel.total>0&&rel.on===rel.total;detail=pass?'All relays confirmed.':'Relay state incomplete: '+rel.on+'/'+rel.total+'.';}
+  else if(rule==='scan'){pass=scanned;detail=pass?'Hidden route data scanned.':'Route still unmapped. Use SCAN.';}
+  else if(rule==='heat'){pass=heat===0;detail=pass?'All heat sources cooled.':heat+' heat source(s) still active.';}
+  else if(rule==='catalyst'){pass=cat===0;detail=pass?'Catalyst blocks dampened.':cat+' catalyst block(s) remain.';}
+  else if(rule==='faults_relays'){pass=faults===0&&rel.on===rel.total;detail=pass?'Faults clear and relays confirmed.':(faults?faults+' fault(s) live. ':'')+'Relays '+rel.on+'/'+rel.total+'.';}
+  else if(rule==='mixed3'){pass=faults===0&&cat===0&&heat===0&&rel.on===rel.total;detail=pass?'Mixed failures clear and relays confirmed.':(faults?faults+' fault(s). ':'')+(cat?cat+' catalyst. ':'')+(heat?heat+' heat. ':'')+'Relays '+rel.on+'/'+rel.total+'.';}
+  else if(rule==='audit'){pass=faults===0&&scanned&&rel.on===rel.total;detail=pass?'Audit mesh proven.':(faults?faults+' fault(s). ':'')+(!scanned?'Scan missing. ':'')+'Relays '+rel.on+'/'+rel.total+'.';}
+  else if(rule==='thermal_relays'){pass=heat===0&&rel.on===rel.total;detail=pass?'Thermal and relay state proven.':(heat?heat+' heat. ':'')+'Relays '+rel.on+'/'+rel.total+'.';}
+  else if(rule==='catalyst_fork'){pass=faults===0&&cat===0&&rel.on===rel.total;detail=pass?'Fork clear and relays confirmed.':(faults?faults+' fault(s). ':'')+(cat?cat+' catalyst. ':'')+'Relays '+rel.on+'/'+rel.total+'.';}
+  else if(rule==='final'){pass=faults===0&&cat===0&&heat===0&&rel.on===rel.total;detail=pass?'Final route proven. All systems hold.':(faults?faults+' fault(s). ':'')+(cat?cat+' catalyst. ':'')+(heat?heat+' heat. ':'')+'Relays '+rel.on+'/'+rel.total+'.';}
+  flags[current+'_validated']=pass; const hint=pass?'':' NEXT: '+nextProofAction()+'.'; show((pass?'ROUTE HOLDS. ':'DOOR HELD. ')+detail+hint,pass?'good':'bad',220);updateHUD();return pass;}
+function tryExit(){if(!validate())return; const next=room().next; if(next==='COMPLETE'){state='COMPLETE';completed=true;show('DISTRICT 01 ROUTE VALIDATED. YOU PROVED THE FIX.','good',9999);return;} loadRoom(next);}
+function interact(){let did=false;for(const [c,r,t] of nearTiles(1.7)){if(t==="E"){tryExit();return;} if(t==='K'){const rel=relayCount();if(rel.total>0&&rel.on===rel.total){flags[key(c,r)+'_unlocked']=true;show('LOCKED DOOR: opened. Relay proof accepted.','good');logParticle(c+.5,r+.5,'109,231,255',12);did=true;}else{show('LOCKED DOOR: needs all relays confirmed first ('+rel.on+'/'+rel.total+').','bad',150);did=true;}continue;} if(t==='S'){flags[key(c,r)+'_relay']=true;show('RELAY CONFIRMED. State changed, not assumed.','good');logParticle(c+.5,r+.5,'99,240,183');did=true;} if(t==='U'){player.stb=3;show('HEALTH SHOWER: stability restored.','good');logParticle(c+.5,r+.5,'143,231,255',12);did=true;} if(t==='G'){const texts=room().glyphs||[];show('EVIDENCE NODE: '+(texts[(c+r)%texts.length]||'Evidence matters.'),'info',240);did=true;}}
+ if(!did)show('No usable node in range.','info',90);updateHUD();}
+function useA(){if(cooldown>0)return; cooldown=18; let hits=0;for(const [c,r,t] of nearTiles(2.1)){if(t==='X'){setTile(c,r,'.');hits++;logParticle(c+.5,r+.5,'255,81,99',12);}}
+ for(const b of bots){if(Math.hypot(b.x-player.x,b.y-player.y)<=2.2){b.stun=120;hits++;}}
+ show(hits?'PULSE: cleared/stunned '+hits+' target(s).':'PULSE: no fault pressure in range.',hits?'good':'info');updateHUD();}
+function toolHasTarget(tool){
+ if(tool==='SCAN'){for(let r=0;r<height;r++)for(let c=0;c<width;c++)if(tile(c,r)==='H')return true;return false;}
+ if(tool==='READ')return true;
+ const want={'SYNC':'S','THERM':'V','DAMP':'C'}[tool];
+ if(!want)return false;
+ for(const [c,r,t] of nearTiles(2.25))if(t===want)return true;
+ return false;
+}
+function useB(){if(cooldown>0)return;
+ // If the selected tool has nothing to act on but a nearby hazard matches another tool, switch to it first.
+ const sugg=suggestTool();
+ if(sugg>=0&&sugg!==selected){const cur=TOOLS[selected].id;const curHasTarget=toolHasTarget(cur);if(!curHasTarget){selected=sugg;buildTools();updateHUD();show('AUTO-TOOL: '+TOOLS[selected].name+' (matched nearby system)','info',70);}}
+ cooldown=18; const tool=TOOLS[selected].id; let hits=0;
+ if(tool==='SCAN'){for(let r=0;r<height;r++)for(let c=0;c<width;c++)if(tile(c,r)==='H'){setTile(c,r,'.');hits++;logParticle(c+.5,r+.5,'83,212,255',6);} flags[current+'_scanned']=true;show(hits?'SCAN: hidden route data revealed.':'SCAN: sector state recorded.',hits?'good':'info');}
+ else if(tool==='SYNC'){for(const [c,r,t] of nearTiles(2.25)){if(t==='S'){flags[key(c,r)+'_relay']=true;hits++;logParticle(c+.5,r+.5,'99,240,183',12);}}show(hits?'SYNC: relay state confirmed.':'SYNC: no relay in confirmed range.',hits?'good':'bad');}
+ else if(tool==='THERM'){for(const [c,r,t] of nearTiles(2.25)){if(t==='V'){setTile(c,r,'.');hits++;logParticle(c+.5,r+.5,'255,148,72',12);}}show(hits?'THERM: cooled '+hits+' source(s).':'THERM: no heat source in range.',hits?'good':'info');}
+ else if(tool==='DAMP'){for(const [c,r,t] of nearTiles(2.25)){if(t==='C'){setTile(c,r,'.');hits++;logParticle(c+.5,r+.5,'206,92,255',14);}}show(hits?'DAMP: catalyst block(s) cleared.':'DAMP: no catalyst in range.',hits?'good':'info');}
+ else if(tool==='READ'){let found=false;for(const [c,r,t] of nearTiles(2.0)){if(t==='G'){found=true;const texts=room().glyphs||[];show('READ: '+(texts[(c+r)%texts.length]||'Evidence preserved.'),'info',240);}} if(!found)show('READ: no archive node in range.','info');}
+ updateHUD();}
+function rotateTool(){selected=(selected+1)%TOOLS.length;buildTools();updateHUD();show('B-tool set: '+TOOLS[selected].name,'info',70);}
+function selectTool(i){if(i<0||i>=TOOLS.length)return;selected=i;buildTools();updateHUD();show('B-tool set: '+TOOLS[selected].name,'info',70);}
+// Suggest the right tool for whatever hazard is in range, so players aren't hunting through the tray.
+const HAZARD_TOOL={'H':'SCAN','S':'SYNC','V':'THERM','C':'DAMP','G':'READ'};
+function suggestTool(){const counts={};for(const [c,r,t] of nearTiles(2.4)){if(HAZARD_TOOL[t])counts[HAZARD_TOOL[t]]=(counts[HAZARD_TOOL[t]]||0)+1;}
+ let bestId=null,bestN=0;for(const id in counts){if(counts[id]>bestN){bestN=counts[id];bestId=id;}}
+ if(!bestId)return -1;return TOOLS.findIndex(t=>t.id===bestId);}
+
+function proofItems(){
+ const r=room(), rel=relayCount(), faults=count(['X']), cat=count(['C']), heat=count(['V']), hidden=count(['H']), scanned=!!flags[current+'_scanned'];
+ const items=[];
+ const add=(label,ok,value,tool)=>items.push({label,ok,value,tool});
+ if(['faults','faults_relays','mixed3','audit','catalyst_fork','final'].includes(r.rule))add('FAULTS',faults===0,faults===0?'CLEAR':faults+' LIVE','PULSE');
+ if(['heat','mixed3','thermal_relays','final'].includes(r.rule))add('HEAT',heat===0,heat===0?'COOLED':heat+' ACTIVE','THERM');
+ if(['catalyst','mixed3','catalyst_fork','final'].includes(r.rule))add('CATALYST',cat===0,cat===0?'DAMPED':cat+' BLOCKS','DAMP');
+ if(['relays','faults_relays','mixed3','audit','thermal_relays','catalyst_fork','final'].includes(r.rule))add('RELAYS',rel.total>0&&rel.on===rel.total,rel.on+'/'+rel.total,'SYNC');
+ if(['scan','audit'].includes(r.rule))add('SCAN',scanned,scanned?'MAPPED':(hidden?hidden+' HIDDEN':'UNMAPPED'),'SCAN');
+ return items;
+}
+function nextProofAction(){
+ const bad=proofItems().find(i=>!i.ok);
+ if(!bad)return 'VALIDATE DOOR';
+ if(bad.tool==='PULSE')return 'A / PULSE → '+bad.label;
+ return 'B / '+bad.tool+' → '+bad.label;
+}
+function updateProofDeck(){
+ if(!hud.proof)return;
+ const items=proofItems();
+ hud.proofTitle.textContent=current+' · '+room().name;
+ hud.proofObjective.textContent=room().objective;
+ hud.proofNext.textContent='NEXT: '+nextProofAction();
+ hud.proofChips.innerHTML='';
+ items.forEach(i=>{const d=document.createElement('div');d.className='proofChip '+(i.ok?'ok':'bad');d.textContent=i.label+': '+i.value;hud.proofChips.appendChild(d);});
+ if(!items.length){const d=document.createElement('div');d.className='proofChip neutral';d.textContent='VALIDATE: DOOR TEST';hud.proofChips.appendChild(d);}
+}
+
+function updateHUD(){hud.room.textContent='D01 · '+current+' · '+room().name;hud.stb.textContent='STB '+player.stb+'/3';hud.tool.textContent='B: '+TOOLS[selected].name;const v=!!flags[current+'_validated'];hud.valid.textContent=v?'VALIDATED':'UNVERIFIED';hud.valid.classList.toggle('good',v);hud.valid.classList.toggle('bad',!v);updateProofDeck();}
+function buildTools(){const box=document.getElementById('tools');box.innerHTML='';const sugg=state==='PLAY'?suggestTool():-1;TOOLS.forEach((t,i)=>{const d=document.createElement('div');d.className='tool'+(i===selected?' sel':'')+(i===sugg&&i!==selected?' sugg':'');d.innerHTML='<b>'+t.name+'</b><span>'+t.desc+'</span>';d.addEventListener('click',()=>selectTool(i));box.appendChild(d);});}
+function damage(){if(player.inv>0)return;player.stb--;player.inv=70;show('STABILITY HIT. System pressure punished unverified movement.','bad',120);if(player.stb<=0){player.stb=3;show('SETBACK: restored at room entry/checkpoint.','bad',180);loadRoom(current,true);}updateHUD();}
+function update(dt){if(state!=='PLAY')return; if(cooldown>0)cooldown--; if(player.inv>0)player.inv--; if(message&&--message.t<=0)message=null;
+ let mx=0,my=0;if(keys.left||joy.left)mx--;if(keys.right||joy.right)mx++;if(keys.up||joy.up)my--;if(keys.down||joy.down)my++;const sp=.062;if(mx||my){const len=Math.hypot(mx,my);mx/=len;my/=len;player.face=mx<0?-1:mx>0?1:player.face;const nx=player.x+mx*sp*dt,ny=player.y+my*sp*dt;if(!solidAt(nx,player.y))player.x=nx;if(!solidAt(player.x,ny))player.y=ny;}
+ const ct=tile(Math.floor(player.x),Math.floor(player.y)); if(ct==='X'||ct==='V')damage(); if(ct==='E'&&just.autoExit)tryExit();
+ for(const b of bots){if(b.stun>0){b.stun--;continue;}const step=.022*dt;if(b.axis==='x'){b.x+=step*b.dir;if(b.x<b.min||b.x>b.max){b.dir*=-1;b.x=Math.max(b.min,Math.min(b.max,b.x));}}else{b.y+=step*b.dir;if(b.y<b.min||b.y>b.max){b.dir*=-1;b.y=Math.max(b.min,Math.min(b.max,b.y));}}if(Math.hypot(b.x-player.x,b.y-player.y)<.65)damage();}
+ for(let i=particles.length-1;i>=0;i--){const p=particles[i];p.x+=p.vx*dt;p.y+=p.vy*dt;p.life-=dt;if(p.life<=0)particles.splice(i,1);} }
+function iso(x,y,z=0){return {x:originX+(x-y)*tileW/2,y:originY+(x+y)*tileH/2-z};}
+function drawDiamond(x,y,w,h,fill,stroke){ctx.beginPath();ctx.moveTo(x,y-h/2);ctx.lineTo(x+w/2,y);ctx.lineTo(x,y+h/2);ctx.lineTo(x-w/2,y);ctx.closePath();ctx.fillStyle=fill;ctx.fill();if(stroke){ctx.strokeStyle=stroke;ctx.lineWidth=1;ctx.stroke();}}
+function tileColors(t){if(t==='#')return ['#172432','#294052']; if(t==='X')return ['#54202a','#ff5163']; if(t==='C')return ['#3f1d50','#ce5cff']; if(t==='V')return ['#5a2a1b','#ff9448']; if(t==='S')return ['#143028','#63f0b7']; if(t==='G')return ['#123044','#53d4ff']; if(t==='E')return ['#172d24','#7ef0b2']; if(t==='H')return ['#101824','#31475a']; if(t==='U')return ['#173143','#8fe7ff']; if(t==='D')return ['#2a2118','#f7ba55']; if(t==='K')return ['#2a1820','#ff6f86']; return ['#1d2a36','#385066'];}
+function render(){ctx.clearRect(0,0,W,H); const bg=ctx.createLinearGradient(0,0,0,H);bg.addColorStop(0,'#07131c');bg.addColorStop(1,'#03070c');ctx.fillStyle=bg;ctx.fillRect(0,0,W,H);
+ if(state==='TITLE')return; if(state==='COMPLETE'){drawComplete();return;}
+ // Camera follows Eli so the isometric map remains playable on phone screens.
+ originX=W/2-(player.x-player.y)*tileW/2; originY=H*.42-(player.x+player.y)*tileH/2;
+ // draw floor/objects in iso order
+ for(let r=0;r<height;r++){for(let c=0;c<width;c++){const t=tile(c,r);const p=iso(c+.5,r+.5,0);const col=tileColors(t); const closedDoor=(t==='D'||t==='K')&&!doorOpen(c,r); if(t==='#'||closedDoor){drawDiamond(p.x,p.y,tileW,tileH,'#101b26','rgba(130,176,205,.18)'); // wall/closed-door block
+   const h=closedDoor?12:16;const top=iso(c+.5,r+.5,h);const capCol=closedDoor?col[0]:'#172432';drawDiamond(top.x,top.y,tileW,tileH,capCol,closedDoor?col[1]:'rgba(130,176,205,.20)');ctx.fillStyle='rgba(0,0,0,.28)';ctx.beginPath();ctx.moveTo(top.x+tileW/2,top.y);ctx.lineTo(p.x+tileW/2,p.y);ctx.lineTo(p.x,p.y+tileH/2);ctx.lineTo(top.x,top.y+tileH/2);ctx.closePath();ctx.fill();ctx.fillStyle='rgba(255,255,255,.04)';ctx.beginPath();ctx.moveTo(top.x-tileW/2,top.y);ctx.lineTo(top.x,top.y+tileH/2);ctx.lineTo(p.x,p.y+tileH/2);ctx.lineTo(p.x-tileW/2,p.y);ctx.closePath();ctx.fill(); }
+  else {drawDiamond(p.x,p.y,tileW,tileH,col[0], 'rgba(120,160,185,.13)'); if((t==='D'||t==='K')&&doorOpen(c,r)){ctx.strokeStyle=col[1];ctx.lineWidth=1.5;ctx.strokeRect(p.x-tileW*.3,p.y-tileH*.3,tileW*.6,tileH*.6);} else if(t!=='.'&&t!=='P'&&t!=='B'){drawMarker(t,p.x,p.y,col[1]);}}
+ }}
+ // bots, player, particles
+ bots.forEach(drawBot); drawPlayer(); particles.forEach(p=>{const q=iso(p.x,p.y,18);ctx.fillStyle='rgba('+p.color+','+Math.max(0,p.life/45)+')';ctx.beginPath();ctx.arc(q.x,q.y,3,0,Math.PI*2);ctx.fill();});
+ drawOverlay();}
+function drawMarker(t,x,y,color){ctx.save();ctx.fillStyle=color;ctx.strokeStyle='rgba(238,248,255,.45)';ctx.lineWidth=1.5;if(t==='S'){ctx.beginPath();ctx.arc(x,y-10,9,0,Math.PI*2);ctx.fill();ctx.stroke();}else if(t==='G'){ctx.translate(x,y-11);ctx.rotate(Math.PI/4+frame*.01);ctx.strokeRect(-7,-7,14,14);}else if(t==='E'){ctx.fillRect(x-13,y-22,26,22);ctx.strokeRect(x-13,y-22,26,22);}else if(t==='X'){ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(x-8,y-15);ctx.lineTo(x+8,y-3);ctx.moveTo(x+8,y-15);ctx.lineTo(x-8,y-3);ctx.strokeStyle=color;ctx.stroke();}else if(t==='C'){ctx.translate(x,y-10);ctx.rotate(Math.PI/4);ctx.fillRect(-8,-8,16,16);ctx.strokeRect(-8,-8,16,16);}else if(t==='V'){ctx.beginPath();ctx.moveTo(x,y-22);ctx.lineTo(x+12,y-2);ctx.lineTo(x-12,y-2);ctx.closePath();ctx.fill();}else if(t==='H'){ctx.fillStyle='rgba(83,212,255,.10)';ctx.fillRect(x-12,y-15,24,6);}else if(t==='U'){ctx.fillRect(x-10,y-25,20,24);ctx.strokeRect(x-10,y-25,20,24);}ctx.restore();}
+function drawPlayer(){const q=iso(player.x,player.y,18);ctx.save();if(player.inv>0&&Math.floor(player.inv/5)%2===0){ctx.globalAlpha=.45;}ctx.fillStyle='rgba(0,0,0,.35)';ctx.beginPath();ctx.ellipse(q.x,q.y+14,14,6,0,0,Math.PI*2);ctx.fill();ctx.fillStyle='#3393d5';ctx.fillRect(q.x-8,q.y-16,16,18);ctx.fillStyle='#d4b27b';ctx.beginPath();ctx.arc(q.x,q.y-23,8,0,Math.PI*2);ctx.fill();ctx.fillStyle='#1a2430';ctx.fillRect(q.x-8,q.y-30,16,6);ctx.fillStyle='#eef8ff';ctx.fillRect(q.x+(player.face>0?2:-6),q.y-24,4,2);ctx.restore();}
+function drawBot(b){const q=iso(b.x,b.y,16);ctx.save();ctx.fillStyle=b.stun>0?'#8b6cff':'#e040fb';ctx.strokeStyle='rgba(238,248,255,.25)';ctx.fillRect(q.x-12,q.y-16,24,16);ctx.strokeRect(q.x-12,q.y-16,24,16);ctx.fillStyle=b.stun>0?'#c5baff':'#ff95f7';ctx.fillRect(q.x-5,q.y-11,10,3);ctx.restore();}
+function drawOverlay(){ctx.save();ctx.font='700 13px system-ui';ctx.textAlign='left';if(message){const w=Math.min(W-32,620),x=16,y=H-96;ctx.fillStyle=message.kind==='bad'?'rgba(80,15,28,.92)':message.kind==='good'?'rgba(13,54,40,.92)':'rgba(7,16,26,.92)';round(x,y,w,70,14);ctx.fill();ctx.strokeStyle=message.kind==='bad'?'rgba(255,101,119,.48)':message.kind==='good'?'rgba(108,240,174,.48)':'rgba(83,212,255,.38)';ctx.stroke();ctx.fillStyle='#eaf8ff';wrapText(message.text,x+18,y+27,w-36,18);}ctx.restore();}
+function drawComplete(){ctx.fillStyle='#03070c';ctx.fillRect(0,0,W,H);ctx.textAlign='center';ctx.fillStyle='#53d4ff';ctx.font='800 34px system-ui';ctx.fillText('DISTRICT 01',W/2,H*.36);ctx.fillStyle='#6cf0ae';ctx.font='800 22px system-ui';ctx.fillText('ROUTE VALIDATED',W/2,H*.46);ctx.fillStyle='#c8dde8';ctx.font='700 15px system-ui';ctx.fillText('YOU PROVED THE FIX. GREEN WAS NOT ENOUGH.',W/2,H*.55);ctx.fillStyle='rgba(200,221,232,.7)';ctx.fillText('PRESS START TO RESTART',W/2,H*.68);}
+function round(x,y,w,h,r){ctx.beginPath();ctx.moveTo(x+r,y);ctx.lineTo(x+w-r,y);ctx.quadraticCurveTo(x+w,y,x+w,y+r);ctx.lineTo(x+w,y+h-r);ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h);ctx.lineTo(x+r,y+h);ctx.quadraticCurveTo(x,y+h,x,y+h-r);ctx.lineTo(x,y+r);ctx.quadraticCurveTo(x,y,x+r,y)}
+function wrapText(text,x,y,maxW,lineH){const words=text.split(' ');let line='';for(const word of words){const test=line?line+' '+word:word;if(ctx.measureText(test).width>maxW){ctx.fillText(line,x,y);line=word;y+=lineH;}else line=test;}if(line)ctx.fillText(line,x,y);}
+function resize(){DPR=Math.min(2,window.devicePixelRatio||1);const maxW=Math.min(window.innerWidth-16,960);const maxH=Math.max(420,Math.min(window.innerHeight*0.62,660));canvas.style.width=maxW+'px';canvas.style.height=maxH+'px';W=Math.floor(maxW*DPR);H=Math.floor(maxH*DPR);canvas.width=W;canvas.height=H;ctx.setTransform(DPR,0,0,DPR,0,0);W=maxW;H=maxH;tileW=Math.max(38,Math.min(56,W/12));tileH=tileW*.5;originX=W/2;originY=34;}
+function start(){document.getElementById('title').classList.add('hidden');state='PLAY';completed=false;flags={};checkpoint=null;player.stb=3;loadRoom('R02');}
+function restart(){state='PLAY';completed=false;flags={};checkpoint=null;player.stb=3;loadRoom('R02');}
+function onPress(k){if(state==='TITLE'&&(k==='start'||k==='a')){start();return;}if(state==='COMPLETE'&&(k==='start'||k==='a')){restart();return;}if(state!=='PLAY')return;if(k==='a')useA();else if(k==='b')useB();else if(k==='interact')interact();else if(k==='rotate')rotateTool();else if(k==='start')show(room().objective,'info',160);}
+window.addEventListener('keydown',e=>{const m={ArrowUp:'up',ArrowDown:'down',ArrowLeft:'left',ArrowRight:'right',w:'up',W:'up',a:'left',A:'left',s:'down',S:'down',d:'right',D:'right',' ':'a',z:'a',Z:'a',j:'a',J:'a',x:'b',X:'b',k:'b',K:'b',e:'interact',E:'interact',y:'interact',Y:'interact',r:'rotate',R:'rotate',Tab:'rotate',Enter:'start',Escape:'start'}[e.key];if(m){e.preventDefault();if(!keys[m])onPress(m);keys[m]=true;just[m]=true;}});
+window.addEventListener('keyup',e=>{const m={ArrowUp:'up',ArrowDown:'down',ArrowLeft:'left',ArrowRight:'right',w:'up',W:'up',a:'left',A:'left',s:'down',S:'down',d:'right',D:'right',' ':'a',z:'a',Z:'a',j:'a',J:'a',x:'b',X:'b',k:'b',K:'b',e:'interact',E:'interact',y:'interact',Y:'interact',r:'rotate',R:'rotate',Tab:'rotate',Enter:'start',Escape:'start'}[e.key];if(m)keys[m]=false;});
+document.querySelectorAll('[data-key]').forEach(btn=>{const k=btn.dataset.key;const down=e=>{e.preventDefault();if(!keys[k])onPress(k);keys[k]=true;btn.classList.add('pressed');};const up=e=>{e.preventDefault();keys[k]=false;btn.classList.remove('pressed');};btn.addEventListener('touchstart',down,{passive:false});btn.addEventListener('touchend',up,{passive:false});btn.addEventListener('touchcancel',up,{passive:false});btn.addEventListener('pointerdown',down);btn.addEventListener('pointerup',up);btn.addEventListener('pointerleave',up);});
+document.getElementById('title').addEventListener('click',start);
+// HITL-style floating joystick: base recenters to first touch, knob tracks, 4-way thresholded into joy booleans.
+let joy={left:false,right:false,up:false,down:false};
+function bindJoy(){
+ const z=document.getElementById('joyZone'),base=document.getElementById('joyBase'),knob=document.getElementById('joyKnob');
+ let active=false,pid=null,ox=0,oy=0;
+ function set(nx,ny){joy.left=nx<-.3;joy.right=nx>.3;joy.up=ny<-.3;joy.down=ny>.3;}
+ function clearJoy(){joy.left=joy.right=joy.up=joy.down=false;}
+ z.addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();if(state!=='PLAY')return;active=true;pid=e.pointerId;z.setPointerCapture&&z.setPointerCapture(pid);const r=z.getBoundingClientRect();ox=e.clientX;oy=e.clientY;base.style.left=(e.clientX-r.left-60)+'px';base.style.bottom=(r.bottom-e.clientY-60)+'px';mv(e);},{passive:false});
+ function mv(e){if(!active||e.pointerId!==pid)return;const dx=e.clientX-ox,dy=e.clientY-oy,mag=Math.hypot(dx,dy)||1,rad=46,k=Math.min(mag,rad);knob.style.transform='translate('+(dx/mag*k)+'px,'+(dy/mag*k)+'px)';if(mag<10)clearJoy();else set(dx/mag,dy/mag);}
+ z.addEventListener('pointermove',e=>{e.preventDefault();mv(e);},{passive:false});
+ function end(e){if(e.pointerId!==pid)return;active=false;pid=null;clearJoy();knob.style.transform='translate(0,0)';base.style.left='34px';base.style.bottom='28px';}
+ z.addEventListener('pointerup',end,{passive:false});z.addEventListener('pointercancel',end,{passive:false});
+}
+bindJoy();
+function loop(ts){frame++;update(1);render();if(state==='PLAY'&&frame%12===0)buildTools();for(const k in just)delete just[k];requestAnimationFrame(loop);}window.addEventListener('resize',resize);resize();buildTools();updateHUD();requestAnimationFrame(loop);
 </script>
 </body>
 </html>
